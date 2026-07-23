@@ -1,8 +1,8 @@
-# Data Load Conditions
+# 数据加载条件 {#data-load-conditions}
 
-Sometimes, it is desirable to disable or enable certain features if another mod is present, or if any mod adds another type of ore, etc. For these use cases, NeoForge adds data load conditions. These were originally called recipe conditions, since recipes were the original use case for this system, but it has since been extended to other systems. This is also why some of the built-in conditions are limited to items.
+有时，你会希望在存在另一个 Mod、或某个 Mod 添加了另一种矿石等情况下，启用或禁用某些功能。针对这些用例，NeoForge 添加了数据加载条件（data load conditions）。它们最初被称为配方条件（recipe conditions），因为配方是该系统的最初用例，但此后已扩展到其他系统。这也是为什么某些内置条件仅限于物品。
 
-Most JSON files can optionally declare a `neoforge:conditions` block in the root, which will be evaluated before the data file is actually loaded. Loading will continue if and only if all conditions pass, otherwise the data file will be ignored. (The exception to this rule are [loot tables][loottable], which will be replaced with an empty loot table instead.)
+大多数 JSON 文件都可以在其根部选择性地声明一个 `neoforge:conditions` 块，它会在数据文件真正被加载之前进行求值。当且仅当所有条件都通过时，加载才会继续，否则该数据文件将被忽略。（此规则的例外是[战利品表][loottable]，它们会被替换为一个空的战利品表。）
 
 ```json5
 {
@@ -20,7 +20,7 @@ Most JSON files can optionally declare a `neoforge:conditions` block in the root
 ```
 
 :::note
-If the value to load is not a map/object, it is stored within `neoforge:value`:
+如果要加载的值不是一个映射／对象，则它存储在 `neoforge:value` 中：
 
 ```json5
 {
@@ -30,7 +30,7 @@ If the value to load is not a map/object, it is stored within `neoforge:value`:
 ```
 :::
 
-For example, if we want to only load our file if a mod with id `examplemod` is present, our file would look something like this:
+例如，若我们只想在存在 id 为 `examplemod` 的 Mod 时才加载文件，我们的文件大致如下：
 
 ```json5
 {
@@ -48,14 +48,14 @@ For example, if we want to only load our file if a mod with id `examplemod` is p
 ```
 
 :::note
-Most vanilla files have been patched to use conditions using the `ConditionalCodec` wrapper. However, not all systems, especially those not using a [codec], can use conditions. To find out whether a data file can use conditions, check the backing codec definition. 
+大多数原版文件已被修补，改用 `ConditionalCodec` 包装器来支持条件。然而，并非所有系统都能使用条件，尤其是那些不使用 [Codec][codec] 的系统。要弄清楚某个数据文件能否使用条件，请检查其背后的 codec 定义。
 :::
 
-## Built-In Conditions
+## 内置条件 {#built-in-conditions}
 
-### `neoforge:always` and `neoforge:never`
+### `neoforge:always` 与 `neoforge:never` {#neoforgealways-and-neoforgenever}
 
-These consist of no data and return the expected value.
+它们不含任何数据，并返回预期的值。
 
 ```json5
 {
@@ -65,18 +65,18 @@ These consist of no data and return the expected value.
 ```
 
 :::tip
-Using the `neoforge:never` condition very cleanly allows disabling any data file. Simply place a file with the following contents at the needed location:
+使用 `neoforge:never` 条件可以非常干净地禁用任何数据文件。只需在所需位置放置一个内容如下的文件：
 
 ```json5
 {"neoforge:conditions":[{"type":"neoforge:never"}]}
 ```
 
-Disabling files this way will **not** cause log spam.
+以这种方式禁用文件**不会**造成日志刷屏。
 :::
 
-### `neoforge:not`
+### `neoforge:not` {#neoforgenot}
 
-This condition accepts another condition and inverts it.
+该条件接受另一个条件并将其取反。
 
 ```json5
 {
@@ -88,9 +88,9 @@ This condition accepts another condition and inverts it.
 }
 ```
 
-### `neoforge:and` and `neoforge:or`
+### `neoforge:and` 与 `neoforge:or` {#neoforgeand-and-neoforgeor}
 
-These conditions accept the condition(s) being operated upon and apply the expected logic. There is no limit to the amount of accepted conditions.
+这些条件接受被操作的条件并施加预期的逻辑。所接受的条件数量没有限制。
 
 ```json5
 {
@@ -107,9 +107,9 @@ These conditions accept the condition(s) being operated upon and apply the expec
 }
 ```
 
-### `neoforge:mod_loaded`
+### `neoforge:mod_loaded` {#neoforgemod_loaded}
 
-This condition returns true if a mod with the given mod id is loaded, and false otherwise.
+若给定 mod id 的 Mod 已加载，该条件返回 true，否则返回 false。
 
 ```json5
 {
@@ -119,9 +119,9 @@ This condition returns true if a mod with the given mod id is loaded, and false 
 }
 ```
 
-### `neoforge:registered`
+### `neoforge:registered` {#neoforgeregistered}
 
-This condition returns true if an object in a specific registry with the given registry name has been registered, and false otherwise.
+若某个特定注册表中已注册了给定注册名的对象，该条件返回 true，否则返回 false。
 
 ```json5
 {
@@ -134,9 +134,9 @@ This condition returns true if an object in a specific registry with the given r
 }
 ```
 
-### `neoforge:tag_empty`
+### `neoforge:tag_empty` {#neoforgetag_empty}
 
-This condition returns true if the given registry [tag] is empty, and false otherwise.
+若给定的注册表[标签][tag]为空，该条件返回 true，否则返回 false。
 
 ```json5
 {
@@ -149,9 +149,9 @@ This condition returns true if the given registry [tag] is empty, and false othe
 }
 ```
 
-### `neoforge:feature_flags_enabled`
+### `neoforge:feature_flags_enabled` {#neoforgefeature_flags_enabled}
 
-This condition returns true if the provided [feature flags][flags] are enabled, and false otherwise.
+若所提供的[特性标志][flags]已启用，该条件返回 true，否则返回 false。
 
 ```json5
 {
@@ -163,11 +163,11 @@ This condition returns true if the provided [feature flags][flags] are enabled, 
 }
 ```
 
-## Creating Custom Conditions
+## 创建自定义条件 {#creating-custom-conditions}
 
-Custom conditions can be created by implementing `ICondition` and its `#test(IContext)` method, as well as creating a [map codec][codec] for it. The `IContext` parameter in `#test` has access to some parts of the game state. Currently, this only allows you to query tags from registries. Some objects with conditions may be loaded earlier than tags, in which case the context will be `IContext.EMPTY` and not contain any tag information at all.
+自定义条件可以通过实现 `ICondition` 及其 `#test(IContext)` 方法，并为其创建一个[映射 codec][codec] 来创建。`#test` 中的 `IContext` 参数可以访问游戏状态的某些部分。目前，它只允许你从注册表中查询标签。某些带条件的对象可能比标签更早加载，这种情况下上下文将是 `IContext.EMPTY`，完全不包含任何标签信息。
 
-For example, let's assume we want to implement an `xor` condition, then our condition would look something like this:
+例如，假设我们想实现一个 `xor` 条件，那么我们的条件大致如下：
 
 ```java
 public record XorCondition(ICondition first, ICondition second) implements ICondition {
@@ -188,7 +188,7 @@ public record XorCondition(ICondition first, ICondition second) implements ICond
 }
 ```
 
-Conditions are a registry of codecs. As such, we need to [register] our codec, like so:
+条件是一个 codec 的注册表。因此，我们需要[注册][register]我们的 codec，如下所示：
 
 ```java
 public static final DeferredRegister<MapCodec<? extends ICondition>> CONDITION_CODECS =
@@ -198,7 +198,7 @@ public static final Supplier<MapCodec<XorCondition>> XOR =
         CONDITION_CODECS.register("xor", () -> XorCondition.CODEC);
 ```
 
-And then, we can use our condition in some data file (assuming we registered the condition under the `examplemod` namespace):
+然后，我们就可以在某个数据文件中使用我们的条件（假设我们在 `examplemod` 命名空间下注册了该条件）：
 
 ```json5
 {
@@ -219,17 +219,17 @@ And then, we can use our condition in some data file (assuming we registered the
 }
 ```
 
-## Datagen
+## 数据生成 {#datagen}
 
-While any datapack JSON file can use load conditions, only a few [data providers][datagen] have been modified to be able to generate them. These include:
+虽然任何数据包 JSON 文件都可以使用加载条件，但只有少数[数据提供器][datagen]被修改为能够生成它们。这些包括：
 
-- [`RecipeProvider`][recipeprovider] (via `RecipeOutput#withConditions`), including recipe advancements
-- `JsonCodecProvider` and its subclass `SpriteSourceProvider`
+- [`RecipeProvider`][recipeprovider]（通过 `RecipeOutput#withConditions`），包括配方进度
+- `JsonCodecProvider` 及其子类 `SpriteSourceProvider`
 - [`DataMapProvider`][datamapprovider]
 - [`GlobalLootModifierProvider`][glmprovider]
-- [`DatapackBuiltinEntriesProvider`][datapackentries] (via `Map<ResourceKey<?>, List<ICondition>>` parameter)
+- [`DatapackBuiltinEntriesProvider`][datapackentries]（通过 `Map<ResourceKey<?>, List<ICondition>>` 参数）
 
-For the conditions themselves, the `NeoForgeConditions` class provides static helpers for each of the built-in condition types that return the corresponding `ICondition`s.
+对于条件本身，`NeoForgeConditions` 类为每种内置条件类型提供了静态辅助方法，它们会返回对应的 `ICondition`。
 
 [codec]: ../../datastorage/codecs
 [datagen]: ../index.md#data-generation

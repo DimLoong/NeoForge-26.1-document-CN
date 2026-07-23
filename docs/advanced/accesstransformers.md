@@ -1,22 +1,22 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Access Transformers
+# 访问转换器 {#access-transformers}
 
-Access Transformers (ATs for short) allow for widening the visibility and modifying the `final` flags of classes, methods, and fields. They allow modders to access and modify otherwise inaccessible members in classes outside their control.
+访问转换器（Access Transformer，简称 AT）用于放宽类、方法和字段的可见性，并修改它们的 `final` 标志。借助它们，Mod 开发者可以访问并修改那些位于自己无法控制的类中、原本无法访问的成员。
 
-The [specification document][specs] can be viewed on the NeoForged GitHub.
+可以在 NeoForged GitHub 上查看[规范文档][specs]。
 
-## Adding ATs
+## 添加 AT {#adding-ats}
 
-Adding an Access Transformer to your mod project is as simple as adding a single line into your `build.gradle`:
+向 Mod 项目添加访问转换器非常简单，只需在 `build.gradle` 中加入一行即可：
 
-Access Transformers need to be declared in `build.gradle`. AT files can be specified anywhere as long as they are copied to the `resources` output directory on compilation.
+访问转换器需要在 `build.gradle` 中声明。AT 文件可以放在任意位置，只要它在编译时会被复制到 `resources` 输出目录即可。
 
 <Tabs defaultValue="mdg">
 <TabItem value="mdg" label="ModDevGradle">
 
-No need to do anything here by default!
+默认情况下这里无需做任何事情！
 
 </TabItem>
 <TabItem value="ng" label="NeoGradle">
@@ -33,7 +33,7 @@ minecraft {
 </TabItem>
 </Tabs>
 
-By default, NeoForge will search for `META-INF/accesstransformer.cfg`. If the `build.gradle` specifies access transformers in any other location, then their location needs to be defined within `neoforge.mods.toml`:
+默认情况下，NeoForge 会查找 `META-INF/accesstransformer.cfg`。如果 `build.gradle` 将访问转换器指定在其他任意位置，则需要在 `neoforge.mods.toml` 中定义它们的位置：
 
 ```toml
 # In neoforge.mods.toml:
@@ -43,7 +43,7 @@ By default, NeoForge will search for `META-INF/accesstransformer.cfg`. If the `b
 file="META-INF/accesstransformer.cfg"
 ```
 
-Additionally, multiple AT files can be specified and will be applied in order. This can be useful for larger mods with multiple packages.
+此外，可以指定多个 AT 文件，它们会按顺序应用。这对于包含多个包的大型 Mod 很有用。
 
 <Tabs defaultValue="mdg">
 <TabItem value="mdg" label="ModDevGradle">
@@ -81,81 +81,81 @@ file="accesstransformer.cfg"
 file="accesstransformer_additions.cfg"
 ```
 
-After adding or modifying any Access Transformer, the Gradle project must be refreshed for the transformations to take effect.
+添加或修改任何访问转换器后，必须刷新 Gradle 项目，转换才会生效。
 
-## The Access Transformer Specification
+## 访问转换器规范 {#the-access-transformer-specification}
 
-### Comments
+### 注释 {#comments}
 
-All text after a `#` until the end of the line will be treated as a comment and will not be parsed.
+`#` 之后直到行尾的所有文本都会被视为注释，不会被解析。
 
-### Access Modifiers
+### 访问修饰符 {#access-modifiers}
 
-Access modifiers specify to what new member visibility the given target will be transformed to. In decreasing order of visibility:
+访问修饰符指定给定目标将被转换成的新成员可见性。按可见性从高到低排列：
 
-- `public` - visible to all classes inside and outside its package
-- `protected` - visible only to classes inside the package and subclasses
-- `default` - visible only to classes inside the package
-- `private` - visible only to inside the class
+- `public` - 对包内外的所有类可见
+- `protected` - 仅对包内的类和子类可见
+- `default` - 仅对包内的类可见
+- `private` - 仅对类内部可见
 
-A special modifier `+f` and `-f` can be appended to the aforementioned modifiers to either add or remove respectively the `final` modifier, which prevents subclassing, method overriding, or field modification when applied.
+可以在上述修饰符后追加特殊修饰符 `+f` 和 `-f`，分别用于添加或移除 `final` 修饰符。应用 `final` 修饰符会阻止子类化、方法重写或字段修改。
 
 :::danger
-Directives only modify the method they directly reference; any overriding methods will not be access-transformed. It is advised to ensure transformed methods do not have non-transformed overrides that restrict the visibility, which will result in the JVM throwing an error.
+指令只会修改它直接引用的方法；任何重写方法都不会被访问转换。建议确保被转换的方法不存在限制可见性的、未被转换的重写方法，否则会导致 JVM 抛出错误。
 
-Examples of methods that can be safely transformed are `final` methods (or methods in `final` classes), and `static` methods. `private` methods are generally safe as well; however, they could cause unintentional overrides in any subtypes, so some additional manual validation should be performed.
+可以安全转换的方法示例包括 `final` 方法（或 `final` 类中的方法）以及 `static` 方法。`private` 方法通常也是安全的；不过它们可能在任何子类型中造成意外的重写，因此应当进行一些额外的手动验证。
 :::
 
-### Targets and Directives
+### 目标与指令 {#targets-and-directives}
 
-#### Classes
+#### 类 {#classes}
 
-To target classes:
+针对类：
 
 ```
 <access modifier> <fully qualified class name>
 ```
 
-Inner classes are denoted by combining the fully qualified name of the outer class and the name of the inner class with a `$` as separator.
+内部类的表示方法是：将外部类的完全限定名与内部类的名称用 `$` 分隔符组合起来。
 
-#### Fields
+#### 字段 {#fields}
 
-To target fields:
+针对字段：
 
 ```
 <access modifier> <fully qualified class name> <field name>
 ```
 
-#### Methods
+#### 方法 {#methods}
 
-Targeting methods require a special syntax to denote the method parameters and return type:
+针对方法需要一种特殊语法来表示方法参数和返回类型：
 
 ```
 <access modifier> <fully qualified class name> <method name>(<parameter types>)<return type>
 ```
 
-##### Specifying Types
+##### 指定类型 {#specifying-types}
 
-Also called "descriptors": see the [Java Virtual Machine Specification, SE 21, sections 4.3.2 and 4.3.3][jvmdescriptors] for more technical details.
+这些类型也称为“描述符”：更多技术细节参见 [Java 虚拟机规范，SE 21，4.3.2 和 4.3.3 节][jvmdescriptors]。
 
-- `B` - `byte`, a signed byte
-- `C` - `char`, a Unicode character code point in UTF-16
-- `D` - `double`, a double-precision floating-point value
-- `F` - `float`, a single-precision floating-point value
-- `I` - `integer`, a 32-bit integer
-- `J` - `long`, a 64-bit integer
-- `S` - `short`, a signed short
-- `Z` - `boolean`, a `true` or `false` value
-- `[` - references one dimension of an array
-    - Example: `[[S` refers to `short[][]`
-- `L<class name>;` - references a reference type
-    - Example: `Ljava/lang/String;` refers to `java.lang.String` reference type _(note the use of slashes instead of periods)_
-- `(` - references a method descriptor, parameters should be supplied here or nothing if no parameters are present
-    - Example: `<method>(I)Z` refers to a method that requires an integer argument and returns a boolean
-- `V` - indicates a method returns no value, can only be used at the end of a method descriptor
-    - Example: `<method>()V` refers to a method that has no arguments and returns nothing
+- `B` - `byte`，有符号字节
+- `C` - `char`，以 UTF-16 表示的 Unicode 字符码点
+- `D` - `double`，双精度浮点值
+- `F` - `float`，单精度浮点值
+- `I` - `integer`，32 位整数
+- `J` - `long`，64 位整数
+- `S` - `short`，有符号短整型
+- `Z` - `boolean`，`true` 或 `false` 值
+- `[` - 表示数组的一个维度
+    - 示例：`[[S` 表示 `short[][]`
+- `L<class name>;` - 表示引用类型
+    - 示例：`Ljava/lang/String;` 表示 `java.lang.String` 引用类型 _（注意此处使用斜杠而非句点）_
+- `(` - 表示方法描述符，参数应在此提供；若无参数则留空
+    - 示例：`<method>(I)Z` 表示一个需要整数参数并返回布尔值的方法
+- `V` - 表示方法不返回任何值，只能用于方法描述符的末尾
+    - 示例：`<method>()V` 表示一个无参数且无返回值的方法
 
-### Examples
+### 示例 {#examples}
 
 ```
 # Makes public the ByteArrayToKeyFunction interface in Crypt

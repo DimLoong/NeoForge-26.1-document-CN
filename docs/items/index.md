@@ -1,67 +1,67 @@
-# Items
+# 物品 {#items}
 
-Along with blocks, items are a key component of Minecraft. While blocks make up the world around you, items exist within inventories.
+物品与方块一样，都是 Minecraft 的核心组成部分。方块构成了你周围的世界，而物品则存在于各类物品栏之中。
 
-## What Even Is an Item?
+## 物品到底是什么？ {#what-even-is-an-item}
 
-Before we get further into creating items, it is important to understand what an item actually is, and what distinguishes it from, say, a [block][block]. Let's illustrate this using an example:
+在深入创建物品之前，理解物品究竟是什么，以及它与诸如[方块][block]之类的东西有何区别，是很重要的。我们用一个例子来说明：
 
-- In the world, you encounter a dirt block and want to mine it. This is a **block**, because it is placed in the world. (Actually, it is not a block, but a blockstate. See the [Blockstates article][blockstates] for more detailed information.)
-    - Not all blocks drop themselves when breaking (e.g. leaves), see the article on [loot tables][loottables] for more information.
-- Once you have [mined the block][breaking], it is removed (= replaced with an air block) and the dirt drops. The dropped dirt is an item **[entity][entity]**. This means that like other entities (pigs, zombies, arrows, etc.), it can inherently be moved by things like water pushing on it, or burned by fire and lava.
-- Once you pick up the dirt item entity, it becomes an **item stack** in your inventory. An item stack is, simply put, an instance of an item with some extra information, such as the stack size.
-- Item stacks are backed by their corresponding **item** (which is what we're creating). Items hold [data components][datacomponents] that contains the default information all items stacks are initialized to (for example, every iron sword has a max durability of 250), while item stacks can modify those data components, allowing two different stacks for the same item to have different information (for example, one iron sword has 100 uses left, while another iron sword has 200 uses left). For more information on what is done through items and what is done through item stacks, read on.
-    - The relationship between items and item stacks is roughly the same as between [blocks][block] and [blockstates][blockstates], in that a blockstate is always backed by a block. It's not a really accurate comparison (item stacks aren't singletons, for example), but it gives a good basic idea about what the concept is here.
+- 在世界中，你遇到一个泥土方块并想挖掉它。这是一个**方块**，因为它被放置在世界里。（严格来说，它并不是一个方块，而是一个方块状态。更详细的信息请参阅[方块状态一文][blockstates]。）
+    - 并非所有方块在被破坏时都会掉落自身（例如树叶），更多信息请参阅[战利品表][loottables]一文。
+- 一旦你[挖掉了这个方块][breaking]，它就会被移除（即被替换为空气方块），泥土随之掉落。掉落的泥土是一个物品**[实体][entity]**。这意味着，和其他实体（猪、僵尸、箭等）一样，它天然会受到水流推动、被火与熔岩烧毁等因素的影响。
+- 一旦你捡起这个物品实体，它就会变成你物品栏中的一个**物品堆叠**。简单来说，物品堆叠是某个物品的一个实例，并附带一些额外信息，例如堆叠数量。
+- 物品堆叠由其对应的**物品**（也就是我们正在创建的东西）作为支撑。物品持有[数据组件][datacomponents]，其中包含所有物品堆叠初始化时所依据的默认信息（例如，每把铁剑的最大耐久度都是 250），而物品堆叠可以修改这些数据组件，从而让同一物品的两个不同堆叠拥有不同的信息（例如，一把铁剑还剩 100 次使用，另一把铁剑还剩 200 次使用）。关于哪些工作通过物品完成、哪些工作通过物品堆叠完成的更多信息，请继续阅读。
+    - 物品与物品堆叠之间的关系，大致等同于[方块][block]与[方块状态][blockstates]之间的关系，即方块状态始终由方块作为支撑。这个类比并不算十分准确（例如物品堆叠并不是单例），但它能让你对这里的概念有个基本的认识。
 
-## Creating an Item
+## 创建一个物品 {#creating-an-item}
 
-Now that we understand what an item is, let's create one!
+既然我们已经理解了物品是什么，那就来创建一个吧！
 
-Like with basic blocks, for basic items that need no special functionality (think sticks, sugar, etc.), the `Item` class can be used directly. To do so, during registration, instantiate `Item` with a `Item.Properties` parameter. This `Item.Properties` parameter can be created using `Item.Properties#of`, and it can be customized by calling its methods:
+和基础方块一样，对于不需要特殊功能的基础物品（比如木棍、糖等），可以直接使用 `Item` 类。为此，在注册时用一个 `Item.Properties` 参数实例化 `Item`。这个 `Item.Properties` 参数可以通过 `Item.Properties#of` 创建，并可通过调用其方法进行自定义：
 
-- `setId` - Sets the resource key of the item.
-    - This **must** be set on every item; otherwise, an exception will be thrown.
-- `overrideDescription` - Sets the translation key of the item. The created `Component` is stored in `DataComponents#ITEM_NAME`.
-- `useBlockDescriptionPrefix` - Convenience helper that calls `overrideDescription` with the translation key `block.<modid>.<registry_name>`. This should be called on any `BlockItem`.
-- `requiredFeatures` - Sets the required feature flags for this item. This is mainly used for vanilla's feature locking system in minor versions. It is discouraged to use this, unless you're integrating with a system locked behind feature flags by vanilla.
-- `stacksTo` - Sets the max stack size (via `DataComponents#MAX_STACK_SIZE`) of this item. Defaults to 64. Used e.g. by ender pearls or other items that only stack to 16.
-- `durability` - Sets the durability (via `DataComponents#MAX_DAMAGE`) of this item and the initial damage to 0 (via `DataComponents#DAMAGE`). Defaults to 0, which means "no durability". For example, iron tools use 250 here. Note that setting the durability automatically locks the max stack size to 1.
-- `fireResistant` - Makes item entities that use this item immune to fire and lava (via `DataComponents#FIRE_RESISTANT`). Used by various netherite items.
-- `rarity` - Sets the rarity of this item (via `DataComponents#RARITY`). Currently, this simply changes the item's color. `Rarity` is an enum consisting of the four values `COMMON` (white, default), `UNCOMMON` (yellow), `RARE` (aqua) and `EPIC` (light purple). Be aware that mods may add more rarity types.
-- `setNoCombineRepair` - Disables grindstone and crafting grid repairing for this item. Unused in vanilla.
-- `jukeboxPlayable` - Sets the resource key of the datapack `JukeboxSong` to play when inserted into a jukebox.
-- `food` - Sets the [`FoodProperties`][food] of this item (via `DataComponents#FOOD`).
+- `setId` —— 设置物品的资源键。
+    - 每个物品都**必须**设置此项；否则将抛出异常。
+- `overrideDescription` —— 设置物品的翻译键。创建出的 `Component` 会存储在 `DataComponents#ITEM_NAME` 中。
+- `useBlockDescriptionPrefix` —— 便捷辅助方法，它以翻译键 `block.<modid>.<registry_name>` 调用 `overrideDescription`。任何 `BlockItem` 都应当调用此方法。
+- `requiredFeatures` —— 设置该物品所需的特性标志。这主要用于原版在小版本中的特性锁定系统。不建议使用它，除非你要与原版通过特性标志锁定的某个系统进行集成。
+- `stacksTo` —— 设置该物品的最大堆叠数量（通过 `DataComponents#MAX_STACK_SIZE`）。默认为 64。例如末影珍珠或其他只能堆叠到 16 的物品会用到它。
+- `durability` —— 设置该物品的耐久度（通过 `DataComponents#MAX_DAMAGE`），并将初始损耗设为 0（通过 `DataComponents#DAMAGE`）。默认为 0，即表示“无耐久度”。例如铁制工具在此使用 250。注意，设置耐久度会自动将最大堆叠数量锁定为 1。
+- `fireResistant` —— 使使用该物品的物品实体免疫火与熔岩（通过 `DataComponents#FIRE_RESISTANT`）。各种下界合金物品会用到它。
+- `rarity` —— 设置该物品的稀有度（通过 `DataComponents#RARITY`）。目前这只是改变物品的颜色。`Rarity` 是一个枚举，包含四个值：`COMMON`（白色，默认）、`UNCOMMON`（黄色）、`RARE`（青色）和 `EPIC`（浅紫色）。注意 Mod 可能会添加更多稀有度类型。
+- `setNoCombineRepair` —— 禁用该物品的砂轮修复与合成网格修复。原版未使用。
+- `jukeboxPlayable` —— 设置放入唱片机时要播放的数据包 `JukeboxSong` 的资源键。
+- `food` —— 设置该物品的 [`FoodProperties`][food]（通过 `DataComponents#FOOD`）。
 
-For examples, or to look at the various values used by Minecraft, have a look at the `Items` class.
+若需示例，或想查看 Minecraft 所使用的各种数值，可参阅 `Items` 类。
 
-### Remainders and Cooldowns
+### 剩余物与冷却 {#remainders-and-cooldowns}
 
-Items may have additional properties that are applied when being used or prevent the item from being used for a set time:
+物品可以拥有一些额外属性，它们在物品被使用时生效，或者在一段设定的时间内阻止物品被使用：
 
-- `craftRemainder` - Sets the crafting remainder of this item. Vanilla uses this for filled buckets that leave behind empty buckets after crafting.
-- `usingConvertsTo` - Sets the item to return after the item is finished being used via `Item#use`, `IItemExtension#finishUsingItem`, or `Item#releaseUsing`. The `ItemStack` is stored on `DataComponents#USE_REMAINDER`.
-- `useCooldown` - Sets the number of seconds before the item can be used again (via `DataComponents#USE_COOLDOWN`).
+- `craftRemainder` —— 设置该物品的合成剩余物。原版用它来处理装满的桶，这些桶在合成后会留下空桶。
+- `usingConvertsTo` —— 设置物品通过 `Item#use`、`IItemExtension#finishUsingItem` 或 `Item#releaseUsing` 使用完毕后要返回的物品。该 `ItemStack` 存储在 `DataComponents#USE_REMAINDER` 中。
+- `useCooldown` —— 设置物品再次可用之前需要经过的秒数（通过 `DataComponents#USE_COOLDOWN`）。
 
-### Tools and Armor
+### 工具与盔甲 {#tools-and-armor}
 
-Some items act like [tools] and [armor]. These are constructed via a series of item properties, with only some usage being delegated to their associated classes:
+有些物品的行为类似[工具][tools]和[盔甲][armor]。它们通过一系列物品属性构建而成，只有部分用法委托给其关联的类：
 
-- `enchantable` - Sets the maximum [enchantment] value of the stack, allowing the item to be enchanted (via `DataComponents#ENCHANTABLE`).
-- `repairable` - Sets the item or tag that can be used to repair the durability of this item (via `DataComponents#REPAIRABLE`). Must have durability components and not `DataComponents#UNBREAKABLE`.
-- `equippable` - Sets the slot the item can be equipped to (via `DataComponents#EQUIPPABLE`).
-- `equippableUnswappable` - Same as `equippable`, but disables quick swapping via the use item button (default right-click).
+- `enchantable` —— 设置堆叠的最大[附魔][enchantment]值，使物品可被附魔（通过 `DataComponents#ENCHANTABLE`）。
+- `repairable` —— 设置可用于修复该物品耐久度的物品或标签（通过 `DataComponents#REPAIRABLE`）。物品必须具有耐久度相关组件，且不具有 `DataComponents#UNBREAKABLE`。
+- `equippable` —— 设置该物品可装备到的槽位（通过 `DataComponents#EQUIPPABLE`）。
+- `equippableUnswappable` —— 与 `equippable` 相同，但禁用通过使用物品按钮（默认为右键）进行的快速切换。
 
-More information can be found on their relevant pages.
+更多信息可在其相关页面上找到。
 
-### More Functionality
+### 更多功能 {#more-functionality}
 
-Directly using `Item` only allows for very basic items. If you want to add functionality, for example right-click interactions, a custom class that extends `Item` is required. The `Item` class has many methods that can be overridden to do different things; see the classes `Item` and `IItemExtension` for more information.
+直接使用 `Item` 只能实现非常基础的物品。如果你想添加功能，例如右键交互，则需要一个继承 `Item` 的自定义类。`Item` 类有许多可被重写以实现不同行为的方法；更多信息请参阅 `Item` 和 `IItemExtension` 类。
 
-The two most common use cases for items are left-clicking and right-clicking. Due to their complexity and their reaching into other systems, they are explained in a separate [Interaction article][interactions].
+物品最常见的两种用途是左键点击和右键点击。由于它们的复杂性以及涉及其他系统，它们在单独的[交互一文][interactions]中讲解。
 
-### `DeferredRegister.Items`
+### `DeferredRegister.Items` {#deferredregisteritems}
 
-All registries use `DeferredRegister` to register their contents, and items are no exceptions. However, due to the fact that adding new items is such an essential feature of an overwhelming amount of mods, NeoForge provides the `DeferredRegister.Items` helper class that extends `DeferredRegister<Item>` and provides some item-specific helpers:
+所有注册表都使用 `DeferredRegister` 来注册其内容，物品也不例外。然而，由于添加新物品是绝大多数 Mod 的一项基础功能，NeoForge 提供了 `DeferredRegister.Items` 辅助类，它继承自 `DeferredRegister<Item>` 并提供了一些物品专用的辅助方法：
 
 ```java
 public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ExampleMod.MOD_ID);
@@ -73,9 +73,9 @@ public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerItem(
 );
 ```
 
-Internally, this will simply call `ITEMS.register("example_item", registryName -> new Item(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, registryName))))` by applying the properties parameter to the provided item factory (which is commonly the constructor). The id is set on the properties.
+在内部，它只是通过把属性参数应用到所提供的物品工厂（通常是构造函数）上，来调用 `ITEMS.register("example_item", registryName -> new Item(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, registryName))))`。id 会在属性上被设置。
 
-If you want to use `Item::new`, you can leave out the factory entirely and use the `simple` method variant:
+如果你想使用 `Item::new`，可以完全省略工厂参数，改用 `simple` 方法变体：
 
 ```java
 public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerSimpleItem(
@@ -84,9 +84,9 @@ public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerSimpleItem(
 );
 ```
 
-This does the exact same as the previous example, but is slightly shorter. Of course, if you want to use a subclass of `Item` and not `Item` itself, you will have to use the previous method instead.
+这与前一个示例的效果完全相同，只是稍微短一些。当然，如果你想使用 `Item` 的子类而非 `Item` 本身，那就必须改用前一种方法。
 
-Both of these methods also have overloads that omit the `new Item.Properties()` parameter:
+这两个方法还都有省略 `new Item.Properties()` 参数的重载：
 
 ```java
 public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerItem("example_item", Item::new);
@@ -95,7 +95,7 @@ public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerItem("exampl
 public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerSimpleItem("example_item");
 ```
 
-Finally, there's also shortcuts for block items. Along with `setId`, these also call `useBlockDescriptionPrefix` to set the translation key to the one used for a block:
+最后，方块物品也有其快捷方式。除了 `setId`，这些方法还会调用 `useBlockDescriptionPrefix`，将翻译键设为方块所用的翻译键：
 
 ```java
 public static final DeferredItem<BlockItem> EXAMPLE_BLOCK_ITEM = ITEMS.registerSimpleBlockItem(
@@ -127,57 +127,57 @@ public static final DeferredItem<BlockItem> EXAMPLE_BLOCK_ITEM = ITEMS.registerS
 ```
 
 :::note
-If you keep your registered blocks in a separate class, you should classload your blocks class before your items class.
+如果你把注册的方块保存在一个单独的类中，则应当在类加载物品类之前先类加载方块类。
 :::
 
-### Resources
+### 资源 {#resources}
 
-If you register your item and get your item (via `/give` or through a [creative tab][creativetabs]), you will find it to be missing a proper model and texture. This is because textures and models are handled by Minecraft's resource system.
+如果你注册了物品并获取到它（通过 `/give` 或[创造模式物品栏标签页][creativetabs]），你会发现它缺少合适的模型和纹理。这是因为纹理和模型由 Minecraft 的资源系统处理。
 
-For every item, you will want to add - or [generate][datagen] - JSON files for the following:
+对于每一个物品，你都需要添加——或[生成][datagen]——以下内容的 JSON 文件：
 
-- A [client item][citems] with an associated [texture]
-- A [translation][i18n]
-- A [recipe][recipes] (optional)
-- Some item [tags] (optional)
+- 一个[客户端物品][citems]及其关联的[纹理][texture]
+- 一个[翻译][i18n]
+- 一个[配方][recipes]（可选）
+- 一些物品[标签][tags]（可选）
 
-For all of the above, also reference the files and data generators of similar vanilla blocks.
+对于上述所有内容，也可参考相似的原版方块所使用的文件和数据生成器。
 
-## `ItemStack`s
+## `ItemStack` {#itemstacks}
 
-Like with blocks and blockstates, most places where you'd expect an `Item` actually use an `ItemStack` instead. `ItemStack`s represent a stack of one or multiple items in a container, e.g. an inventory. Again like with blocks and blockstates, methods should be overridden by the `Item` and called on the `ItemStack`, and many methods in `Item` get an `ItemStack` instance passed in.
+和方块与方块状态一样，大多数你以为会用到 `Item` 的地方，实际上用的都是 `ItemStack`。`ItemStack` 表示容器（例如物品栏）中由一个或多个物品组成的堆叠。同样地，和方块与方块状态一样，方法应当由 `Item` 重写，并在 `ItemStack` 上调用，而 `Item` 中许多方法都会传入一个 `ItemStack` 实例。
 
-An `ItemStack` consists of three major parts:
+一个 `ItemStack` 由三个主要部分组成：
 
-- The `Item` it represents, obtainable through `ItemStack#getItem`, or `getItemHolder` for `Holder<Item>`.
-- The stack size, typically between 1 and 64, obtainable through `getCount` and changeable through `setCount` or `shrink`.
-- The [data components][datacomponents] map, where stack-specific data is stored. Obtainable through `getComponents`. The components values are typically accessed and mutated via `has`, `get`, `set`, `update`, and `remove`.
+- 它所表示的 `Item`，可通过 `ItemStack#getItem` 获取，或用 `getItemHolder` 获取 `Holder<Item>`。
+- 堆叠数量，通常在 1 到 64 之间，可通过 `getCount` 获取，并通过 `setCount` 或 `shrink` 改变。
+- [数据组件][datacomponents]映射，其中存储着堆叠专属的数据。可通过 `getComponents` 获取。组件值通常通过 `has`、`get`、`set`、`update` 和 `remove` 来访问和修改。
 
-To create a new `ItemStack`, call `new ItemStack(Item)`, passing in the backing item. By default, this uses a count of 1 and no NBT data; there are constructor overloads that accept a count and NBT data as well if needed. Note that an `ItemStack` cannot exist until components are bound/until a level exists. Until then, you should use an `ItemStackTemplate` as detailed below.
+要创建一个新的 `ItemStack`，调用 `new ItemStack(Item)`，传入作为支撑的物品。默认情况下，这会使用数量 1 且无 NBT 数据；如有需要，也有接受数量和 NBT 数据的构造函数重载。注意，在组件被绑定之前、或世界存在之前，`ItemStack` 无法存在。在此之前，你应当使用下文详述的 `ItemStackTemplate`。
 
-`ItemStack`s are mutable objects (see below), however it is sometimes required to treat them as immutables. If you need to modify an `ItemStack` that is to be treated immutable, you can clone the stack using `#copy` or `#copyWithCount` if a specific stack size should be used.
+`ItemStack` 是可变对象（见下文），然而有时需要把它们当作不可变对象来对待。如果你需要修改一个应被视作不可变的 `ItemStack`，可以用 `#copy` 克隆该堆叠，或在需要指定堆叠数量时用 `#copyWithCount`。
 
-If you want to represent that a stack has no item, use `ItemStack.EMPTY`. If you want to check whether an `ItemStack` is empty, call `#isEmpty`.
+如果你想表示一个堆叠不含任何物品，使用 `ItemStack.EMPTY`。如果你想检查一个 `ItemStack` 是否为空，调用 `#isEmpty`。
 
-### Mutability of `ItemStack`s
+### `ItemStack` 的可变性 {#mutability-of-itemstacks}
 
-`ItemStack`s are mutable objects. This means that if you call for example `#setCount` or any data component map methods, the `ItemStack` itself will be modified. Vanilla uses the mutability of `ItemStack`s extensively, and several methods rely on it. For example, `#split` splits the given amount off the stack it is called on, both modifying the caller and returning a new `ItemStack` in the process.
+`ItemStack` 是可变对象。这意味着，如果你调用例如 `#setCount` 或任何数据组件映射方法，`ItemStack` 本身就会被修改。原版大量利用了 `ItemStack` 的可变性，多个方法都依赖于此。例如，`#split` 会从被调用的堆叠中拆分出给定数量，在此过程中既修改调用者本身，又返回一个新的 `ItemStack`。
 
-However, this can sometimes lead to issues when dealing with multiple `ItemStack`s at once. The most common instance where this arises is when handling inventory slots, since you have to consider both the `ItemStack` currently selected by the cursor, as well as the `ItemStack` you are trying to insert to/extract from.
+然而，这有时会在同时处理多个 `ItemStack` 时导致问题。最常见的情形出现在处理物品栏槽位时，因为你既要考虑当前被光标选中的 `ItemStack`，也要考虑你试图向其中插入/从中取出的 `ItemStack`。
 
 :::tip
-When in doubt, better be safe than sorry and `#copy` the stack.
+拿不准时，宁可稳妥也别冒险，直接 `#copy` 该堆叠。
 :::
 
-## `ItemStackTemplate`s
+## `ItemStackTemplate` {#itemstacktemplates}
 
-`ItemStackTemplate`s are the immutable form of `ItemStack`s, typically representing a stack within an immutable context, such as recipes. Templates contain the basic elements that make up an `ItemStack`: the held holder `Item`, the stack size, and the [data components][datacomponents] the item has, stored as a patch.
+`ItemStackTemplate` 是 `ItemStack` 的不可变形式，通常表示不可变上下文中的一个堆叠，例如配方。模板包含构成 `ItemStack` 的基本要素：持有的 holder `Item`、堆叠数量，以及物品所拥有的[数据组件][datacomponents]（以补丁形式存储）。
 
-To create a new `ItemStackTemplate`, call one of the `new ItemStackTemplate(...)` methods, passing in the `Item` and any other desired elements. Then, when a stack is needed, an `ItemStack` can be created via `ItemStackTemplate#create`.
+要创建一个新的 `ItemStackTemplate`，调用某个 `new ItemStackTemplate(...)` 方法，传入 `Item` 以及其他所需要素。然后，当需要一个堆叠时，可通过 `ItemStackTemplate#create` 创建出一个 `ItemStack`。
 
-### JSON Representation
+### JSON 表示 {#json-representation}
 
-In many situations, for example [recipes], `ItemStackTemplate`s need to be represented as JSON objects. An item stack template's JSON representation looks the following way:
+在许多情形下，例如[配方][recipes]中，`ItemStackTemplate` 需要表示为 JSON 对象。物品堆叠模板的 JSON 表示如下所示：
 
 ```json5
 {
@@ -192,25 +192,25 @@ In many situations, for example [recipes], `ItemStackTemplate`s need to be repre
 }
 ```
 
-## `ItemInstance`
+## `ItemInstance` {#iteminstance}
 
-`ItemInstance` is a superinterface that `ItemStack` and `ItemStackTemplate` implement. Generally, `ItemStack` and `ItemStackTemplate`s are used in isolated contexts. However, when the stack and template can be used interchangeably (e.g. the number of items in the stack / template), the `ItemInstance` superinterface is provided instead of a specific type.
+`ItemInstance` 是一个由 `ItemStack` 和 `ItemStackTemplate` 共同实现的父接口。一般来说，`ItemStack` 和 `ItemStackTemplate` 用于彼此隔离的上下文中。然而，当堆叠与模板可以互换使用时（例如堆叠/模板中的物品数量），就会改用 `ItemInstance` 父接口，而非某个具体类型。
 
-`ItemInstance` provides common methods for checking the `Item` (`#is`), the stack size (`count`), and reading the data components through the `DataComponentGetter`.
+`ItemInstance` 提供了用于检查 `Item`（`#is`）、堆叠数量（`count`），以及通过 `DataComponentGetter` 读取数据组件的通用方法。
 
-## Creative Tabs
+## 创造模式物品栏标签页 {#creative-tabs}
 
-By default, your item will only be available through `/give` and not appear in the creative inventory. Let's change that!
+默认情况下，你的物品只能通过 `/give` 获得，而不会出现在创造模式物品栏中。让我们来改变这一点！
 
-The way you get your item into the creative menu depends on what tab you want to add it to.
+将物品加入创造模式菜单的方式，取决于你想把它加到哪个标签页。
 
-### Existing Creative Tabs
+### 已有的创造模式标签页 {#existing-creative-tabs}
 
 :::note
-This method is for adding your items to Minecraft's tabs, or to other mods' tabs. To add items to your own tabs, see below.
+此方法用于把你的物品加入 Minecraft 的标签页，或加入其他 Mod 的标签页。要把物品加入你自己的标签页，请见下文。
 :::
 
-An item can be added to an existing `CreativeModeTab` via the `BuildCreativeModeTabContentsEvent`, which is fired on the [mod event bus][modbus], only on the [logical client][sides]. Add items by calling `event#accept`.
+可通过 `BuildCreativeModeTabContentsEvent` 将物品加入某个已有的 `CreativeModeTab`，该事件在[模组事件总线][modbus]上触发，且仅在[逻辑客户端][sides]上触发。通过调用 `event#accept` 来添加物品。
 
 ```java
 //MyItemsClass.MY_ITEM is a Supplier<? extends Item>, MyBlocksClass.MY_BLOCK is a Supplier<? extends Block>
@@ -225,11 +225,11 @@ public static void buildContents(BuildCreativeModeTabContentsEvent event) {
 }
 ```
 
-The event also provides some extra information, such as `getFlags` to get the list of enabled feature flags, or `hasPermissions` to check if the player has permissions to view the operator items tab.
+该事件还提供了一些额外信息，例如用 `getFlags` 获取已启用的特性标志列表，或用 `hasPermissions` 检查玩家是否有权限查看管理员物品标签页。
 
-### Custom Creative Tabs
+### 自定义创造模式标签页 {#custom-creative-tabs}
 
-`CreativeModeTab`s are a registry, meaning custom `CreativeModeTab`s must be [registered][registering]. Creating a creative tab uses a builder system, the builder is obtainable through `CreativeModeTab#builder`. The builder provides options to set the title, icon, default items, and a number of other properties. In addition, NeoForge provides additional methods to customize the tab's image, label and slot colors, where the tab should be ordered, etc.
+`CreativeModeTab` 是一种注册表，这意味着自定义 `CreativeModeTab` 必须被[注册][registering]。创建创造模式标签页使用构建器系统，构建器可通过 `CreativeModeTab#builder` 获取。该构建器提供了设置标题、图标、默认物品以及许多其他属性的选项。此外，NeoForge 还提供了额外的方法来自定义标签页的图像、标签文字与槽位颜色、标签页应排列在何处等。
 
 ```java
 //CREATIVE_MODE_TABS is a DeferredRegister<CreativeModeTab>
@@ -248,11 +248,11 @@ public static final Supplier<CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.r
 );
 ```
 
-## `ItemLike`
+## `ItemLike` {#itemlike}
 
-`ItemLike` is an interface implemented by `Item`s and [`Block`s][block] in vanilla. It defines the method `#asItem`, which returns an item representation of whatever the object actually is: `Item`s just return themselves, while `Block`s return their associated `BlockItem` if available, and `Blocks.AIR` otherwise. `ItemLike`s are used in various contexts where the "origin" of the item isn't important, for example in many [data generators][datagen].
+`ItemLike` 是原版中由 `Item` 和[`Block`][block]实现的接口。它定义了 `#asItem` 方法，该方法返回对象实际内容的物品表示：`Item` 直接返回自身，而 `Block` 在可用时返回其关联的 `BlockItem`，否则返回 `Blocks.AIR`。`ItemLike` 用于各种不关心物品“来源”的场景，例如许多[数据生成器][datagen]中。
 
-It is also possible to implement `ItemLike` on your custom objects. Simply override `#asItem` and you're good to go.
+你也可以在自己的自定义对象上实现 `ItemLike`。只需重写 `#asItem` 即可。
 
 [armor]: armor.md
 [block]: ../blocks/index.md

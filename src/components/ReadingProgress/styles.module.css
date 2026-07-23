@@ -1,0 +1,185 @@
+/* 顶部阅读进度条：固定于视口顶端，低调细线。 */
+.progressBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  z-index: calc(var(--ifm-z-index-fixed, 200) + 2);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: linear-gradient(
+    90deg,
+    var(--ifm-color-primary),
+    var(--ifm-color-primary-light)
+  );
+  box-shadow: 0 0 6px color-mix(in srgb, var(--ifm-color-primary) 55%, transparent);
+  will-change: transform;
+  transition: transform 120ms linear;
+  pointer-events: none;
+}
+
+/* “继续阅读”导航项。 */
+.continueWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.continueButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ifm-navbar-link-color);
+  background: color-mix(in srgb, var(--ifm-color-primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ifm-color-primary) 30%, transparent);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+  max-width: 15rem;
+}
+
+.continueButton:hover {
+  background: color-mix(in srgb, var(--ifm-color-primary) 20%, transparent);
+  border-color: color-mix(in srgb, var(--ifm-color-primary) 50%, transparent);
+}
+
+.continueIcon {
+  flex: 0 0 auto;
+  opacity: 0.85;
+}
+
+.continueLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.continuePercent {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
+/* 弹出面板。 */
+.popover {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 18rem;
+  max-width: 22rem;
+  padding: 1rem;
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--nf-border-color, rgba(128, 128, 128, 0.25));
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+  z-index: calc(var(--ifm-z-index-fixed, 200) + 4);
+}
+
+.popoverTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 0.5rem;
+}
+
+.popoverDocTitle {
+  font-size: 0.98rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  line-height: 1.4;
+}
+
+.popoverMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.75;
+  margin-bottom: 0.75rem;
+}
+
+.miniBar {
+  flex: 1;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ifm-color-emphasis-500) 30%, transparent);
+  overflow: hidden;
+}
+
+.miniBarFill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ifm-color-primary);
+}
+
+.popoverActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.popoverPrimary {
+  flex: 1;
+  text-align: center;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--ifm-color-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.popoverPrimary:hover {
+  background: var(--ifm-color-primary-dark);
+  color: #fff;
+  text-decoration: none;
+}
+
+.resetButton {
+  padding: 0.45rem 0.7rem;
+  font-size: 0.82rem;
+  color: var(--ifm-color-danger, #d64545);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--ifm-color-danger, #d64545) 40%, transparent);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.resetButton:hover {
+  background: color-mix(in srgb, var(--ifm-color-danger, #d64545) 12%, transparent);
+}
+
+.resetConfirm {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--nf-border-color, rgba(128, 128, 128, 0.2));
+  font-size: 0.82rem;
+}
+
+.resetConfirmText {
+  margin-bottom: 0.5rem;
+  opacity: 0.85;
+}
+
+.empty {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+@media (max-width: 996px) {
+  .continueLabel {
+    display: none;
+  }
+  .continueButton {
+    max-width: none;
+  }
+}

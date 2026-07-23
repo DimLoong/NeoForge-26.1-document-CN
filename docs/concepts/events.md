@@ -4,19 +4,19 @@ sidebar_position: 3
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Events
+# 事件 {#events}
 
-One of NeoForge's main features is the event system. Events are fired for various things that happen in the game. For example, there are events for when the player right clicks, when a player or another entity jumps, when blocks are rendered, when the game is loaded, etc. A modder can subscribe event handlers to each of these events, and then perform their desired behavior inside these event handlers.
+NeoForge 的主要特性之一是事件系统。游戏中发生的各种事情都会触发事件。例如，有玩家右键点击时的事件、玩家或其他实体跳跃时的事件、方块被渲染时的事件、游戏加载时的事件等等。Mod 开发者可以为这些事件中的每一个订阅事件处理器，然后在这些事件处理器内部执行他们期望的行为。
 
-Events are fired on their respective event bus. The most important bus is `NeoForge.EVENT_BUS`, also known as the **game** bus. Besides that, during startup, a mod bus is spawned for each loaded mod and passed into the mod's constructor. Many mod bus events are fired in parallel (as opposed to main bus events that always run on the same thread), dramatically increasing startup speed. See [below][modbus] for more information.
+事件在它们各自的事件总线上触发。最重要的总线是 `NeoForge.EVENT_BUS`，也称为**游戏（game）**总线。除此之外，在启动期间，会为每个已加载的 Mod 生成一个 Mod 总线，并传入该 Mod 的构造函数。许多 Mod 总线事件是并行触发的（与总在同一线程上运行的主总线事件不同），这大大提升了启动速度。更多信息参见[下文][modbus]。
 
-## Registering an Event Handler
+## 注册事件处理器 {#registering-an-event-handler}
 
-There are multiple ways to register event handlers. Common for all of those ways is that every event handler is a method with a single event parameter and no result (i.e. return type `void`).
+注册事件处理器有多种方式。这些方式的共同点是：每个事件处理器都是一个只有单个事件参数、且没有返回结果（即返回类型为 `void`）的方法。
 
-### `IEventBus#addListener`
+### `IEventBus#addListener` {#ieventbusaddlistener}
 
-The simplest way to register method handlers is by registering their method reference, like so:
+注册方法处理器最简单的方式是注册它们的方法引用，如下所示：
 
 ```java
 @Mod("yourmodid")
@@ -36,9 +36,9 @@ public class YourMod {
 }
 ```
 
-### `@SubscribeEvent`
+### `@SubscribeEvent` {#subscribeevent}
 
-Alternatively, event handlers can be annotation-driven by creating an event handler method and annotating it with `@SubscribeEvent`. Then, you can pass an instance of the encompassing class to the event bus, registering all `@SubscribeEvent`-annotated event handlers of that instance:
+或者，事件处理器也可以由注解驱动：创建一个事件处理器方法并为其加上 `@SubscribeEvent` 注解。然后，你可以把包含该方法的类的一个实例传给事件总线，从而注册该实例上所有带 `@SubscribeEvent` 注解的事件处理器：
 
 ```java
 public class EventHandler {
@@ -59,7 +59,7 @@ public class YourMod {
 }
 ```
 
-You can also do it statically. Simply make all event handlers static, and instead of a class instance, pass in the class itself:
+你也可以以静态方式来做。只需把所有事件处理器设为 static，并传入类本身而非类实例：
 
 ```java
 public class EventHandler {
@@ -80,11 +80,11 @@ public class YourMod {
 }
 ```
 
-### `@EventBusSubscriber`
+### `@EventBusSubscriber` {#eventbussubscriber}
 
-We can go one step further and also annotate the event handler class with `@EventBusSubscriber`. This annotation is discovered automatically by NeoForge, allowing you to remove all event-related code from the mod constructor. In essence, it is equivalent to calling `NeoForge.EVENT_BUS.register(EventHandler.class)` and `modBus.register(EventHandler.class)` at the end of the mod constructor. This means that all handlers must be static, too.
+我们还可以更进一步，同时给事件处理器类加上 `@EventBusSubscriber` 注解。这个注解会被 NeoForge 自动发现，从而让你能够把所有与事件相关的代码从 Mod 构造函数中移除。本质上，它等价于在 Mod 构造函数末尾调用 `NeoForge.EVENT_BUS.register(EventHandler.class)` 和 `modBus.register(EventHandler.class)`。这也意味着所有处理器同样必须是 static 的。
 
-While not required, it is highly recommended to specify the `modid` parameter in the annotation, in order to make debugging easier (especially when it comes to mod conflicts).
+虽然并非必需，但强烈推荐在注解中指定 `modid` 参数，以便让调试更容易（尤其是在涉及 Mod 冲突时）。
 
 ```java
 @EventBusSubscriber(modid = "yourmodid")
@@ -99,18 +99,18 @@ public class EventHandler {
 }
 ```
 
-## Event Options
+## 事件的各种选项 {#event-options}
 
-### Fields and Methods
+### 字段与方法 {#fields-and-methods}
 
-Fields and methods are probably the most obvious part of an event. Most events contain context for the event handler to use, such as an entity causing the event or a level the event occurs in.
+字段和方法大概是一个事件最显而易见的部分。大多数事件都包含供事件处理器使用的上下文，例如引发该事件的实体，或该事件发生所在的 level。
 
-### Hierarchy
+### 层级结构 {#hierarchy}
 
-In order to use the advantages of inheritance, some events do not directly extend `Event`, but one of its subclasses, for example `BlockEvent` (which contains block context for block-related events) or `EntityEvent` (which similarly contains entity context) and its subclasses `LivingEvent` (for `LivingEntity`-specific context) and `PlayerEvent` (for `Player`-specific context). These context-providing super events are `abstract` and cannot be listened to.
+为了利用继承带来的优势，一些事件并不直接扩展 `Event`，而是扩展它的某个子类，例如 `BlockEvent`（为与方块相关的事件包含方块上下文）或 `EntityEvent`（类似地包含实体上下文），以及后者的子类 `LivingEvent`（用于 `LivingEntity` 专属上下文）和 `PlayerEvent`（用于 `Player` 专属上下文）。这些提供上下文的父级事件是 `abstract` 的，无法被监听。
 
 :::danger
-If you listen to an `abstract` event, your game will crash, as this is never what you want. You always want to listen to one of the subevents instead.
+如果你监听一个 `abstract` 事件，你的游戏将会崩溃，因为这绝不会是你想要的结果。你应当始终监听它的某个子事件。
 :::
 
 ```mermaid
@@ -126,17 +126,17 @@ graph TD;
     class BlockDropsEvent,CanPlayerSleepEvent blue;
 ```
 
-### Cancellable Events
+### 可取消的事件 {#cancellable-events}
 
-Some events implement the `ICancellableEvent` interface. These events can be cancelled using `#setCanceled(boolean canceled)`, and the cancellation status can be checked using `#isCanceled()`. If an event is cancelled, other event handlers for this event will not run, and some kind of behavior that is associated with "cancelling" is enabled. For example, cancelling `LivingChangeTargetEvent` will prevent the entity's target entity from changing.
+一些事件实现了 `ICancellableEvent` 接口。这些事件可以使用 `#setCanceled(boolean canceled)` 取消，且可以使用 `#isCanceled()` 检查其取消状态。如果一个事件被取消，该事件的其他事件处理器将不再运行，同时会启用某种与“取消”相关联的行为。例如，取消 `LivingChangeTargetEvent` 将阻止该实体的目标实体发生改变。
 
-Event handlers can opt to explicitly receive cancelled events. This is done by setting the `receiveCanceled` boolean parameter in `IEventBus#addListener` (or `@SubscribeEvent`, depending on your way of attaching the event handlers) to true.
+事件处理器可以选择显式地接收已取消的事件。这通过把 `IEventBus#addListener`（或 `@SubscribeEvent`，取决于你附加事件处理器的方式）中的 `receiveCanceled` 布尔参数设为 true 来实现。
 
-### TriStates and Results
+### TriState 与 Result {#tristates-and-results}
 
-Some events have three potential return states represented by `TriState`, or a `Result` enum directly on the event class. The return states can typically either cancel the action the event is handling (`TriState#FALSE`), force the action to run (`TriState#TRUE`), or execute default Vanilla behavior (`TriState#DEFAULT`).
+一些事件有三种可能的返回状态，由 `TriState` 表示，或直接在事件类上以 `Result` 枚举表示。这些返回状态通常可以取消该事件正在处理的动作（`TriState#FALSE`）、强制该动作运行（`TriState#TRUE`），或执行默认的原版行为（`TriState#DEFAULT`）。
 
-An event with three potential return states has some `set*` method to set the desired outcome.
+一个拥有三种可能返回状态的事件会有某个 `set*` 方法，用来设置期望的结果。
 
 ```java
 // In some event handler class
@@ -154,59 +154,59 @@ public static void mobDespawn(MobDespawnEvent event) {
 }
 ```
 
-### Priority
+### 优先级 {#priority}
 
-Event handlers can optionally get assigned a priority. The `EventPriority` enum contains five values: `HIGHEST`, `HIGH`, `NORMAL` (default), `LOW` and `LOWEST`. Event handlers are executed from highest to lowest priority. If they have the same priority, they fire in registration order on the main bus, which is roughly related to mod load order, and in exact mod load order on the mod bus (see below).
+事件处理器可以选择性地被指定一个优先级。`EventPriority` 枚举包含五个值：`HIGHEST`、`HIGH`、`NORMAL`（默认）、`LOW` 和 `LOWEST`。事件处理器按从最高到最低的优先级执行。如果它们优先级相同，则在主总线上按注册顺序触发（这大致与 Mod 加载顺序相关），在 Mod 总线上则按确切的 Mod 加载顺序触发（见下文）。
 
-Priorities can be defined by setting the `priority` parameter in `IEventBus#addListener` or `@SubscribeEvent`, depending on how you attach event handlers. Note that priorities are ignored for events that are fired in parallel.
+优先级可以通过设置 `IEventBus#addListener` 或 `@SubscribeEvent` 中的 `priority` 参数来定义，取决于你附加事件处理器的方式。注意，对于并行触发的事件，优先级会被忽略。
 
-### Sided Events
+### 分端事件 {#sided-events}
 
-Some events are only fired on one [side][side]. Common examples include the various render events, which are only fired on the client. Since client-only events generally need to access other client-only parts of the Minecraft codebase, they need to be registered accordingly.
+一些事件只在某一[端][side]触发。常见的例子包括各种渲染事件，它们只在客户端触发。由于纯客户端事件通常需要访问 Minecraft 代码库中其他纯客户端的部分，因此它们需要相应地注册。
 
-Event handlers that use `IEventBus#addListener` should check the current physical side via `FMLEnvironment#getDist` or the `Dist` parameter in your main mod constructor and add the listener in a separate client-only class, as outlined in the article on [sides][side].
+使用 `IEventBus#addListener` 的事件处理器应当通过 `FMLEnvironment#getDist` 或主 Mod 构造函数中的 `Dist` 参数检查当前的物理端，并像[端][side]相关文章中所述那样，在一个单独的纯客户端类中添加监听器。
 
-Event handlers that use `@EventBusSubscriber` can specify the side as the `value` parameter of the annotation, for example `@EventBusSubscriber(value = Dist.CLIENT, modid = "yourmodid")`.
+使用 `@EventBusSubscriber` 的事件处理器可以把端指定为注解的 `value` 参数，例如 `@EventBusSubscriber(value = Dist.CLIENT, modid = "yourmodid")`。
 
-## Event Buses
+## 事件总线 {#event-buses}
 
-While most events are posted on the `NeoForge.EVENT_BUS`, some events are posted on the mod event bus instead. These are generally called mod bus events. Mod bus events can be distinguished from regular events by their superinterface `IModBusEvent`.
+虽然大多数事件都发布在 `NeoForge.EVENT_BUS` 上，但一些事件改为发布在 Mod 事件总线上。这些通常被称为 Mod 总线事件。Mod 总线事件可以通过它们的超接口 `IModBusEvent` 与常规事件区分开来。
 
-The mod event bus is passed to you as a parameter in the mod constructor, and you can then subscribe mod bus events to it. If you use `@EventBusSubscriber`, the event will automatically be subscribed to the correct bus.
+Mod 事件总线会作为参数在 Mod 构造函数中传给你，然后你就可以向它订阅 Mod 总线事件。如果你使用 `@EventBusSubscriber`，事件会被自动订阅到正确的总线上。
 
-### The Mod Lifecycle
+### Mod 生命周期 {#the-mod-lifecycle}
 
-Most mod bus events are what is known as lifecycle events. Lifecycle events run once in every mod's lifecycle during startup. Many of them are fired in parallel by subclassing `ParallelDispatchEvent`; if you want to run code from one of these events on the main thread, enqueue them using `#enqueueWork(Runnable runnable)`.
+大多数 Mod 总线事件是所谓的生命周期事件。生命周期事件在每个 Mod 的生命周期中于启动期间运行一次。它们中的许多通过继承 `ParallelDispatchEvent` 而并行触发；如果你想在主线程上运行来自这些事件之一的代码，请使用 `#enqueueWork(Runnable runnable)` 将其入队。
 
-The lifecycle generally follows the following order:
+生命周期大体遵循以下顺序：
 
-- The mod constructor is called. Register your event handlers here, or in the next step.
-- All `@EventBusSubscriber`s are called.
-- `FMLConstructModEvent` is fired.
-- The registry events are fired, these include [`NewRegistryEvent`][newregistry], [`DataPackRegistryEvent.NewRegistry`][newdatapackregistry] and, for each registry, [`RegisterEvent`][registerevent].
-- `FMLCommonSetupEvent` is fired. This is where various miscellaneous setup happens.
-- The [sided][side] setup is fired: `FMLClientSetupEvent` if on a physical client, and `FMLDedicatedServerSetupEvent` if on a physical server.
-- `InterModComms` are handled (see below).
-- `FMLLoadCompleteEvent` is fired.
+- 调用 Mod 构造函数。在这里，或在下一步中注册你的事件处理器。
+- 调用所有 `@EventBusSubscriber`。
+- 触发 `FMLConstructModEvent`。
+- 触发注册事件，其中包括 [`NewRegistryEvent`][newregistry]、[`DataPackRegistryEvent.NewRegistry`][newdatapackregistry]，以及为每个注册表触发的 [`RegisterEvent`][registerevent]。
+- 触发 `FMLCommonSetupEvent`。这是各种杂项设置发生的地方。
+- 触发[分端][side]设置：在物理客户端上触发 `FMLClientSetupEvent`，在物理服务端上触发 `FMLDedicatedServerSetupEvent`。
+- 处理 `InterModComms`（见下文）。
+- 触发 `FMLLoadCompleteEvent`。
 
-#### `InterModComms`
+#### `InterModComms` {#intermodcomms}
 
-`InterModComms` is a system that allows modders to send messages to other mods for compatibility features. The class holds the messages for mods, all methods are thread-safe to call. The system is mainly driven by two events: `InterModEnqueueEvent` and `InterModProcessEvent`.
+`InterModComms` 是一个允许 Mod 开发者向其他 Mod 发送消息以实现兼容功能的系统。该类为各个 Mod 保存消息，所有方法调用都是线程安全的。该系统主要由两个事件驱动：`InterModEnqueueEvent` 和 `InterModProcessEvent`。
 
-During `InterModEnqueueEvent`, you can use `InterModComms#sendTo` to send messages to other mods. These methods accept the id of the mod to send the message to, the key associated with the message data (to distinguish between different messages), and a `Supplier` holding the message data. The sender can be optionally specified as well.
+在 `InterModEnqueueEvent` 期间，你可以使用 `InterModComms#sendTo` 向其他 Mod 发送消息。这些方法接受要将消息发送到的 Mod 的 id、与消息数据关联的键（用于区分不同的消息），以及一个持有消息数据的 `Supplier`。发送方也可以选择性地指定。
 
-Then, during `InterModProcessEvent`, you can use `InterModComms#getMessages` to get a stream of all received messages as `IMCMessage` objects. These hold the sender of the data, the intended receiver of the data, the data key, and the supplier for the actual data.
+然后，在 `InterModProcessEvent` 期间，你可以使用 `InterModComms#getMessages` 获取所有已接收消息的流，形式为 `IMCMessage` 对象。它们持有数据的发送方、数据的预期接收方、数据键，以及实际数据的 supplier。
 
-### Other Mod Bus Events
+### 其他 Mod 总线事件 {#other-mod-bus-events}
 
-Next to the lifecycle events, there are a few miscellaneous events that are fired on the mod event bus, mostly for legacy reasons. These are generally events where you can register, set up, or initialize various things. Most of these events are not ran in parallel in contrast to the lifecycle events. A few examples:
+除了生命周期事件之外，还有少数杂项事件在 Mod 事件总线上触发，大多出于历史遗留原因。这些通常是你可以用来注册、设置或初始化各种东西的事件。与生命周期事件不同，这些事件中的大多数不会并行运行。举几个例子：
 
-- `RegisterColorHandlersEvent.BlockTintSources`, `.ItemTintSources`, `.ColorResolvers` 
+- `RegisterColorHandlersEvent.BlockTintSources`、`.ItemTintSources`、`.ColorResolvers` 
 - `ModelEvent.BakingCompleted`
 - `TextureAtlasStitchedEvent`
 
 :::warning
-Most of these events are planned to be moved to the game event bus in a future version.
+这些事件中的大多数计划在未来某个版本中移到游戏事件总线上。
 :::
 
 [modbus]: #event-buses

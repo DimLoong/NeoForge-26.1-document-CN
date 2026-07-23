@@ -35,15 +35,15 @@ function createContentDocs(id, label) {
   });
 }
 
-createContentDocs("toolchain", "Toolchain Features");
-createContentDocs("primer", "Primers");
-createContentDocs("user", "User Guide");
-createContentDocs("modpack", "Modpack Development");
+createContentDocs("toolchain", "工具链特性");
+createContentDocs("primer", "版本导读");
+createContentDocs("user", "用户指南");
+createContentDocs("modpack", "整合包开发");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "NeoForged docs",
-  tagline: "The better mod loader",
+  title: "NeoForged 文档",
+  tagline: "更好的 Mod 加载器",
   favicon: "img/favicon.ico",
 
   // Set the production url of your site here
@@ -62,9 +62,11 @@ const config = {
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
   // to replace "en" with "zh-Hans".
+  // 默认语言设为简体中文：默认语言的内容仍在 docs/ 等常规目录，无需 i18n/ 子目录，
+  // 同时会自动加载 Docusaurus 内置的中文界面翻译（上一页/下一页、提示框标签、搜索等）。
   i18n: {
-    defaultLocale: "en",
-    locales: ["en"],
+    defaultLocale: "zh-Hans",
+    locales: ["zh-Hans"],
   },
 
   presets: [
@@ -95,13 +97,15 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       colorMode: {
-        respectPrefersColorScheme: true
+        defaultMode: "dark",
+        disableSwitch: false,
+        respectPrefersColorScheme: false,
       },
 
       // Replace with your project's social card
       //image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: "Homepage",
+        title: "首页",
         logo: {
           alt: "NeoForged Logo",
           src: "img/logo.svg",
@@ -111,18 +115,18 @@ const config = {
             type: "docSidebar",
             sidebarId: "mainSidebar",
             position: "left",
-            label: "NeoForge Documentation",
+            label: "NeoForge 文档",
           }
         ]
         .concat(navbarItems)
         .concat([
           {
-            type: "docsVersionDropdown",
+            // 自定义“继续阅读”入口，见 src/theme/NavbarItem/ComponentTypes
+            type: "custom-continueReading",
             position: "right",
           },
           {
-            to: "/contributing",
-            label: "Contributing",
+            type: "docsVersionDropdown",
             position: "right",
           },
           {
@@ -136,42 +140,42 @@ const config = {
         style: "dark",
         links: [
           {
-            title: "Docs",
+            title: "文档",
             items: [
               {
                 to: "/docs/gettingstarted/",
-                label: "NeoForge Documentation",
+                label: "NeoForge 文档",
               },
             ]
             .concat(footerItems)
             .concat([
               {
                 to: "/contributing",
-                label: "Contributing to the Documentation"
+                label: "参与文档贡献"
               }
             ]),
           },
           {
-            title: "Links",
+            title: "相关链接",
             items: [
               {
                 label: "Discord",
                 href: "https://discord.neoforged.net/",
               },
               {
-                label: "Main Website",
+                label: "官方网站",
                 href: "https://neoforged.net/",
               },
               {
-                label: "GitHub",
+                label: "GitHub 源仓库",
                 href: "https://github.com/neoforged/documentation",
               },
             ],
           },
         ],
         copyright: `
-        <p>NOT AN OFFICIAL MINECRAFT WEBSITE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.</p>
-        <p>Copyright © ${new Date().getFullYear()}, under the MIT license. Built with Docusaurus.</p>
+        <p>本站非 Minecraft 官方网站，未获 Mojang 或 Microsoft 批准，亦与其无关联。</p>
+        <p>本地中文阅读版，仅供个人学习。原文档 Copyright © ${new Date().getFullYear()}，基于 MIT 许可证，使用 Docusaurus 构建。</p>
         `,
       },
       prism: {

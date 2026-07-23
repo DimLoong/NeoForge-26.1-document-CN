@@ -1,16 +1,16 @@
-# Custom Model Loaders
+# 自定义模型加载器 {#custom-model-loaders}
 
-A model is simply a shape. It can be a cube, a collection of cubes, a collection of triangles, or any other geometrical shape (or collection of geometrical shape). For most contexts, it is not relevant how a model is defined, as everything will end up baked into a `QuadCollection` anyway. As such, NeoForge adds the ability to register custom model loaders that can transform any model you want into the baked format for the game to use.
+模型本质上就是一个形状。它可以是一个立方体、一组立方体、一组三角形，或任何其他几何形状（乃至几何形状的集合）。在大多数场景下，模型如何定义并不重要，因为一切最终都会被烘焙成 `QuadCollection`。因此，NeoForge 增加了注册自定义模型加载器的能力，让你能把任意模型转换成供游戏使用的烘焙格式。
 
-## Model Loaders
+## 模型加载器 {#model-loaders}
 
-The entry point for a block model remains the model JSON file. However, you can specify a `loader` field in the root of the JSON that will swap out the default loader for your own loader. A custom model loader may ignore all fields the default loader requires.
+方块模型的入口仍然是模型 JSON 文件。不过，你可以在 JSON 的根节点指定一个 `loader` 字段，用你自己的加载器替换默认加载器。自定义模型加载器可以忽略默认加载器所需的全部字段。
 
-Besides the default model loader, NeoForge offers several builtin loaders, each serving a different purpose.
+除默认模型加载器外，NeoForge 还提供了若干内置加载器，各自服务于不同目的。
 
-### Composite Model
+### 复合模型 {#composite-model}
 
-A composite model can be used to specify different model parts in the parent and only apply some of them in a child. This is best illustrated by an example. Consider the following parent model at `examplemod:example_composite_model`:
+复合模型可用于在父模型中指定多个不同的模型部件，而在子模型中只应用其中一部分。用一个例子来说明最为直观。考虑位于 `examplemod:example_composite_model` 的以下父模型：
 
 ```json5
 {
@@ -32,7 +32,7 @@ A composite model can be used to specify different model parts in the parent and
 }
 ```
 
-Then, we can disable and enable individual parts in a child model of `examplemod:example_composite_model`:
+随后，我们可以在 `examplemod:example_composite_model` 的子模型中单独禁用或启用某些部件：
 
 ```json5
 {
@@ -45,15 +45,15 @@ Then, we can disable and enable individual parts in a child model of `examplemod
 }
 ```
 
-To [datagen][modeldatagen] this model, use the custom loader class `CompositeModelBuilder`.
+要为该模型进行[数据生成][modeldatagen]，请使用自定义加载器类 `CompositeModelBuilder`。
 
 :::warning
-The composite model loader should not be used for models used by [client items][citems]. Instead, they should use the [composite model][itemcomposite] provided in the definition itself.
+复合模型加载器不应用于[客户端物品][citems]所使用的模型。这类模型应改用定义本身提供的[复合模型][itemcomposite]。
 :::
 
-### Empty Model
+### 空模型 {#empty-model}
 
-An empty model just renders nothing at all.
+空模型什么也不渲染。
 
 ```json5
 {
@@ -61,9 +61,9 @@ An empty model just renders nothing at all.
 }
 ```
 
-### OBJ Model
+### OBJ 模型 {#obj-model}
 
-The OBJ model loader allows you to use Wavefront `.obj` 3D models in the game, allowing for arbitrary shapes (including triangles, circles, etc.) to be included in a model. The `.obj` model must be placed in the `models` folder (or a subfolder thereof), and a `.mtl` file with the same name must be provided (or set manually), so for example, an OBJ model at `models/block/example.obj` must have a corresponding MTL file at `models/block/example.mtl`.
+OBJ 模型加载器允许你在游戏中使用 Wavefront `.obj` 3D 模型，从而在模型中包含任意形状（包括三角形、圆形等）。`.obj` 模型必须放置在 `models` 文件夹（或其子文件夹）中，并且必须提供（或手动设置）一个同名的 `.mtl` 文件。例如，位于 `models/block/example.obj` 的 OBJ 模型必须有一个对应的 MTL 文件 `models/block/example.mtl`。
 
 ```json5
 {
@@ -92,30 +92,30 @@ The OBJ model loader allows you to use Wavefront `.obj` 3D models in the game, a
 }
 ```
 
-To [datagen][modeldatagen] this model, use the custom loader class `ObjModelBuilder`.
+要为该模型进行[数据生成][modeldatagen]，请使用自定义加载器类 `ObjModelBuilder`。
 
-### Creating Custom Model Loaders
+### 创建自定义模型加载器 {#creating-custom-model-loaders}
 
-To create your own model loader, you need four classes, plus an event handler:
+要创建自己的模型加载器，你需要四个类，外加一个事件处理器：
 
-- An `UnbakedModelLoader` class
-- An `UnbakedGeometry` class, usually an `ExtendedUnbakedGeometry` instance
-- An `UnbakedModel` class, usually an `AbstractUnbakedModel` instance
-- A `QuadCollection` class to hold the baked quads, usually the class itself
-- A [client-side][sides] [event handler][event] for `ModelEvent.RegisterLoaders` that registers the unbaked model loader
-- Optional: A [client-side][sides] [event handler][event] for `AddClientReloadListenersEvent` for model loaders that cache data about what is being loaded
+- 一个 `UnbakedModelLoader` 类
+- 一个 `UnbakedGeometry` 类，通常是一个 `ExtendedUnbakedGeometry` 实例
+- 一个 `UnbakedModel` 类，通常是一个 `AbstractUnbakedModel` 实例
+- 一个用于存放烘焙后四边形的 `QuadCollection` 类，通常就是该类本身
+- 一个针对 `ModelEvent.RegisterLoaders` 的[客户端][sides][事件处理器][event]，用于注册未烘焙模型加载器
+- 可选：一个针对 `AddClientReloadListenersEvent` 的[客户端][sides][事件处理器][event]，供那些会缓存所加载内容相关数据的模型加载器使用
 
-To illustrate how these classes are connected, we will follow a model being loaded:
+为说明这些类之间如何关联，我们来跟随一个模型的加载过程：
 
-- During model loading, a model JSON with the `loader` property set to your loader is passed to your unbaked model loader. The loader then reads the model JSON and returns an `UnbakedModel` object using the model JSON's properties and an `UnbakedGeometry` with the model's unbaked quads.
-- During model baking, `UnbakedGeometry#bake` is called, returning a `QuadCollection`.
-- During model rendering, the `QuadCollection`, along with any other information required by the [client item][citems] or [block state definition][blockstatedefinition] is used in rendering.
+- 在模型加载期间，一个 `loader` 属性设置为你的加载器的模型 JSON 会被传递给你的未烘焙模型加载器。加载器随即读取该模型 JSON，并根据其属性返回一个 `UnbakedModel` 对象，以及一个包含模型未烘焙四边形的 `UnbakedGeometry`。
+- 在模型烘焙期间，`UnbakedGeometry#bake` 会被调用，返回一个 `QuadCollection`。
+- 在模型渲染期间，`QuadCollection` 连同[客户端物品][citems]或[方块状态定义][blockstatedefinition]所需的其他信息一起参与渲染。
 
 :::note
-If you are creating a custom model loader for a model used by an item or block state, depending on the use case, it might be better to create a new `ItemModel` or `BlockStateModel` instead. For example, a model that uses or generates `QuadCollection`s would make more sense as an `ItemModel` or `BlockStateModel`, while a model that parses a different data format (like `.obj`) should use a new model loader.
+如果你要为物品或方块状态所使用的模型创建自定义模型加载器，视具体用例而定，创建一个新的 `ItemModel` 或 `BlockStateModel` 可能更合适。例如，使用或生成 `QuadCollection` 的模型作为 `ItemModel` 或 `BlockStateModel` 更为合理，而解析不同数据格式（如 `.obj`）的模型则应使用新的模型加载器。
 :::
 
-Let's illustrate this further through a basic class setup. The loader class is named `MyUnbakedModelLoader`, the unbaked class is named `MyUnbakedModel`, and the unbaked geometry is called `MyUnbakedGeometry`. We will also assume that the model loader requires some cache:
+让我们通过一个基本的类结构进一步说明。加载器类命名为 `MyUnbakedModelLoader`，未烘焙类命名为 `MyUnbakedModel`，未烘焙几何体命名为 `MyUnbakedGeometry`。我们还假设该模型加载器需要某种缓存：
 
 ```java
 // This is the class used to load the model into its unbaked format
@@ -200,7 +200,7 @@ public class MyUnbakedModel extends AbstractUnbakedModel {
 }
 ```
 
-When all is done, don't forget to actually register your loader:
+一切就绪后，别忘了实际注册你的加载器：
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client
@@ -219,9 +219,9 @@ public static void addClientResourceListeners(AddClientReloadListenersEvent even
 }
 ```
 
-#### Model Loader Datagen
+#### 模型加载器数据生成 {#model-loader-datagen}
 
-Of course, we can also [datagen] our models. To do so, we need a class that extends `CustomLoaderBuilder`:
+当然，我们也可以对模型进行[数据生成][datagen]。为此，我们需要一个继承 `CustomLoaderBuilder` 的类：
 
 ```java
 public class MyLoaderBuilder extends CustomLoaderBuilder {
@@ -255,7 +255,7 @@ public class MyLoaderBuilder extends CustomLoaderBuilder {
 }
 ```
 
-To use this loader builder, do the following during block (or item) [model datagen][modeldatagen]:
+要使用这个加载器构建器，在方块（或物品）[模型数据生成][modeldatagen]期间执行以下操作：
 
 ```java
 // This assumes an extension of ModelProvider and a DeferredBlock<Block> EXAMPLE_BLOCK.
@@ -285,17 +285,17 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 }
 ```
 
-#### Visibility
+#### 可见性 {#visibility}
 
-The default implementation of `CustomLoaderBuilder` holds methods for applying visibility. You may choose to use or ignore the `visibility` property in your model loader. Currently, only the [composite model loader][composite] and [OBJ loader][obj] make use of this property.
+`CustomLoaderBuilder` 的默认实现提供了应用可见性的方法。你可以选择在自己的模型加载器中使用或忽略 `visibility` 属性。目前，只有[复合模型加载器][composite]和 [OBJ 加载器][obj]会使用该属性。
 
-## Block State Model Loaders
+## 方块状态模型加载器 {#block-state-model-loaders}
 
-As block state models are considered separate from the model JSON file, there are also custom NeoForge loaders, handled by specifying a `type` in a variant or multipart. A custom block state model loader may ignore all fields the loader requires.
+由于方块状态模型被视为独立于模型 JSON 文件，NeoForge 也提供了自定义加载器，通过在某个 variant 或 multipart 中指定 `type` 来处理。自定义方块状态模型加载器可以忽略该加载器所需的全部字段。
 
-### Composite Block State Model
+### 复合方块状态模型 {#composite-block-state-model}
 
-A composite block state model can be used to render multiple `BlockStateModel`s together.
+复合方块状态模型可用于将多个 `BlockStateModel` 一起渲染。
 
 ```json5
 {
@@ -322,11 +322,11 @@ A composite block state model can be used to render multiple `BlockStateModel`s 
 }
 ```
 
-To [datagen][modeldatagen] this block state model, use the custom loader class `CompositeBlockStateModelBuilder`.
+要为该方块状态模型进行[数据生成][modeldatagen]，请使用自定义加载器类 `CompositeBlockStateModelBuilder`。
 
-### Reusing the Default Model Loader
+### 复用默认模型加载器 {#reusing-the-default-model-loader}
 
-In some contexts, it makes sense to reuse the vanilla model loader and just building your model logic on top of that instead of outright replacing it. We can do so using a neat trick: in the model loader, we simply remove the `loader` property and send it back to the model deserializer, tricking it into thinking that it is a regular unbaked model now. Then, we can modify the model or its geometry before the baking process, where we can do whatever way we want.
+在某些场景下，与其彻底替换原版模型加载器，不如复用它，只在其之上构建你自己的模型逻辑。我们可以用一个巧妙的技巧来做到：在模型加载器中，我们直接移除 `loader` 属性，再把它送回模型反序列化器，骗它以为这现在是一个普通的未烘焙模型。随后，我们可以在烘焙过程之前修改模型或其几何体，在那里想怎么做都行。
 
 ```java
 public class MyUnbakedModelLoader implements UnbakedModelLoader<MyUnbakedModel> {
@@ -355,24 +355,24 @@ public class MyUnbakedModel extends DelegateUnbakedModel {
 }
 ```
 
-### Creating Custom Block State Model Loaders
+### 创建自定义方块状态模型加载器 {#creating-custom-block-state-model-loaders}
 
-To create your own block state model loader, you need five classes, plus an event handler:
+要创建自己的方块状态模型加载器，你需要五个类，外加一个事件处理器：
 
-- A `CustomUnbakedBlockStateModel` class to load the block state model
-- A `BlockStateModel` class to bake the model, usually a `DynamicBlockStateModel` instance
-- A `BlockStateModelPart.Unbaked` to load the model JSON
-- A `ModelState` to apply any transformations to a given face or model 
-- A `BlockStateModelPart` to hold the quads, ambient occlusion, and particle texture, commonly a `SimpleModelWrapper`
-- A [client-side][sides] [event handler][event] for `RegisterBlockStateModels` that registers the codec for the unbaked block state model loader
+- 一个用于加载方块状态模型的 `CustomUnbakedBlockStateModel` 类
+- 一个用于烘焙模型的 `BlockStateModel` 类，通常是一个 `DynamicBlockStateModel` 实例
+- 一个用于加载模型 JSON 的 `BlockStateModelPart.Unbaked`
+- 一个用于对给定面或模型应用变换的 `ModelState`
+- 一个用于存放四边形、环境光遮蔽和粒子纹理的 `BlockStateModelPart`，通常是一个 `SimpleModelWrapper`
+- 一个针对 `RegisterBlockStateModels` 的[客户端][sides][事件处理器][event]，用于为未烘焙方块状态模型加载器注册 codec
 
-To illustrate how these classes are connected, we will follow a block state model being loaded:
+为说明这些类之间如何关联，我们来跟随一个方块状态模型的加载过程：
 
-- During definition loading, a block state model within a variant, multipart, or [custom definition][customdefinition] with the `type` property set to your loader is decoded to your `CustomUnbakedBlockStateModel`.
-- During model baking, `CustomUnbakedBlockStateModel#bake` is called, returning a `BlockStateModel`, which contains some list of `BlockStateModelPart`s.
-- During model rendering, `BlockStateModel#collectParts` collects the list of `BlockStateModelPart`s to render.
+- 在定义加载期间，某个 variant、multipart 或[自定义定义][customdefinition]中，`type` 属性设置为你的加载器的方块状态模型会被解码为你的 `CustomUnbakedBlockStateModel`。
+- 在模型烘焙期间，`CustomUnbakedBlockStateModel#bake` 会被调用，返回一个 `BlockStateModel`，其中包含若干 `BlockStateModelPart` 组成的列表。
+- 在模型渲染期间，`BlockStateModel#collectParts` 会收集要渲染的 `BlockStateModelPart` 列表。
 
-Let's illustrate this further through a basic class setup. The baked model is named `MyBlockStateModel`, the unbaked class is an inner record `MyBlockStateModel.Unbaked`, model parts is called `MyBlockStateModelPart`, the unbaked part class is an inner record `MyBlockStateModelPart.Unbaked`, and the `ModelState` is named `MyModelState`:
+让我们通过一个基本的类结构进一步说明。烘焙后的模型命名为 `MyBlockStateModel`，未烘焙类是内部记录 `MyBlockStateModel.Unbaked`，模型部件命名为 `MyBlockStateModelPart`，未烘焙部件类是内部记录 `MyBlockStateModelPart.Unbaked`，`ModelState` 命名为 `MyModelState`：
 
 ```java
 // The model state used to apply the necessary transformations
@@ -533,7 +533,7 @@ public record MyBlockStateModel(MyBlockStateModelPart model) implements DynamicB
 ```
 
 
-When all is done, don't forget to actually register your loader:
+一切就绪后，别忘了实际注册你的加载器：
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client
@@ -542,9 +542,9 @@ public static void registerDefinitions(RegisterBlockStateModels event) {
 }
 ```
 
-#### State Model Loader Datagen
+#### 状态模型加载器数据生成 {#state-model-loader-datagen}
 
-Of course, we can also [datagen] our models. To do so, we need a class that extends `CustomBlockStateModelBuilder`:
+当然，我们也可以对模型进行[数据生成][datagen]。为此，我们需要一个继承 `CustomBlockStateModelBuilder` 的类：
 
 ```java
 // The builder used to construct the block state JSON
@@ -583,7 +583,7 @@ public class MyBlockStateModelBuilder extends CustomBlockStateModelBuilder {
 }
 ```
 
-To use this state definition loader builder, do the following during block (or item) [model datagen][modeldatagen]:
+要使用这个状态定义加载器构建器，在方块（或物品）[模型数据生成][modeldatagen]期间执行以下操作：
 
 ```java
 // This assumes an extension of ModelProvider and a DeferredBlock<Block> EXAMPLE_BLOCK.
@@ -600,7 +600,7 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 }
 ```
 
-This will generate a model like so:
+这将生成如下所示的模型：
 
 ```json5
 {
@@ -613,25 +613,25 @@ This will generate a model like so:
 }
 ```
 
-## Block State Definition Loaders
+## 方块状态定义加载器 {#block-state-definition-loaders}
 
-While individual block state models handle the loading of a single block state, block state definition loaders handle the entire loading of a block state file, handled by specifying a `neoforge:definition_type`. A custom block state definition loader may ignore all fields the loader requires.
+单个方块状态模型处理的是单一方块状态的加载，而方块状态定义加载器处理的是整个方块状态文件的加载，通过指定 `neoforge:definition_type` 来处理。自定义方块状态定义加载器可以忽略该加载器所需的全部字段。
 
-### Creating Custom Block State Definition Loaders
+### 创建自定义方块状态定义加载器 {#creating-custom-block-state-definition-loaders}
 
-To create your own block state definition loader, you need two classes, plus an event handler:
+要创建自己的方块状态定义加载器，你需要两个类，外加一个事件处理器：
 
-- A `CustomBlockModelDefinition` class to load the block state definition
-- A `BlockStateModel.UnbakedRoot` class to bake a block state to its `BlockStateModel`
-- A [client-side][sides] [event handler][event] for `RegisterBlockStateModels` that registers the codec for the unbaked block state model loader
+- 一个用于加载方块状态定义的 `CustomBlockModelDefinition` 类
+- 一个用于将方块状态烘焙为其 `BlockStateModel` 的 `BlockStateModel.UnbakedRoot` 类
+- 一个针对 `RegisterBlockStateModels` 的[客户端][sides][事件处理器][event]，用于为未烘焙方块状态模型加载器注册 codec
 
-To illustrate how these classes are connected, we will follow a block state model being loaded:
+为说明这些类之间如何关联，我们来跟随一个方块状态模型的加载过程：
 
-- During definition loading, a block state definition with the `neoforge:definition_type` property set to your loader is decoded to a `CustomBlockModelDefinition`.
-- Then, `CustomBlockModelDefinition#instantiate` is called to map all possible block states to their `BlockStateModel.UnbakedRoot`. For simple cases, this is constructed via `BlockStateModel.Unbaked#asRoot`. Complicated instances create their own `BlockStateModel.UnbakedRoot`.
-- During model baking, `BlockStateModel.UnbakedRoot#bake` is called, returning a `BlockStateModel` for some `BlockState`.
+- 在定义加载期间，一个 `neoforge:definition_type` 属性设置为你的加载器的方块状态定义会被解码为一个 `CustomBlockModelDefinition`。
+- 然后，`CustomBlockModelDefinition#instantiate` 会被调用，将所有可能的方块状态映射到它们各自的 `BlockStateModel.UnbakedRoot`。对于简单情形，这是通过 `BlockStateModel.Unbaked#asRoot` 构造的。复杂的实例则会创建它们自己的 `BlockStateModel.UnbakedRoot`。
+- 在模型烘焙期间，`BlockStateModel.UnbakedRoot#bake` 会被调用，为某个 `BlockState` 返回一个 `BlockStateModel`。
 
-Let's illustrate this further through a basic class setup. The block model definition is named `MyBlockModelDefinition` and we will reuse `BlockStateModel.Unbaked#asRoot` to construct the `BlockStateModel.UnbakedRoot`:
+让我们通过一个基本的类结构进一步说明。方块模型定义命名为 `MyBlockModelDefinition`，我们将复用 `BlockStateModel.Unbaked#asRoot` 来构造 `BlockStateModel.UnbakedRoot`：
 
 ```java
 public record MyBlockModelDefinition(MyBlockStateModel.Unbaked model) implements CustomBlockModelDefinition {
@@ -662,7 +662,7 @@ public record MyBlockModelDefinition(MyBlockStateModel.Unbaked model) implements
 }
 ```
 
-When all is done, don't forget to actually register your loader:
+一切就绪后，别忘了实际注册你的加载器：
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client
@@ -671,9 +671,9 @@ public static void registerDefinitions(RegisterBlockStateModels event) {
 }
 ```
 
-#### State Definition Loader Datagen
+#### 状态定义加载器数据生成 {#state-definition-loader-datagen}
 
-Of course, we can also [datagen] our definitions. To do so, we need a class that extends `BlockModelDefinitionGenerator`:
+当然，我们也可以对定义进行[数据生成][datagen]。为此，我们需要一个继承 `BlockModelDefinitionGenerator` 的类：
 
 ```java
 public class MyBlockModelDefinitionGenerator implements BlockModelDefinitionGenerator {
@@ -704,7 +704,7 @@ public class MyBlockModelDefinitionGenerator implements BlockModelDefinitionGene
 } 
 ```
 
-To use this state definition loader builder, do the following during block (or item) [model datagen][modeldatagen]:
+要使用这个状态定义加载器构建器，在方块（或物品）[模型数据生成][modeldatagen]期间执行以下操作：
 
 ```java
 // This assumes a DeferredBlock<Block> EXAMPLE_BLOCK.
@@ -720,7 +720,7 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 }
 ```
 
-This will generate a model like so:
+这将生成如下所示的模型：
 
 ```json5
 {

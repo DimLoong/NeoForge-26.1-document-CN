@@ -1,12 +1,12 @@
-# Custom Recipes
+# 自定义配方 {#custom-recipes}
 
-To add custom recipes, we need at least three things: a `Recipe`, a `RecipeType`, and a `RecipeSerializer`. Depending on what you are implementing, you may also need a custom `RecipeInput`, `RecipeDisplay`, `SlotDisplay`, `RecipeBookCategory`, and `RecipePropertySet` if reusing an existing subclass is not feasible.
+要添加自定义配方，我们至少需要三样东西：一个 `Recipe`、一个 `RecipeType` 和一个 `RecipeSerializer`。根据你要实现的内容，若复用现有子类不可行，你可能还需要自定义 `RecipeInput`、`RecipeDisplay`、`SlotDisplay`、`RecipeBookCategory` 和 `RecipePropertySet`。
 
-For the sake of example, and to highlight many different features, we are going to implement a recipe-driven mechanic that requires you to right-click a `BlockState` in-world with a certain item, breaking the `BlockState` and dropping the result item.
+为便于举例，同时也为了突出许多不同的特性，我们将实现一个配方驱动的机制：它要求你用某种物品在世界中右键点击一个 `BlockState`，破坏该 `BlockState` 并掉落结果物品。
 
-## The Recipe Input
+## 配方输入 {#the-recipe-input}
 
-Let's begin by defining what we want to put into the recipe. It's important to understand that the recipe input represents the actual inputs that the player is using right now. As such, we don't use tags or ingredients here, instead we use the actual item stacks and blockstates we have available.
+我们先来定义想要放入配方的内容。重要的是要理解，配方输入表示玩家此时此刻实际使用的输入。因此，我们这里不使用标签或材料，而是使用手头实际拥有的物品堆叠和方块状态。
 
 ```java
 // Our inputs are a BlockState and an ItemStack.
@@ -28,11 +28,11 @@ public record RightClickBlockInput(BlockState state, ItemStack stack) implements
 }
 ```
 
-Recipe inputs don't need to be registered or serialized in any way because they are created on demand. It is not always necessary to create your own, the vanilla ones (`CraftingInput`, `SingleRecipeInput` and `SmithingRecipeInput`) are fine for many use cases.
+配方输入无需以任何方式注册或序列化，因为它们是按需创建的。并不总是需要创建你自己的输入，原版的输入（`CraftingInput`、`SingleRecipeInput` 和 `SmithingRecipeInput`）在许多用例中都足够用。
 
-## The Recipe Class
+## 配方类 {#the-recipe-class}
 
-Now that we have our inputs, let's get to the recipe itself. This is what holds our recipe data, and also handles matching and returning the recipe result. As such, it is usually the longest class for your custom recipe.
+有了输入之后，我们来看配方本身。这里保存我们的配方数据，同时处理匹配和返回配方结果。因此，它通常是自定义配方中最长的类。
 
 ```java
 // The generic parameter for Recipe<T> is our RightClickBlockInput from above.
@@ -85,11 +85,11 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 }
 ```
 
-### Common Information
+### 公共信息 {#common-information}
 
-All recipes have common information which, although it may not be implemented the same way, is parsed from the JSON. For all recipes, vanilla provides `Recipe.CommonInfo`. Currently, it allows the recipe to specify whether to show the notification toast or not when unlocking. `CommonInfo` also provides a [map codec][codec] and [stream codec][streamcodec] for integrating with the [`RecipeSerializer`][serializer] below.
+所有配方都有公共信息，尽管其实现方式未必相同，但都从 JSON 解析而来。对于所有配方，原版都提供了 `Recipe.CommonInfo`。目前，它允许配方指定在解锁时是否显示通知提示气泡。`CommonInfo` 还提供了一个[映射 Codec][codec] 和一个[流式编解码器][streamcodec]，用于与下文的 [`RecipeSerializer`][serializer] 集成。
 
-As such, the `CommonInfo` can then be used to specify some methods on the `Recipe`:
+因此，可以用 `CommonInfo` 在 `Recipe` 上指定一些方法：
 
 ```java
 public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
@@ -112,14 +112,14 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 ```
 
 :::note
-You are not required to make use of the `CommonInfo` record, or even make the `show_notification` field available on the JSON. It is up to the modder to decide if it makes sense to use.
+你并非必须使用 `CommonInfo` record，甚至不必在 JSON 上提供 `show_notification` 字段。是否使用它由 Mod 开发者自行决定。
 :::
 
-## Recipe Book Information
+## 配方书信息 {#recipe-book-information}
 
-Like the common information, there is also fields parsed from the JSON relating to the recipe book: a [GUI][gui] that displays recipes in some transformation menu (e.g., crafting table, furnace, etc.). For these fields, vanilla provides the `Recipe.BookInfo<CategoryType>` interface, where `CategoryType` defines either the category of the recipe (assuming it is serializable) or an intermediate serializable object that can be converted to the category. Like `CommonInfo`, it provides a [map codec][codec] and [stream codec][streamcodec] for integrating with the [`RecipeSerializer`][serializer] below.
+和公共信息类似，还有一些从 JSON 解析而来、与配方书相关的字段：配方书是一种在某个转化菜单（例如工作台、熔炉等）中显示配方的 [GUI][gui]。对于这些字段，原版提供了 `Recipe.BookInfo<CategoryType>` 接口，其中 `CategoryType` 要么定义配方的类别（假定其可序列化），要么定义一个可转换为该类别的中间可序列化对象。和 `CommonInfo` 一样，它提供了一个[映射 Codec][codec] 和一个[流式编解码器][streamcodec]，用于与下文的 [`RecipeSerializer`][serializer] 集成。
 
-For example:
+例如：
 
 ```java
 public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
@@ -166,12 +166,12 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 ```
 
 :::note
-Like with `CommonInfo`, you are not required to use `BookInfo` or even make fields available on the JSON. It is up to the modder to decide if it makes sense to use for their recipe (i.e., recipes where `Recipe#isSpecial` returns true do not appear in the recipe book, so `BookInfo` should not be used). However, both `Recipe#group` and `recipeBookCategory` must be non-null objects.
+和 `CommonInfo` 一样，你并非必须使用 `BookInfo`，甚至不必在 JSON 上提供相应字段。是否使用它对其配方有意义，由 Mod 开发者自行决定（即 `Recipe#isSpecial` 返回 true 的配方不会出现在配方书中，因此不应使用 `BookInfo`）。不过，`Recipe#group` 和 `recipeBookCategory` 都必须是非 null 对象。
 :::
 
-### Recipe Groups
+### 配方分组 {#recipe-groups}
 
-Groups act as a key to group recipes together into a single entry within the recipe book. If the group is set to an empty string, it will be treated as its own unique entry.
+分组的作用相当于一个键，用于把配方归入配方书中的单个条目。若分组设为空字符串，则会被视为其自身独立的条目。
 
 ```java
 public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
@@ -184,15 +184,15 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 }
 ```
 
-### Book Categories
+### 书籍类别 {#book-categories}
 
-A `RecipeBookCategory` simply defines a group to display this recipe within in a recipe book. For example, an iron pickaxe crafting recipe would show up in the `RecipeBookCategories#CRAFTING_EQUIPMENT` while a cooked cod recipe would show up in `#FURNANCE_FOOD` or `#SMOKER_FOOD`. Each recipe has one associated `RecipeBookCategory`. The vanilla categories can be found in `RecipeBookCategories`.
+`RecipeBookCategory` 只是定义在配方书中显示该配方的分组。例如，铁镐合成配方会出现在 `RecipeBookCategories#CRAFTING_EQUIPMENT` 中，而熟鳕鱼配方会出现在 `#FURNANCE_FOOD` 或 `#SMOKER_FOOD` 中。每个配方都有一个关联的 `RecipeBookCategory`。原版类别可在 `RecipeBookCategories` 中找到。
 
 :::note
-There are two cooked cod recipes, one for the furnace and one for the smoker. The furnace and smoker recipes have different book categories.
+熟鳕鱼有两个配方，一个用于熔炉，一个用于烟熏炉。熔炉和烟熏炉配方有不同的书籍类别。
 :::
 
-If your recipe does not fit into one of the existing categories, typically because the recipe does not use one of the existing crafting stations (e.g., crafting table, furnace), then a new `RecipeBookCategory` can be created. Each `RecipeBookCategory` must be [registered][registry] to `BuiltInRegistries#RECIPE_BOOK_CATEGORY`:
+如果你的配方不属于任何现有类别，通常是因为该配方没有使用某个现有的合成工作站（例如工作台、熔炉），那么可以创建一个新的 `RecipeBookCategory`。每个 `RecipeBookCategory` 都必须[注册][registry]到 `BuiltInRegistries#RECIPE_BOOK_CATEGORY`：
 
 ```java
 /// For some DeferredRegister<RecipeBookCategory> RECIPE_BOOK_CATEGORIES
@@ -201,7 +201,7 @@ public static final Supplier<RecipeBookCategory> RIGHT_CLICK_BLOCK_CATEGORY = RE
 );
 ```
 
-Then, to set the category, we can override `#recipeBookCategory` to either directly return our category, or use the book info (if implemented) to map to our category, like so:
+然后，要设置类别，我们可以重写 `#recipeBookCategory`，直接返回我们的类别，或利用书籍信息（若已实现）映射到我们的类别，如下所示：
 
 ```java
 public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
@@ -219,11 +219,11 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 }
 ```
 
-### Search Categories
+### 搜索类别 {#search-categories}
 
-All `RecipeBookCategory`s are technically `ExtendedRecipeBookCategory`s. There is another type of `ExtendedRecipeBookCategory` called `SearchRecipeBookCategory`, which is used to aggregate `RecipeBookCategory`s when viewing all recipes in a recipe book.
+所有 `RecipeBookCategory` 在技术上都是 `ExtendedRecipeBookCategory`。还有另一种 `ExtendedRecipeBookCategory`，称为 `SearchRecipeBookCategory`，用于在配方书中查看所有配方时聚合多个 `RecipeBookCategory`。
 
-NeoForge allows users to specify their own `ExtendedRecipeBookCategory` as a search category via `RegisterRecipeBookSearchCategoriesEvent#register` on the mod event bus. `register` takes in the `ExtendedRecipeBookCategory` representing the search category and the `RecipeBookCategory`s that make up that search category. The `ExtendedRecipeBookCategory` search category does not need to be registered to some static vanilla registry.
+NeoForge 允许用户通过 mod 事件总线上的 `RegisterRecipeBookSearchCategoriesEvent#register` 把自己的 `ExtendedRecipeBookCategory` 指定为搜索类别。`register` 接受表示搜索类别的 `ExtendedRecipeBookCategory` 以及构成该搜索类别的多个 `RecipeBookCategory`。`ExtendedRecipeBookCategory` 搜索类别无需注册到某个静态原版注册表。
 
 ```java
 // In some location
@@ -243,11 +243,11 @@ public static void registerSearchCategories(RegisterRecipeBookSearchCategoriesEv
 }
 ```
 
-## Placement Info
+## 放置信息 {#placement-info}
 
-A `PlacementInfo` is meant to define the crafting requirements used by the recipe consumer and whether/how it can be placed into its associated crafting station (e.g., crafting table, furnace). `PlacementInfo` are only meant for item ingredients, so if other types of ingredients are desired (e.g., fluid, block), the surrounding logic will need to be implemented from scratch. In these cases, the recipe can be labelled as not placeable, and say as such via `PlacementInfo#NOT_PLACEABLE`. However, if there is at least one item-like object in your recipe, you should create a `PlacementInfo`.
+`PlacementInfo` 用于定义配方消费者所用的合成要求，以及配方是否/如何能被放入其关联的合成工作站（例如工作台、熔炉）。`PlacementInfo` 仅适用于物品材料，因此如果需要其他类型的材料（例如流体、方块），则需要从头实现周边逻辑。在这些情况下，可以把配方标记为不可放置，并通过 `PlacementInfo#NOT_PLACEABLE` 加以说明。不过，如果你的配方中至少有一个类物品对象，你就应该创建一个 `PlacementInfo`。
 
-A `PlacementInfo` can be created via `create`, which takes in one or a list of ingredient, or `createFromOptionals`, which takes in a list of optional ingredients. If your recipe contains some representation of empty slots, then `createFromOptionals` should be used, providing an empty optional for an empty slot:
+`PlacementInfo` 可以通过 `create` 创建，它接受一个或一列材料；或通过 `createFromOptionals` 创建，它接受一列可选材料。如果你的配方包含对空槽位的某种表示，则应使用 `createFromOptionals`，为空槽位提供一个空 optional：
 
 ```java
 public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
@@ -274,40 +274,40 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 }
 ```
 
-## Slot Displays
+## 槽位显示 {#slot-displays}
 
-`SlotDisplay`s represent the information on what should render in what slot when viewed by a recipe consumer, like a recipe book. A `SlotDisplay` has two methods. First there's `resolve`, which takes in the `ContextMap` containing the available registries and fuel values (as shown in `SlotDisplayContext`); and the current `DisplayContentsFactory`, which accepts the contents to display for this slot; and returns the transformed list of contents into the output to be accepted. Then there's `type`, which holds the [`MapCodec`][codec] and [`StreamCodec`][streamcodec] used to encode/decode the display.
+`SlotDisplay` 表示当被配方消费者（如配方书）查看时，某个槽位应渲染什么内容的信息。一个 `SlotDisplay` 有两个方法。首先是 `resolve`，它接受包含可用注册表和燃料值（如 `SlotDisplayContext` 所示）的 `ContextMap`；以及当前的 `DisplayContentsFactory`（它接受该槽位要显示的内容）；并返回转换后的内容列表，作为要被接受的输出。其次是 `type`，它持有用于编码/解码显示的 [`MapCodec`][codec] 和 [`StreamCodec`][streamcodec]。
 
-`SlotDisplay`s are typically implemented on the [`Ingredient` via `#display`, or `ICustomIngredient#display` for modded ingredients][ingredients]; however, in some cases, the input may not be an ingredient, meaning a `SlotDisplay` will need to use one available, or have a new one created.
+`SlotDisplay` 通常[通过 `Ingredient` 上的 `#display` 实现，对于 Mod 材料则通过 `ICustomIngredient#display` 实现][ingredients]；不过在某些情况下，输入可能不是材料，这意味着 `SlotDisplay` 将需要使用一个可用的，或者创建一个新的。
 
-These are the available slot displays provided by Vanilla and NeoForge:
+以下是原版和 NeoForge 提供的可用槽位显示：
 
-- `SlotDisplay.Empty`: A slot that represents nothing.
-- `SlotDisplay.ItemSlotDisplay`: A slot that represents an item.
-- `SlotDisplay.ItemStackSlotDisplay`: A slot that represents an item stack template.
-- `SlotDisplay.TagSlotDisplay`: A slot that represents an item tag.
-- `SlotDisplay.OnlyWithComponent`: A slot that filters some other display to only items with the given data component.
-- `SlotDisplay.WithAnyPotion`: A slot that represents some input with a random `DataComponents#POTION_CONTENTS` value.
-- `SlotDisplay.WithRemainder`: A slot that represents some input that has some crafting remainder.
-- `SlotDisplay.AnyFuel`: A slot that represents all fuel items.
-- `SlotDisplay.Composite`: A slot that represents a combination of other slot displays.
-- `SlotDisplay.DyedSlotDemo`: A slot that represents a dye being applied to some target, setting `DataComponents#DYED_COLOR`. 
-- `SlotDisplay.SmithingTrimDemoSlotDisplay`: A slot that represents a random smithing trim being applied to some base with the given material.
-- `FluidSlotDisplay`: A slot that represents a fluid.
-- `FluidStackSlotDisplay`: A slot that represents a fluid stack.
-- `FluidTagSlotDisplay`: A slot that represents a fluid tag.
+- `SlotDisplay.Empty`：表示无内容的槽位。
+- `SlotDisplay.ItemSlotDisplay`：表示一个物品的槽位。
+- `SlotDisplay.ItemStackSlotDisplay`：表示一个物品堆叠模板的槽位。
+- `SlotDisplay.TagSlotDisplay`：表示一个物品标签的槽位。
+- `SlotDisplay.OnlyWithComponent`：把某个其他显示过滤为只显示带有给定数据组件的物品的槽位。
+- `SlotDisplay.WithAnyPotion`：表示带有随机 `DataComponents#POTION_CONTENTS` 值的某个输入的槽位。
+- `SlotDisplay.WithRemainder`：表示带有某种合成剩余物的某个输入的槽位。
+- `SlotDisplay.AnyFuel`：表示所有燃料物品的槽位。
+- `SlotDisplay.Composite`：表示其他多个槽位显示组合的槽位。
+- `SlotDisplay.DyedSlotDemo`：表示一种染料被应用到某个目标上、并设置 `DataComponents#DYED_COLOR` 的槽位。
+- `SlotDisplay.SmithingTrimDemoSlotDisplay`：表示用给定材料把一个随机锻造纹饰应用到某个基础项上的槽位。
+- `FluidSlotDisplay`：表示一种流体的槽位。
+- `FluidStackSlotDisplay`：表示一个流体堆叠的槽位。
+- `FluidTagSlotDisplay`：表示一个流体标签的槽位。
 
-We have three 'slots' in our recipe: the `BlockState` input, the `Ingredient` input, and the `ItemStack` result. The `Ingredient` input will already have an associated `SlotDisplay` and the `ItemStack` can be represented by `SlotDisplay.ItemStackSlotDisplay`. The `BlockState`, on the other hand, will need its own custom `SlotDisplay` and `DisplayContentsFactory`, as existing ones only take in item stacks, and for this example, block states are handled in a different fashion.
+我们的配方中有三个“槽位”：`BlockState` 输入、`Ingredient` 输入和 `ItemStack` 结果。`Ingredient` 输入已经有关联的 `SlotDisplay`，而 `ItemStack` 可以用 `SlotDisplay.ItemStackSlotDisplay` 表示。另一方面，`BlockState` 则需要它自己的自定义 `SlotDisplay` 和 `DisplayContentsFactory`，因为现有的这些只接受物品堆叠，而在本例中方块状态是以另一种方式处理的。
 
-Starting with the `DisplayContentsFactory`, it is meant to be a transformer for some type to desired content display type. The available factories are:
+先从 `DisplayContentsFactory` 开始，它意在充当把某个类型转换为所需内容显示类型的转换器。可用的工厂有：
 
-- `DisplayContentsFactory.ForStacks`: A transformer that takes in `ItemStack`s.
-- `DisplayContentsFactory.ForRemainders`: A transformer that takes in the input object and a list of remainder objects.
-- `ForFluidStacks`: A transformer that takes in a `FluidStack`.
+- `DisplayContentsFactory.ForStacks`：接受 `ItemStack` 的转换器。
+- `DisplayContentsFactory.ForRemainders`：接受输入对象和一列剩余物对象的转换器。
+- `ForFluidStacks`：接受 `FluidStack` 的转换器。
 
-With this, the `DisplayContentsFactory` can be implemented to transform the provided objects into the desired output. For example, `SlotDisplay.ItemStackContentsFactory`, takes the `ForStacks` transformer and has the stacks transformed into `ItemStack`s.
+有了它，`DisplayContentsFactory` 就可以被实现来把所提供的对象转换为所需的输出。例如，`SlotDisplay.ItemStackContentsFactory` 接受 `ForStacks` 转换器，并把堆叠转换为 `ItemStack`。
 
-For our `BlockState`, we'll create a factory that takes in the state, along with a basic implementation that outputs the state itself.
+对于我们的 `BlockState`，我们将创建一个接受该状态的工厂，以及一个输出该状态本身的基础实现。
 
 ```java
 // A basic transformer for block states
@@ -353,7 +353,7 @@ public class BlockStateStackContentsFactory implements ForBlockStates<ItemStack>
 }
 ```
 
-Then, with that, we can create a new `SlotDisplay`. The `SlotDisplay.Type` must be [registered][registry]:
+然后，有了它，我们就可以创建一个新的 `SlotDisplay`。`SlotDisplay.Type` 必须被[注册][registry]：
 
 ```java
 // A simple slot display
@@ -394,11 +394,11 @@ public static final Supplier<SlotDisplay.Type<BlockStateSlotDisplay>> BLOCK_STAT
 );
 ```
 
-## Recipe Display
+## 配方显示 {#recipe-display}
 
-A `RecipeDisplay` is the same as a `SlotDisplay`, except that it represents an entire recipe. The default interface only keeps track of the `result` of recipe and the `craftingStation` which represents the workbench where the recipe is applied. The `RecipeDisplay` also has a `type` that holds the [`MapCodec`][codec] and [`StreamCodec`][streamcodec] used to encode/decode the display. However, no available subtypes of `RecipeDisplay` contain all the information required to properly render our recipe on the client. As such, we will need to create our own `RecipeDisplay`.
+`RecipeDisplay` 与 `SlotDisplay` 相同，只不过它表示整个配方。默认接口只跟踪配方的 `result` 以及表示应用该配方的工作台的 `craftingStation`。`RecipeDisplay` 也有一个 `type`，持有用于编码/解码显示的 [`MapCodec`][codec] 和 [`StreamCodec`][streamcodec]。不过，`RecipeDisplay` 的现有子类型都不包含在客户端正确渲染我们配方所需的全部信息。因此，我们将需要创建自己的 `RecipeDisplay`。
 
-All slots and ingredients should be represented as `SlotDisplay`s. Any restrictions, such as grid size, can be provided in any manner the user decides.
+所有槽位和材料都应表示为 `SlotDisplay`。任何限制（例如网格大小）都可以由用户自行决定以任意方式提供。
 
 ```java
 // A simple recipe display
@@ -444,7 +444,7 @@ public static final Supplier<RecipeDisplay.Type<RightClickBlockRecipeDisplay>> R
 );
 ```
 
-Then we can create the recipe display for the recipe by overriding `#display` like so:
+然后我们可以通过重写 `#display` 为配方创建配方显示，如下所示：
 
 ```java
 public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
@@ -467,9 +467,9 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 }
 ```
 
-## The Recipe Type
+## 配方类型 {#the-recipe-type}
 
-Next up, our recipe type. This is fairly straightforward because there's no data other than a name associated with a recipe type. They are one of two [registered][registry] parts of the recipe system, so like with all other registries, we create a `DeferredRegister` and register to it:
+接下来是我们的配方类型。这相当简单，因为与配方类型关联的除了名称之外没有其他数据。它们是配方系统中两个[已注册][registry]部分之一，所以和所有其他注册表一样，我们创建一个 `DeferredRegister` 并向它注册：
 
 ```java
 public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES =
@@ -483,7 +483,7 @@ public static final Supplier<RecipeType<RightClickBlockRecipe>> RIGHT_CLICK_BLOC
         );
 ```
 
-After we have registered our recipe type, we must override `#getType` in our recipe, like so:
+注册配方类型之后，我们必须在配方中重写 `#getType`，如下所示：
 
 ```java
 public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
@@ -496,11 +496,11 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 }
 ```
 
-## The Recipe Serializer
+## 配方序列化器 {#the-recipe-serializer}
 
-A recipe serializer provides two codecs, one map codec and one stream codec, for serialization from/to JSON and from/to network, respectively. This section will not go in depth about how the codecs work, please see [Map Codecs][codec] and [Stream Codecs][streamcodec] for more information.
+配方序列化器提供两个 Codec，一个映射 Codec 和一个流式编解码器，分别用于从/到 JSON 的序列化以及从/到网络的序列化。本节不会深入讲解这些 Codec 的工作原理，请参见[映射 Codec][codec] 和[流式编解码器][streamcodec]了解更多信息。
 
-We'll create a map codec and stream codec inside our recipe class.
+我们将在配方类内部创建一个映射 Codec 和一个流式编解码器。
 
 ```java
 public static final MapCodec<RightClickBlockRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
@@ -521,7 +521,7 @@ public static final StreamCodec<RegistryFriendlyByteBuf, RightClickBlockRecipe> 
 );
 ```
 
-Like with the type, we'll create and register our serializer:
+和类型一样，我们将创建并注册我们的序列化器：
 
 ```java
 public static final DeferredRegister<RecipeType<?>> RECIPE_SERIALIZERS =
@@ -531,7 +531,7 @@ public static final Supplier<RecipeSerializer<RightClickBlockRecipe>> RIGHT_CLIC
         RECIPE_SERIALIZERS.register("right_click_block", ()-> new RecipeSerializer<>(RightClickBlockRecipe.CODEC, RightClickBlockRecipe.STREAM_CODEC));
 ```
 
-And similarly, we must also override `#getSerializer` in our recipe, like so:
+类似地，我们还必须在配方中重写 `#getSerializer`，如下所示：
 
 ```java
 public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
@@ -544,13 +544,13 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 }
 ```
 
-## The Crafting Mechanic
+## 合成机制 {#the-crafting-mechanic}
 
-Now that all parts of your recipe are complete, you can make yourself some recipe JSONs (see the [datagen] section for that) and then query the recipe manager for your recipes, like above. What you then do with the recipe is up to you. A common use case would be a machine that can process your recipes, storing the active recipe as a field.
+现在你的配方的所有部分都已完成，你可以给自己制作一些配方 JSON（参见[数据生成][datagen]一节），然后像上文那样向配方管理器查询你的配方。之后如何处理配方由你决定。一个常见用例是一台能处理你配方的机器，把当前活动配方作为字段存储。
 
-In our case, however, we want to apply the recipe when an item is right-clicked on a block. We will do so using an [event handler][event]. Keep in mind that this is an example implementation, and you can alter this in any way you like (so long as you run it on the server). As we want the interaction state to match on both the client and server, we will also need to [sync any relevant input states across the network][networking].
+不过在我们的例子中，我们想在物品右键点击方块时应用配方。我们将使用一个[事件处理器][event]来做到这一点。请记住，这是一个示例实现，你可以随意以任何方式修改它（只要你在服务端运行它）。由于我们希望交互状态在客户端和服务端都能匹配，我们还需要[跨网络同步任何相关的输入状态][networking]。
 
-We can set up a simple network implementation to sync the recipe inputs like so:
+我们可以像这样搭建一个简单的网络实现来同步配方输入：
 
 ```java
 // A basic packet class, must be registered.
@@ -697,7 +697,7 @@ public class RightClickBlockRecipes {
 }
 ```
 
-Alternatively, you can sync the [full recipe to the client instead][clientrecipes]:
+或者，你也可以[改为把完整配方同步到客户端][clientrecipes]：
 
 ```java
 // Present on both server and client to do initial matching.
@@ -839,7 +839,7 @@ public class RightClickBlockRecipes {
 }
 ```
 
-Then, using the synced inputs, we can check the game for the used inputs:
+然后，利用已同步的输入，我们可以在游戏中检查所用的输入：
 
 ```java
 @SubscribeEvent // on the game event bus
@@ -887,9 +887,9 @@ public static void useItemOnBlock(UseItemOnBlockEvent event) {
 }
 ```
 
-## Data Generation
+## 数据生成 {#data-generation}
 
-To create a recipe builder for your own recipe serializer(s), you need to implement `RecipeBuilder` and its methods. A common implementation, partially copied from vanilla, would look like this:
+要为你自己的配方序列化器创建配方构建器，你需要实现 `RecipeBuilder` 及其方法。一个常见的实现，部分从原版复制而来，看起来如下所示：
 
 ```java
 // This class is abstract because there is a lot of per-recipe-serializer logic.
@@ -946,9 +946,9 @@ public abstract class SimpleRecipeBuilder implements RecipeBuilder {
 }
 ```
 
-So we have a base for our recipe builder. Now, before we continue with the recipe serializer-dependent part, we should first consider what to make our recipe factory. In our case, it makes sense to use the constructor directly. In other situations, using a static helper or a small functional interface is the way to go. This is especially relevant if you use one builder for multiple recipe classes.
+这样我们就有了配方构建器的基础。现在，在继续依赖具体配方序列化器的部分之前，我们应先考虑把什么作为配方工厂。在我们的例子中，直接使用构造函数是合理的。在其他情况下，使用静态辅助方法或一个小型函数式接口才是正道。如果你用一个构建器服务于多个配方类，这一点尤为重要。
 
-Utilizing `RightClickBlockRecipe::new` as our recipe factory, and reusing the `SimpleRecipeBuilder` class above, we can create the following recipe builder for `RightClickBlockRecipe`s:
+以 `RightClickBlockRecipe::new` 作为配方工厂，并复用上面的 `SimpleRecipeBuilder` 类，我们可以为 `RightClickBlockRecipe` 创建以下配方构建器：
 
 ```java
 public class RightClickBlockRecipeBuilder extends SimpleRecipeBuilder {
@@ -985,7 +985,7 @@ public class RightClickBlockRecipeBuilder extends SimpleRecipeBuilder {
 }
 ```
 
-And now, during [datagen][recipedatagen], you can call on your recipe builder like any other:
+现在，在[数据生成][recipedatagen]期间，你可以像调用任何其他构建器一样调用你的配方构建器：
 
 ```java
 @Override
@@ -1004,7 +1004,7 @@ protected void buildRecipes(RecipeOutput output) {
 ```
 
 :::note
-It is also possible to have `SimpleRecipeBuilder` be merged into `RightClickBlockRecipeBuilder` (or your own recipe builder), especially if you only have one or two recipe builders. The abstraction here serves to show which parts of the builder are recipe-dependent and which are not.
+也可以把 `SimpleRecipeBuilder` 合并进 `RightClickBlockRecipeBuilder`（或你自己的配方构建器），尤其是当你只有一两个配方构建器时。这里的抽象是为了展示构建器中哪些部分依赖具体配方、哪些部分不依赖。
 :::
 
 [clientrecipes]: index.md#client-side-recipes

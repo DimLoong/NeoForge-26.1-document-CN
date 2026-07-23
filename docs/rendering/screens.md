@@ -1,32 +1,32 @@
-# Screens
+# 界面 {#screens}
 
-Screens are typically the base of all Graphical User Interfaces (GUIs) in Minecraft: taking in user input, verifying it on the server, and syncing the resulting action back to the client. They can be combined with [menus] to create an communication network for inventory-like views, or they can be standalone which modders can handle through their own [network] implementations.
+界面（Screen）通常是 Minecraft 中所有图形用户界面（GUI）的基础：接收用户输入，在服务端进行校验，并将由此产生的行为同步回客户端。它们可以与[菜单][menus]结合，为类似物品栏的视图搭建一套通信网络；也可以独立使用，由 Mod 开发者通过自己的[网络][network]实现来处理。
 
-Screens are made up of numerous parts, making it difficult to fully understand what a 'screen' actually is in Minecraft. As such, this document will go over each of the screen's components and how it is applied before discussing the screen itself.
+界面由众多部分组成，这使得人们很难完全理解 Minecraft 中的“界面”究竟是什么。因此，本文将在讨论界面本身之前，先逐一介绍界面的各个组成部分及其应用方式。
 
-## Rendering a GUI
+## 渲染 GUI {#rendering-a-gui}
 
-Rendering a GUI takes place in two steps: the submission phase and the render phase.
+渲染 GUI 分两步进行：提交阶段和渲染阶段。
 
-The submission phase is responsible for collecting all elements (e.g. buttons, text, items) to render to the screen. Each submission will be stored in the `GuiRenderState` to be processed and then rendered during the render phase. There are four types of elements provided by vanilla: `GuiElementRenderState`, `GuiItemRenderState`, `GuiTextRenderState`, and `PictureInPictureRenderState`. Everything discussed in the below sections takes place during the submission phase by internally creating one of the above render states.
+提交阶段负责收集所有要渲染到界面上的元素（例如按钮、文本、物品）。每次提交都会存入 `GuiRenderState`，以便在渲染阶段被处理并渲染。原版提供了四类元素：`GuiElementRenderState`、`GuiItemRenderState`、`GuiTextRenderState` 和 `PictureInPictureRenderState`。下文各节讨论的一切，都是在提交阶段通过内部创建上述某种渲染状态来完成的。
 
-The render phase, as the name implies, renders the elements to the screen. First, `PictureInPictureRenderState`, `GuiItemRenderState`, and `GuiTextRenderState` are prepared and processed into `GuiElementRenderState`s. Then, the elements are sorted before being finally drawn to the screen. Finally, the `GuiRenderState` is reset and ready to be used for the next GUI or render tick.
+渲染阶段，顾名思义，把元素渲染到界面上。首先，`PictureInPictureRenderState`、`GuiItemRenderState` 和 `GuiTextRenderState` 被准备并处理为 `GuiElementRenderState`。然后，元素在最终绘制到界面之前先被排序。最后，`GuiRenderState` 被重置，准备用于下一个 GUI 或下一次渲染 tick。
 
-### Relative Coordinates
+### 相对坐标 {#relative-coordinates}
 
-Whenever anything is submitted to the render state, there needs to be some coordinates which specifies where the element will be rendered. With numerous abstractions, most of Minecraft's rendering calls accept X and Y coordinates. X values increase from left to right, while Y values increase from top to bottom. However, the coordinates are not fixed to a specified range. Their range can change depending on the size of the screen and the GUI scale specified within the game’s options. As such, extra care must be taken to ensure the coordinates values passed to rendering calls scale properly - are relativized correctly - to the changeable screen size.
+每当有东西提交给渲染状态时，都需要一些坐标来指定该元素将在何处渲染。经过大量抽象后，Minecraft 的大多数渲染调用都接收 X 和 Y 坐标。X 值从左到右递增，Y 值从上到下递增。然而，这些坐标并不固定在某个特定范围内。它们的范围会随界面大小以及游戏选项中指定的 GUI 缩放而变化。因此，必须格外小心，确保传递给渲染调用的坐标值能正确缩放——即相对化正确——以适应可变的界面大小。
 
-Information on how to relativize your coordinates is in the [screen] section.
+关于如何相对化你的坐标，相关信息见[界面][screen]一节。
 
 :::caution
-If you choose to use fixed coordinates or incorrectly scale the screen, the rendered objects may look strange or misplaced. An easy way to check if you relativized your coordinates correctly is to click the 'Gui Scale' button in your video settings. This value is used as the divisor to the width and height of your display when determining the scale at which a GUI should render.
+如果你选择使用固定坐标，或对界面缩放处理不当，渲染出的对象可能会显得怪异或位置错乱。检查坐标是否相对化正确的一个简便方法，是点击视频设置中的“GUI 缩放”按钮。在确定 GUI 应以何种比例渲染时，该值会被用作显示器宽度和高度的除数。
 :::
 
-### GuiGraphicsExtractor
+### GuiGraphicsExtractor {#guigraphicsextractor}
 
-Any element submitted to the `GuiRenderState` is typically handled via `GuiGraphicsExtractor`. `GuiGraphicsExtractor` is the first parameter to almost every method during the submission phase, containing methods for submitting commonly used objects to be rendered.
+提交给 `GuiRenderState` 的任何元素通常都通过 `GuiGraphicsExtractor` 处理。`GuiGraphicsExtractor` 是提交阶段几乎每个方法的第一个参数，包含用于提交常用渲染对象的各种方法。
 
-`GuiGraphicsExtractor` exposes the current pose as a `Matrix3x2fStack` to apply any XY transformations:
+`GuiGraphicsExtractor` 将当前的 pose 暴露为 `Matrix3x2fStack`，以便应用任何 XY 变换：
 
 ```java
 // For some GuiGraphicsExtractor graphics
@@ -50,7 +50,7 @@ graphics.blitSprite(...);
 graphics.pose().popMatrix();
 ```
 
-Additionally, elements can be cropped to a specific area using `enableScissor` and `disableScissor`:
+此外，元素还可以使用 `enableScissor` 和 `disableScissor` 被裁剪到某个特定区域：
 
 ```java
 // For some GuiGraphicsExtractor graphics
@@ -74,27 +74,27 @@ graphics.blitSprite(...);
 graphics.disableScissor();
 ```
 
-### Node Trees and Strata
+### 节点树与层组 {#node-trees-and-strata}
 
-When submitting an element to the `GuiRenderState`, it isn't just added to some list. If that were the case, some elements may be completely covered by other elements depending on the order of submission. To get around this hurdle, elements are initially sorted into node trees in some stratum. How an element is sorted is based upon its defined `ScreenArea#bounds`; otherwise, the element will not be submitted for rendering.
+当向 `GuiRenderState` 提交元素时，它并不只是被加入某个列表。若真如此，某些元素可能会因提交顺序不同而被其他元素完全遮挡。为绕过这一难题，元素在初始时会被排序进某个层组（stratum）中的节点树。元素如何被排序，取决于其定义的 `ScreenArea#bounds`；否则，该元素不会被提交渲染。
 
-The `GuiRenderState` is made up of `GuiRenderState.Node`s as a single-linked list, using 'up' to hold a reference to the next element. Nodes are rendered from first element 'up'wards. Each node holds its own layer data containing the render states. When an element is initially submitted to `GuiRenderState`, it determines what node to use or create based upon its defined `ScreenArea#bounds`. The node chosen, or created, is one node above the highest node with intersecting elements.
+`GuiRenderState` 由 `GuiRenderState.Node` 组成，形成一个单向链表，用“up”持有对下一个元素的引用。节点从第一个元素向“up”方向逐一渲染。每个节点持有自己的层数据，其中包含渲染状态。当一个元素初始提交给 `GuiRenderState` 时，它会根据自己定义的 `ScreenArea#bounds` 来决定使用或创建哪个节点。所选或所创建的节点，是位于所有与之元素相交的最高节点之上的那一个节点。
 
 :::warning
-Although `ScreenArea#bounds` is marked as nullable, a element being submitted to the render state will not be added if the bounds is not defined. The method is only nullable as elements submitted during the render phase are added to the current node rather than computing its node based on the bounds.
+尽管 `ScreenArea#bounds` 被标记为可空，但提交给渲染状态的元素若未定义 bounds，将不会被添加。该方法之所以可空，是因为在渲染阶段提交的元素会被加入当前节点，而不是根据 bounds 计算其节点。
 :::
 
-Each node list is known as a stratum within the render state. A render state can have multiple strata by calling `GuiGraphicsExtractor#nextStratum`, creating a new node list. The new stratum will render above all the previous stratum's elements (e.g., item tooltips). You cannot navigate back to the previous stratum once you call `nextStratum`.
+每个节点链表在渲染状态中被称为一个层组（stratum）。渲染状态可以通过调用 `GuiGraphicsExtractor#nextStratum` 拥有多个层组，从而创建一个新的节点链表。新层组会渲染在此前所有层组的元素之上（例如物品的工具提示）。一旦调用了 `nextStratum`，你就无法再回到之前的层组。
 
-### `GuiElementRenderState`
+### `GuiElementRenderState` {#guielementrenderstate}
 
-A `GuiElementRenderState` holds the metadata on how a GUI element is rendered to the screen. The element render state extends `ScreenArea` to define the `bounds` on the screen. The bounds should always encompass the entire element that is rendered so that it's sorted correctly in the node list. Bounds computation typically takes in some of the parameters below, including the position and pose.
+`GuiElementRenderState` 持有关于一个 GUI 元素如何渲染到界面上的元数据。元素渲染状态继承 `ScreenArea`，以定义其在界面上的 `bounds`。bounds 应始终涵盖被渲染的整个元素，以便它在节点链表中被正确排序。bounds 的计算通常会用到下面的一些参数，包括位置和 pose。
 
-`scissorArea` crops the area where the element can render. If `scissorArea` is `null`, then the entire element is rendered to the screen. Similarly, if the `scissorArea` rectangle does not intersect with the `bounds`, then nothing will be rendered.
+`scissorArea` 裁剪元素可以渲染的区域。如果 `scissorArea` 为 `null`，则整个元素都会渲染到界面上。同样地，如果 `scissorArea` 矩形与 `bounds` 不相交，则什么都不会渲染。
 
-The remaining three methods handle the actual rendering of the element. `pipeline` defines the shaders and metadata used by the element. `textureSetup` can specify either `Sampler0`, `Sampler1`, `Sampler2`, or some combination in the fragment shader. Finally, `buildVertices` passes the vertices to upload to the buffer. It takes in the `VertexConsumer` to pass the vertices to.
+其余三个方法处理元素的实际渲染。`pipeline` 定义元素所用的着色器和元数据。`textureSetup` 可以指定 `Sampler0`、`Sampler1`、`Sampler2` 之一，或它们在片段着色器中的某种组合。最后，`buildVertices` 传入要上传到缓冲区的顶点。它接收用于传递顶点的 `VertexConsumer`。
 
-NeoForge adds the method `GuiGraphicsExtractor#submitGuiElementRenderState` to submit a custom element render state if the available methods provided by `GuiGraphicsExtractor` is not enough.
+如果 `GuiGraphicsExtractor` 提供的现有方法不够用，NeoForge 添加了 `GuiGraphicsExtractor#submitGuiElementRenderState` 方法来提交自定义的元素渲染状态。
 
 ```java
 // For some GuiGraphicsExtractor graphics
@@ -164,87 +164,87 @@ graphics.submitGuiElementRenderState(new GuiElementRenderState() {
 });
 ```
 
-### Element Ordering
+### 元素排序 {#element-ordering}
 
-So far, the elements shown above have only been operating on XY coordinates. The Z coordinate is ignored in GUI rendering, as all of the elements drawn to the screen use a `RenderPipeline` that disables the depth test. Even the 3D elements with their more advanced pipelines are drawn to a 2D texture using `RenderPipeline#GUI_TEXTURED_PREMULTIPLIED_ALPHA` by default, which does the same, preventing any Z-fighting in common use cases.
+到目前为止，上面展示的元素都只在 XY 坐标上操作。Z 坐标在 GUI 渲染中被忽略，因为绘制到界面上的所有元素都使用一个禁用深度测试的 `RenderPipeline`。即便是带有更高级管线的 3D 元素，默认也会使用 `RenderPipeline#GUI_TEXTURED_PREMULTIPLIED_ALPHA` 绘制到一张 2D 纹理上，该管线同样禁用深度测试，从而在常见用例中避免任何 Z-fighting。
 
-As such, during the render phase, each stratum is rendered in order, with the nodes in the node list rendered from the first element 'up'wards. But what about within a given node? This is handled via the `GuiRenderer#ELEMENT_SORT_COMPARATOR`, which sorts elements based on their `GuiElementRenderState#scissorArea`, `pipeline`, then `textureSetup`.
-
-:::warning
-Glyphs rendered for text are not sorted and will always render after all elements in the current node.
-:::
-
-Elements with no specified `scissorArea` will always be rendered first, followed by the top Y, the bottom Y, the left X, and finally the right X. If the `scissorArea` for two elements match, the sort key of the `pipeline` (via `RenderPipeline#getSortKey`) will be used. The sort key is based on the order that the `RenderPipeline`s are built in, which in vanilla is the classloading of static constants within `RenderPipelines`. If the sort keys match, then the `textureSetup` is used. Elements with no specified `textureSetup` are ordered first, followed by the sort key (via `TextureSetup#getSortKey`) of texture elements.
+因此，在渲染阶段，每个层组按顺序渲染，节点链表中的节点从第一个元素向“up”方向渲染。但同一个节点内部又如何呢？这由 `GuiRenderer#ELEMENT_SORT_COMPARATOR` 处理，它依次根据元素的 `GuiElementRenderState#scissorArea`、`pipeline`，再到 `textureSetup` 对其排序。
 
 :::warning
-On a technical level, element ordering is not deterministic due to the `RenderPipeline` and `TextureSetup`. This is because the goal of sorting is not determinism, but rather to render the elements with the least amount of pipeline and texture switches possible.
+为文本渲染的字形（glyph）不参与排序，且总是在当前节点中所有元素之后渲染。
 :::
 
-## Methods in `GuiGraphicsExtractor`
+未指定 `scissorArea` 的元素总是最先渲染，其后依次按顶部 Y、底部 Y、左侧 X，最后右侧 X 排序。如果两个元素的 `scissorArea` 相同，则使用 `pipeline` 的排序键（通过 `RenderPipeline#getSortKey`）。排序键基于 `RenderPipeline` 被构建的顺序，在原版中即 `RenderPipelines` 内静态常量的类加载顺序。如果排序键也相同，则使用 `textureSetup`。未指定 `textureSetup` 的元素排在最前，其后是带纹理元素的排序键（通过 `TextureSetup#getSortKey`）。
 
-`GuiGraphicsExtractor` contains methods used to submit commonly used objects for rendering. These fall into six categories: colored rectangles, strings, textures, items, tooltips, and picture-in-pictures. Each of these methods submit an element, inheriting the current pose from `pose` and the scissor area from `peekScissorStack` based on `enableScissor` / `disableScissor`. Any colors provided to the methods must be in [ARGB][argb] format.
+:::warning
+从技术层面看，由于 `RenderPipeline` 和 `TextureSetup` 的存在，元素排序并非确定性的。这是因为排序的目标并不是确定性，而是尽可能以最少的管线和纹理切换次数来渲染元素。
+:::
 
-### Colored Rectangles
+## `GuiGraphicsExtractor` 中的方法 {#methods-in-guigraphicsextractor}
 
-Colored rectangles are submitted using a `ColoredRectangleRenderState`. All fill methods can take in an optional `RenderPipeline` and `TextureSetup` to specify how the rectangle should be rendered. There are three types of colored rectangles that can be submitted.
+`GuiGraphicsExtractor` 包含用于提交常用渲染对象的方法。它们分为六类：彩色矩形、字符串、纹理、物品、工具提示，以及画中画。这些方法各自提交一个元素，从 `pose` 继承当前 pose，并根据 `enableScissor` / `disableScissor` 从 `peekScissorStack` 继承裁剪区域。传给这些方法的任何颜色都必须为 [ARGB][argb] 格式。
 
-First, there is a colored horizontal and vertical one-pixel wide line, `horizontalLine` and `verticalLine` respectively. `horizontalLine` takes in two X coordinates defining the left and right (inclusively), the top Y coordinate, and the color. `verticalLine` takes in the left X coordinate, two Y coordinates defining the top and bottom (inclusively), and the color.
+### 彩色矩形 {#colored-rectangles}
 
-Second, there is the `fill` method, which submits a rectangle to be drawn to the screen. The line methods internally call this method. This takes in the left X coordinate, the top Y coordinate, the right X coordinate, the bottom Y coordinate, and the color.
+彩色矩形使用 `ColoredRectangleRenderState` 提交。所有 fill 方法都可以接收一个可选的 `RenderPipeline` 和 `TextureSetup`，以指定矩形应如何渲染。可以提交三种彩色矩形。
 
-Third, there is the `outline` method, which submits four rectangles that are one-pixel wide to act as an outline. This takes in the left X coordinate, the top Y coordinate, the width of the outline, the height of the outline, and the color.
+首先，是彩色的水平和垂直一像素宽的线，分别为 `horizontalLine` 和 `verticalLine`。`horizontalLine` 接收定义左右边界的两个 X 坐标（含端点）、顶部 Y 坐标和颜色。`verticalLine` 接收左侧 X 坐标、定义上下边界的两个 Y 坐标（含端点）和颜色。
 
-Finally, there is the `fillGradient` method, which draws a rectangle with a vertical gradient. This takes in the left X coordinate, the top Y coordinate, the right X coordinate, the bottom Y coordinate, and the bottom and top colors.
+其次，是 `fill` 方法，它提交一个要绘制到界面上的矩形。前面的线方法内部都调用此方法。它接收左侧 X 坐标、顶部 Y 坐标、右侧 X 坐标、底部 Y 坐标和颜色。
 
-### Strings
+第三，是 `outline` 方法，它提交四个一像素宽的矩形以充当轮廓。它接收左侧 X 坐标、顶部 Y 坐标、轮廓宽度、轮廓高度和颜色。
 
-Strings, [`Component`s][component], and `FormattedCharSequence`s are submitted using a `GuiTextRenderState`. Each string is drawn through the provided `Font`, which is used to create a `BakedGlyph.GlyphInstance` and optionally a `BakedGlyph.Effect`, using the specified `GlyphRenderTypes#guiPipeline`. The text render state is then transformed into `GlyphRenderState`s and potentially a `GlyphEffectRenderState` per character in the string during the render phase.
+最后，是 `fillGradient` 方法，它绘制一个带垂直渐变的矩形。它接收左侧 X 坐标、顶部 Y 坐标、右侧 X 坐标、底部 Y 坐标，以及底部和顶部的颜色。
 
-There are two alignments strings can be rendered with: a left-aligned string (`text`) and a center-aligned string (`centeredText`). These both take in the font the string will be rendered in, the string to draw, the X coordinate representing the left or center of the string respectively, the top Y coordinate, and the color. The left-aligned strings may also take in whether to draw a drop shadow for the text.
+### 字符串 {#strings}
 
-If the text should be wrapped within a given bounds, then `textWithWordWrap` can be used instead. If the text should have some sort of rectangle backdrop, then `textWithBackdrop` can be used. They both submit a left-aligned string by default.
+字符串、[`Component`][component] 和 `FormattedCharSequence` 使用 `GuiTextRenderState` 提交。每个字符串都通过所提供的 `Font` 绘制，`Font` 用于创建 `BakedGlyph.GlyphInstance` 以及可选的 `BakedGlyph.Effect`，并使用指定的 `GlyphRenderTypes#guiPipeline`。随后在渲染阶段，文本渲染状态会针对字符串中的每个字符转换为 `GlyphRenderState`，以及可能的 `GlyphEffectRenderState`。
 
-Strings can also be submitted using an `ActiveTextCollector`, which provides methods for rendering strings with specific metadata, such as alignment, opacity, and scrolling. Text collectors are created via `GuiGraphicsExtractor#textRenderer` or `textRendererForWidget`, or `ActiveTextCollector` itself can be subclassed, typically taking in a `$HoveredTextEffects` for some basic options on whether to render tooltips or cursor changes. From there, either `accept` or `acceptScrolling` can be used to render the text, taking in an X position relative to the alignment, a Y position, a set of parameters from the `GuiGraphicsExtractor`, the text itself, and optionally the text alignment. `acceptScrolling` also takes in the leftmost, rightmost, topmost, and bottommost position to represent the scrolling bounds.
+字符串可以两种对齐方式渲染：左对齐字符串（`text`）和居中对齐字符串（`centeredText`）。二者都接收字符串将使用的字体、要绘制的字符串、分别代表字符串左端或中心的 X 坐标、顶部 Y 坐标和颜色。左对齐字符串还可以接收一个参数，指定是否为文本绘制投影阴影。
+
+如果文本应在给定边界内换行，可改用 `textWithWordWrap`。如果文本应带有某种矩形背景，可使用 `textWithBackdrop`。二者默认都提交左对齐字符串。
+
+字符串也可以使用 `ActiveTextCollector` 提交，它提供了以特定元数据（如对齐方式、不透明度和滚动）渲染字符串的方法。文本收集器通过 `GuiGraphicsExtractor#textRenderer` 或 `textRendererForWidget` 创建，或者也可以对 `ActiveTextCollector` 本身进行子类化，通常会接收一个 `$HoveredTextEffects` 用于配置是否渲染工具提示或改变光标等一些基本选项。此后，可使用 `accept` 或 `acceptScrolling` 来渲染文本，它们接收相对于对齐方式的 X 位置、Y 位置、来自 `GuiGraphicsExtractor` 的一组参数、文本本身，以及可选的文本对齐方式。`acceptScrolling` 还接收最左、最右、最上和最下位置，以表示滚动边界。
 
 :::note
-Strings should typically be passed in as [`Component`s][component] as they handle a variety of use cases, including the two other overloads of the method.
+字符串通常应作为 [`Component`][component] 传入，因为它能处理各种用例，包括该方法的另外两个重载。
 :::
 
-### Textures
+### 纹理 {#textures}
 
-Textures are submitted through a `BlitRenderState`, hence the method name `blit`. The `BlitRenderState` copies the bits of an image and renders them to the screen through the `RenderPipeline` parameter. Each `blit` also takes in a `Identifier`, which represents the absolute location of the texture:
+纹理通过 `BlitRenderState` 提交，因此方法名为 `blit`。`BlitRenderState` 复制一张图像的位数据，并通过 `RenderPipeline` 参数将其渲染到界面上。每个 `blit` 还接收一个 `Identifier`，它代表纹理的绝对位置：
 
 ```java
 // Points to 'assets/examplemod/textures/gui/container/example_container.png'
 private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath("examplemod", "textures/gui/container/example_container.png");
 ```
 
-While there are many different `blit` overloads, we will only discuss two of them.
+虽然 `blit` 有许多不同的重载，但我们只讨论其中两个。
 
-The first `blit` takes in two integers, then two floats, and finally four more integers, assuming the image is on a PNG file. It takes in the left X and top Y screen coordinate, the left X and top Y coordinate within the PNG, the width and height of the image to render, and the width and height of the PNG file.
+第一个 `blit`（假设图像位于一个 PNG 文件上）接收两个整数，然后两个浮点数，最后再接收四个整数。它接收左侧 X 与顶部 Y 的屏幕坐标、PNG 内部的左侧 X 与顶部 Y 坐标、要渲染的图像宽度和高度，以及 PNG 文件的宽度和高度。
 
 :::tip
-The size of the PNG file must be specified so that the coordinates can be normalized to obtain the associated UV values.
+必须指定 PNG 文件的大小，以便坐标能被归一化以求得关联的 UV 值。
 :::
 
-The second `blit` adds an additional integer at the end which represents the tint color of the image to be drawn. If not specified, the tint color is `0xFFFFFFFF`.
+第二个 `blit` 在末尾额外加了一个整数，代表要绘制的图像的着色颜色。如果不指定，着色颜色为 `0xFFFFFFFF`。
 
-#### `blitSprite`
+#### `blitSprite` {#blitsprite}
 
-`blitSprite` is a special implementation of `blit` where the texture is obtained from the GUI texture atlas. Most textures that overlay the background, such as the 'burn progress' overlay in furnace GUIs, are sprites. All sprite textures are relative to `textures/gui/sprites` and do not need to specify the file extension.
+`blitSprite` 是 `blit` 的一种特殊实现，其纹理取自 GUI 纹理图集。大多数叠加在背景之上的纹理，如熔炉 GUI 中的“燃烧进度”覆盖层，都是精灵图。所有精灵纹理都相对于 `textures/gui/sprites`，且无需指定文件扩展名。
 
 ```java
 // Points to 'assets/examplemod/textures/gui/sprites/container/example_container/example_sprite.png'
 private static final Identifier SPRITE = Identifier.fromNamespaceAndPath("examplemod", "container/example_container/example_sprite");
 ```
 
-One set of `blitSprite` methods have the same parameters as `blit`, except for the the four integers dealing with the coordinates, width, and height of the PNG.
+有一组 `blitSprite` 方法的参数与 `blit` 相同，只是去掉了那四个涉及 PNG 坐标、宽度和高度的整数。
 
-The other `blitSprite` methods take in more texture information to allow for drawing a portion of the sprite. These methods take in the sprite width and height, the X and Y coordinate in the sprite, the left X and top Y screen coordinate, the tint color, and the width and height of the image to render.
+另一组 `blitSprite` 方法接收更多纹理信息，以支持绘制精灵图的一部分。这些方法接收精灵宽度和高度、精灵内的 X 和 Y 坐标、左侧 X 与顶部 Y 的屏幕坐标、着色颜色，以及要渲染的图像宽度和高度。
 
-If the sprite size does not match the texture size, then the sprite can be scaled in one of three ways: `stretch`, `tile`, and `nine_slice`. `stretch` stretches the image from the texture size to the screen size. `tile` renders the texture over and over again until it reaches the screen size. `nine_slice` divides the texture into one center, four edges, and four corners to tile the texture to the required screen size.
+如果精灵大小与纹理大小不匹配，则精灵可以三种方式之一进行缩放：`stretch`、`tile` 和 `nine_slice`。`stretch` 将图像从纹理大小拉伸到屏幕大小。`tile` 将纹理反复平铺，直到填满屏幕大小。`nine_slice` 将纹理划分为一个中心、四条边和四个角，以将纹理平铺到所需的屏幕大小。
 
-This is set by adding the `gui.scaling` JSON object in an mcmeta file with the same name of the texture file.
+这通过在一个与纹理文件同名的 mcmeta 文件中添加 `gui.scaling` JSON 对象来设置。
 
 ```json5
 // For some texture file example_sprite.png
@@ -297,34 +297,34 @@ This is set by adding the `gui.scaling` JSON object in an mcmeta file with the s
 ```
 
 :::note
-`blitSprite` when using a texture with tiling or nice slice set will submit their elements using `TiledBlitRenderState`, which specifies the tile width and height in addition to the other parameters in `BlitRenderState`.
+`blitSprite` 在使用设置了 tile 或 nine slice 的纹理时，会用 `TiledBlitRenderState` 提交其元素，它在 `BlitRenderState` 的其他参数之外，还指定了平铺的宽度和高度。
 :::
 
-### Items
+### 物品 {#items}
 
-Items are submitted using a `GuiItemRenderState`. The item render state is then transformed into a `BlitRenderState` or `OversizedItemRenderState`, depending on the item bounds and client item properties, during the render phase.
+物品使用 `GuiItemRenderState` 提交。物品渲染状态随后在渲染阶段根据物品边界和客户端物品属性，转换为 `BlitRenderState` 或 `OversizedItemRenderState`。
 
-`item` takes in an `ItemStack`, in addition to the left X and top Y coordinate on screen. It can optionally take in the holding `LivingEntity`, the current `Level` the stack is in, and a seeded value. There is also an alternative `fakeItem` which sets the `LivingEntity` to `null`.
+`item` 接收一个 `ItemStack`，以及屏幕上的左侧 X 和顶部 Y 坐标。它还可以选择性地接收持有物品的 `LivingEntity`、物品堆叠所在的当前 `Level`，以及一个种子值。还有一个替代的 `fakeItem`，它将 `LivingEntity` 设为 `null`。
 
-The item decorations - such as the durability bar, cooldown, and count - are handled through `itemDecorations`. It takes in the same parameters as the base `item`, in addition to the `Font` and a count text override.
+物品装饰——如耐久条、冷却和数量——通过 `itemDecorations` 处理。它接收与基础 `item` 相同的参数，另外还接收 `Font` 和一个数量文本覆盖值。
 
-### Tooltips
+### 工具提示 {#tooltips}
 
-Tooltips are submitted through a variety of the above render states. The tooltip methods are broken into two categories: 'next frame' and 'immediate'. Both methods takes in the `Font` to render the text, some list of `Component`s, an optional `TooltipComponent` for special rendering, the left X and top Y, a `ClientTooltipPositioner` for adjusting the location, and the background and frame texture.
+工具提示通过上述多种渲染状态提交。工具提示方法分为两类：“下一帧”和“即时”。两类方法都接收用于渲染文本的 `Font`、某个 `Component` 列表、用于特殊渲染的可选 `TooltipComponent`、左侧 X 和顶部 Y、用于调整位置的 `ClientTooltipPositioner`，以及背景和边框纹理。
 
-Next frame tooltips don't actually submit the tooltip on the next frame, but instead defer the tooltip submission until after `Screen#render` is called. The tooltip is added to a new stratum, meaning it will render on top of all elements in the screen. Next frame methods are in the form of `set*Tooltip*ForNextFrame`. They also can take in an additional boolean indicating whether to override the currently deferred tooltip if present, and an `ItemStack` that the rendered tooltip should use.
+下一帧工具提示实际上并不会在下一帧提交工具提示，而是将工具提示的提交推迟到 `Screen#render` 被调用之后。工具提示被添加到一个新的层组中，也就是说它会渲染在界面所有元素之上。下一帧方法的形式为 `set*Tooltip*ForNextFrame`。它们还可以接收一个额外的布尔值，指示是否覆盖当前已推迟的工具提示（如果存在），以及一个所渲染工具提示应使用的 `ItemStack`。
 
-Immediate tooltips, on the other hand, are submitted immediately when the method is called. Immediate methods are in the form of `tooltip`. They also take in the `ItemStack` that the tooltip is hovering over.
+即时工具提示则在方法被调用时立即提交。即时方法的形式为 `tooltip`。它们还接收工具提示所悬浮于其上的 `ItemStack`。
 
-### Picture-in-Picture
+### 画中画 {#picture-in-picture}
 
-Picture-in-Picture (PiP) allows for arbitrary objects to be drawn to the screen. Instead of drawing directly to the output, PiP draws the object to an intermediary texture, or a 'picture', that is then submitted to the `GuiRenderState` as a `BlitRenderState` during the render phase (by default). `GuiGraphicsExtractor` provides methods for maps (`map`), entities (`entity`), player skins (`skin`), book models (`book`), banner pattern (`bannerPattern`), signs (`sign`), and the profiler chart (`profilerChart`).
+画中画（Picture-in-Picture，PiP）允许将任意对象绘制到界面上。PiP 不是直接绘制到输出，而是将对象绘制到一张中间纹理，即一张“画（picture）”上，然后（默认情况下）在渲染阶段将其作为 `BlitRenderState` 提交给 `GuiRenderState`。`GuiGraphicsExtractor` 为地图（`map`）、实体（`entity`）、玩家皮肤（`skin`）、书本模型（`book`）、旗帜图案（`bannerPattern`）、告示牌（`sign`）和性能分析器图表（`profilerChart`）提供了相应方法。
 
 :::note
-Items that exceed the default 16x16 bounds, when `ClientItem.Properties#oversizedInGui` is true, use the `OversizedItemRenderer` PiP as its rendering mechanism.
+当 `ClientItem.Properties#oversizedInGui` 为 true 时，超出默认 16x16 边界的物品会使用 `OversizedItemRenderer` PiP 作为其渲染机制。
 :::
 
-Each PiP submits a `PictureInPictureRenderState` to render an object to the screen. Similarly to `GuiElementRenderState`, `PictureInPictureRenderState` also extends `ScreenArea` to define its `bounds` and the scissor via `scissorArea`. `PictureInPictureRenderState` then defines the render location and size of the picture, specifying the left X (`x0`), the right X (`x1`), the top Y (`y0`), and the bottom Y (`y1`). The element within the picture can also be `scale`d by some float value. Finally, an additional `pose` can be used to transform the XY coordinates of the picture. By default, this is the identity pose as generally, the rendered object is already transformed within the picture itself. For ease of implementation, the `bounds` can be computed using `PictureInPictureRenderState#getBounds`, though if the `pose` is modified, you will need to implement your own logic.
+每个 PiP 都提交一个 `PictureInPictureRenderState` 以将对象渲染到界面上。与 `GuiElementRenderState` 类似，`PictureInPictureRenderState` 同样继承 `ScreenArea`，以定义其 `bounds` 和通过 `scissorArea` 定义的裁剪区域。`PictureInPictureRenderState` 随后定义画的渲染位置和大小，指定左侧 X（`x0`）、右侧 X（`x1`）、顶部 Y（`y0`）和底部 Y（`y1`）。画内的元素还可以通过某个浮点值进行 `scale` 缩放。最后，还可以用一个额外的 `pose` 来变换画的 XY 坐标。默认情况下，这是恒等 pose，因为通常所渲染的对象在画内部已经完成了变换。为便于实现，`bounds` 可以使用 `PictureInPictureRenderState#getBounds` 计算，不过如果修改了 `pose`，你就需要自行实现相应逻辑。
 
 ```java
 // Other parameters can be added, but this is the minimum required to implement all methods
@@ -353,11 +353,11 @@ public record ExampleRenderState(
 }
 ```
 
-To draw and submit the PiP render state to a picture, each PiP has its own `PictureInPictureRenderer<T>`, where `T` is the implemented `PictureInPictureRenderState`. There are numerous methods that can be overridden, allowing the user almost full control of the entire pipeline, but there are three that must be implemented.
+要将 PiP 渲染状态绘制并提交到一张画上，每个 PiP 都有自己的 `PictureInPictureRenderer<T>`，其中 `T` 是所实现的 `PictureInPictureRenderState`。有许多方法可以重写，让用户几乎完全掌控整条管线，但有三个方法必须实现。
 
-First is `getRenderStateClass`, which simply returns the class of the `PictureInPictureRenderState`. In vanilla, this method was used to register what render state the renderer was used for. NeoForge still uses the render state class, but provides registration through an event to map to a dynamic pool of renderers instead of calling `getRenderStateClass`.
+第一个是 `getRenderStateClass`，它只是返回 `PictureInPictureRenderState` 的类。在原版中，此方法用于注册该渲染器所用于的渲染状态。NeoForge 仍然使用渲染状态类，但通过一个事件提供注册，以映射到一个动态的渲染器池，而不是调用 `getRenderStateClass`。
 
-Then, there is `getTextureLabel`, which provides a unique debug label for the picture being written to. Finally, there is `renderToTexture`, which actually draws the object to the picture, similar to other render methods.
+接着是 `getTextureLabel`，它为被写入的画提供一个唯一的调试标签。最后是 `renderToTexture`，它实际将对象绘制到画上，类似于其他渲染方法。
 
 ```java
 public class ExampleRenderer extends PictureInPictureRenderer<ExampleRenderState> {
@@ -429,7 +429,7 @@ public class ExampleRenderer extends PictureInPictureRenderer<ExampleRenderState
 }
 ```
 
-To use the PiP, the renderer must be registered to `RegisterPictureInPictureRenderersEvent` on the [mod event bus][modbus].
+要使用该 PiP，必须在 [mod 事件总线][modbus]上把渲染器注册到 `RegisterPictureInPictureRenderersEvent`。
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -443,7 +443,7 @@ public static void registerPip(RegisterPictureInPictureRenderersEvent event) {
 }
 ```
 
-The PiP render state can then be submitted using the NeoForge-added `GuiGraphicsExtractor#submitPictureInPictureRenderState`:
+随后即可使用 NeoForge 添加的 `GuiGraphicsExtractor#submitPictureInPictureRenderState` 提交 PiP 渲染状态：
 
 ```java
 // For some GuiGraphicsExtractor graphics
@@ -456,48 +456,48 @@ graphics.submitPictureInPictureRenderState(new ExampleRenderState(
 ```
 
 :::note
-NeoForge fixes a bug that prevents multiple instances of a PiP render state to be submitted for any given frame.
+NeoForge 修复了一个 bug，该 bug 会阻止在任意给定帧中提交同一 PiP 渲染状态的多个实例。
 :::
 
-## Renderable
+## Renderable {#renderable}
 
-`Renderable`s are essentially objects that are rendered. These include screens, buttons, chat boxes, lists, etc. `Renderable`s only have one method: `#extractRenderState`. This takes in the `GuiGraphicsExtractor` used to submit elements to the screen, the x and y positions of the mouse scaled to the relative screen size, and the tick delta (how many ticks have passed since the last frame).
+`Renderable` 本质上就是被渲染的对象。这些包括界面、按钮、聊天框、列表等。`Renderable` 只有一个方法：`#extractRenderState`。它接收用于向界面提交元素的 `GuiGraphicsExtractor`、缩放到相对界面大小的鼠标 x 和 y 位置，以及 tick delta（自上一帧以来经过了多少 tick）。
 
-Some common renderables are screens and 'widgets': interactable elements such as `Button`, its subtype `ImageButton`, and `EditBox` which is used to input text on the screen.
+一些常见的 renderable 是界面和“控件（widget）”：可交互的元素，如 `Button`、其子类型 `ImageButton`，以及用于在界面上输入文本的 `EditBox`。
 
-## GuiEventListener
+## GuiEventListener {#guieventlistener}
 
-Any screen in Minecraft implements `GuiEventListener`. `GuiEventListener`s are responsible for handling user interaction with the screen. These include inputs from the mouse (movement, clicked, released, dragged, scrolled, mouseover) and keyboard (pressed, released, typed). Each method returns whether the associated action affected the screen successfully. Widgets like buttons, chat boxes, lists, etc. also implement this interface.
+Minecraft 中的任何界面都实现了 `GuiEventListener`。`GuiEventListener` 负责处理用户与界面的交互。这些包括来自鼠标（移动、点击、释放、拖拽、滚动、悬停）和键盘（按下、释放、键入）的输入。每个方法返回相应操作是否成功影响了界面。按钮、聊天框、列表等控件也实现了此接口。
 
-### ContainerEventHandler
+### ContainerEventHandler {#containereventhandler}
 
-Almost synonymous with `GuiEventListener`s are their subtype: `ContainerEventHandler`s. These are responsible for handling user interaction on screens which contain widgets, managing which is currently focused and how the associated interactions are applied. `ContainerEventHandler`s add three additional features: interactable children, dragging, and focusing.
+与 `GuiEventListener` 几乎同义的，是它们的子类型：`ContainerEventHandler`。它们负责处理在包含控件的界面上的用户交互，管理当前哪个控件被聚焦，以及相关交互如何应用。`ContainerEventHandler` 增加了三项额外功能：可交互的子元素、拖拽和聚焦。
 
-Event handlers hold children which are used to determine the interaction order of elements. During the mouse event handlers (excluding dragging), the first child in the list that the mouse hovers over has their logic executed.
+事件处理器持有子元素，用于确定元素的交互顺序。在鼠标事件处理器（拖拽除外）期间，列表中第一个被鼠标悬停的子元素会执行其逻辑。
 
-Dragging an element with the mouse, implemented via `#mouseClicked` and `#mouseReleased`, provides more precisely executed logic.
+用鼠标拖拽元素（通过 `#mouseClicked` 和 `#mouseReleased` 实现）提供了更精确执行的逻辑。
 
-Focusing allows for a specific child to be checked first and handled during an event's execution, such as during keyboard events or dragging the mouse. Focus is typically set through `#setFocused`. In addition, interactable children can be cycled using `#nextFocusPath`, selecting the child based upon the `FocusNavigationEvent` passed in.
+聚焦允许某个特定子元素被优先检查并在事件执行期间处理，例如在键盘事件或拖拽鼠标期间。焦点通常通过 `#setFocused` 设置。此外，可交互的子元素可以使用 `#nextFocusPath` 循环切换，根据传入的 `FocusNavigationEvent` 选择子元素。
 
 :::note
-Screens implement `ContainerEventHandler` through `AbstractContainerEventHandler`, which adds in the setter and getter logic for dragging and focusing children.
+界面通过 `AbstractContainerEventHandler` 实现 `ContainerEventHandler`，后者加入了用于拖拽和聚焦子元素的 setter 和 getter 逻辑。
 :::
 
-## NarratableEntry
+## NarratableEntry {#narratableentry}
 
-`NarratableEntry`s are elements which can be spoken about through Minecraft's accessibility narration feature. Each element can provide different narration depending on what is hovered or selected, prioritized typically by focus, hovering, and then all other cases.
+`NarratableEntry` 是可以通过 Minecraft 无障碍旁白功能朗读的元素。每个元素可以根据悬停或选中的对象提供不同的旁白，通常按焦点、悬停，然后其他所有情况的优先级排序。
 
-`NarratableEntry`s have four methods: two which determine the priority of the element when being read (`#narrationPriority` and `#getTabOrderGroup`), one which determines whether to speak the narration (`#isActive`), and finally one which supplies the narration to its associated output, spoken or read (`#updateNarration`). 
+`NarratableEntry` 有四个方法：两个用于确定元素在被朗读时的优先级（`#narrationPriority` 和 `#getTabOrderGroup`），一个用于确定是否朗读旁白（`#isActive`），最后一个用于将旁白提供给其关联的输出，无论是朗读还是显示（`#updateNarration`）。
 
 :::note
-All widgets from Minecraft are `NarratableEntry`s, so it typically does not need to be manually implemented if using an available subtype.
+Minecraft 的所有控件都是 `NarratableEntry`，因此如果使用现有的子类型，通常无需手动实现。
 :::
 
-## The Screen Subtype
+## Screen 子类型 {#the-screen-subtype}
 
-With all of the above knowledge, a basic screen can be constructed. To make it easier to understand, the components of a screen will be mentioned in the order they are typically encountered.
+有了以上全部知识，就可以构造一个基础界面了。为便于理解，界面的各组成部分将按其通常被遇到的顺序来介绍。
 
-First, all screens take in a `Component` which represents the title of the screen. This component is typically drawn to the screen by one of its subtypes. It is only used in the base screen for the narration message. The screen can also take in the `Minecraft` instance and the `Font` to use when rendering text; if not specified, the default instance and font are used.
+首先，所有界面都接收一个代表界面标题的 `Component`。该组件通常由界面的某个子类型绘制到界面上。在基础界面中，它仅用于旁白消息。界面还可以接收 `Minecraft` 实例和渲染文本时所用的 `Font`；如果不指定，则使用默认实例和字体。
 
 ```java
 // In some Screen subclass
@@ -506,19 +506,19 @@ public MyScreen(Component title) {
 }
 ```
 
-### Initialization
+### 初始化 {#initialization}
 
-Once a screen has been initialized, the `#init` method is called. The `init` method sets the initial settings inside the screen from the `Minecraft` instance to the relative width and height as scaled by the game. Any setup such as adding widgets or precomputing relative coordinates should be done in this method. If the game window is resized, the screen will be reinitialized by calling the `init` method.
+界面被初始化后，会调用 `#init` 方法。`init` 方法根据 `Minecraft` 实例，将界面内的初始设置设为经游戏缩放的相对宽度和高度。任何设置工作，如添加控件或预计算相对坐标，都应在此方法中完成。如果游戏窗口被调整大小，界面会通过调用 `init` 方法重新初始化。
 
-There are three ways to add a widget to a screen, each serving a separate purpose:
+向界面添加控件有三种方式，各有其用途：
 
-| Method               | Description                                                                   |
+| 方法                  | 描述                                                            |
 |:--------------------:|:------------------------------------------------------------------------------|
-|`addWidget`           | Adds a widget that is interactable and narrated, but not rendered.            |
-|`addRenderableOnly`   | Adds a widget that will only be rendered; it is not interactable or narrated. |
-|`addRenderableWidget` | Adds a widget that is interactable, narrated, and rendered.                   |
+|`addWidget`           | 添加一个可交互且带旁白，但不渲染的控件。                          |
+|`addRenderableOnly`   | 添加一个只会被渲染的控件；它不可交互，也不带旁白。                |
+|`addRenderableWidget` | 添加一个可交互、带旁白且会被渲染的控件。                          |
 
-Typically, `addRenderableWidget` will be used most often.
+通常，`addRenderableWidget` 使用得最频繁。
 
 ```java
 // In some Screen subclass
@@ -531,9 +531,9 @@ protected void init() {
 }
 ```
 
-### Ticking Screens
+### 界面的 tick {#ticking-screens}
 
-Screens also tick using the `#tick` method to perform some level of client side logic for rendering purposes.
+界面也使用 `#tick` 方法进行 tick，以执行某种层面上用于渲染目的的客户端逻辑。
 
 ```java
 // In some Screen subclass
@@ -545,23 +545,23 @@ public void tick() {
 }
 ```
 
-### Input Handling
+### 输入处理 {#input-handling}
 
-Since screens are subtypes of `GuiEventListener`s, the input handlers can also be overridden, such as for handling logic on a specific [key press][keymapping].
+由于界面是 `GuiEventListener` 的子类型，输入处理器也可以被重写，例如用于处理特定[按键][keymapping]的逻辑。
 
-### Rendering the Screen
+### 渲染界面 {#rendering-the-screen}
 
-Screens submit their elements for rendering through `#extractRenderStateWithTooltipAndSubtitles` in three different strata: the background stratum, the element stratum, and the optional hoverable strata.
+界面通过 `#extractRenderStateWithTooltipAndSubtitles` 在三个不同的层组中提交其元素以供渲染：背景层组、元素层组，以及可选的可悬停层组。
 
-The background stratum elements are submitted first via `#extractBackground`, generally containing any blurring or background textures.
+背景层组的元素首先通过 `#extractBackground` 提交，通常包含任何模糊或背景纹理。
 
 :::warning
-Blurring, as handled through `GuiGraphicsExtractor#blurBeforeThisStratum`, can only be called once on any given frame. Attempting to submit a second blur will cause an exception to be thrown.
+模糊（通过 `GuiGraphicsExtractor#blurBeforeThisStratum` 处理）在任意给定帧中只能调用一次。尝试提交第二次模糊将导致抛出异常。
 :::
 
-The element stratum elements are submitted next via the `#extractRenderState` method, provided by being a `Renderable` subtype. This mainly submits widgets and labels, along with setting the hoverables to submit.
+元素层组的元素接下来通过 `#extractRenderState` 方法提交，该方法因作为 `Renderable` 子类型而提供。它主要提交控件和标签，同时设置要提交的可悬停元素。
 
-Finally, the hoverable strata submit elements that hover over the previous elements, such as tooltips.
+最后，可悬停层组提交悬浮于之前元素之上的元素，如工具提示。
 
 ```java
 // In some Screen subclass
@@ -587,13 +587,13 @@ public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mo
 }
 ```
 
-### Closing the Screen
+### 关闭界面 {#closing-the-screen}
 
-When a screen is closed, two methods handle the teardown: `#onClose` and `#removed`.
+当界面被关闭时，有两个方法处理清理工作：`#onClose` 和 `#removed`。
 
-`onClose` is called whenever the user makes an input to close the current screen. This method is typically used as a callback to destroy and save any internal processes in the screen itself. This includes sending packets to the server.
+`onClose` 在用户做出关闭当前界面的输入时被调用。此方法通常用作回调，用于销毁并保存界面自身的任何内部进程。这包括向服务端发送数据包。
 
-`removed` is called just before the screen changes and is released to the garbage collector. This handles anything that hasn't been reset back to its initial state before the screen was opened.
+`removed` 在界面即将切换并被释放交给垃圾回收器之前被调用。它处理任何在界面打开前未重置回其初始状态的内容。
 
 ```java
 // In some Screen subclass
@@ -615,32 +615,32 @@ public void removed() {
 ;}
 ```
 
-## `AbstractContainerScreen`
+## `AbstractContainerScreen` {#abstractcontainerscreen}
 
-If a screen is directly attached to a [menu][menus], then an `AbstractContainerScreen` should be subclassed instead. An `AbstractContainerScreen` acts as the screen and input handler of a menu and contains logic for syncing and interacting with slots. As such, only two methods typically need to be overridden or implemented to have a working container screen. Once again, to make it easier to understand, the components of a container screen will be mentioned in the order they are typically encountered.
+如果一个界面直接附加到某个[菜单][menus]上，则应改为继承 `AbstractContainerScreen`。`AbstractContainerScreen` 充当菜单的界面和输入处理器，并包含用于同步槽位和与槽位交互的逻辑。因此，通常只需重写或实现两个方法，即可拥有一个可用的容器界面。同样地，为便于理解，容器界面的各组成部分将按其通常被遇到的顺序来介绍。
 
-An `AbstractContainerScreen` typically requires five parameters: the container menu being opened (represented by the generic `T`), the player inventory (only for the display name), the title of the screen itself, and the width and height of the background texture.
+`AbstractContainerScreen` 通常需要五个参数：被打开的容器菜单（由泛型 `T` 表示）、玩家物品栏（仅用于显示名称）、界面自身的标题，以及背景纹理的宽度和高度。
 
 :::note
-The background texture width and height can be omitted from the super constructor if is 176 x 166. This does not refer to the image size, which is typically a PNG of 256 x 256, but the specific texture bounds within.
+如果背景纹理宽高为 176 x 166，则可以从父构造函数中省略背景纹理的宽度和高度。这里指的不是图像大小（通常是 256 x 256 的 PNG），而是其中特定的纹理边界。
 :::
 
 
-Within here, a number of positioning fields can be set:
+在此可以设置若干定位字段：
 
-Field             | Description
+字段              | 描述
 :---:             | :---
-`titleLabelX`     | The relative x coordinate of where the screen title will be rendered.
-`titleLabelY`     | The relative y coordinate of where the screen title will be rendered.
-`inventoryLabelX` | The relative x coordinate of where the player inventory name will be rendered.
-`inventoryLabelY` | The relative y coordinate of where the player inventory name will be rendered.
+`titleLabelX`     | 界面标题将被渲染的相对 x 坐标。
+`titleLabelY`     | 界面标题将被渲染的相对 y 坐标。
+`inventoryLabelX` | 玩家物品栏名称将被渲染的相对 x 坐标。
+`inventoryLabelY` | 玩家物品栏名称将被渲染的相对 y 坐标。
 
 :::caution
-In a previous section, it was mentioned that precomputed relative coordinates should be set in the `#init` method. This still remains true, as the values mentioned here are not precomputed coordinates but static values and relativized coordinates.
+在前面某一节中提到，预计算的相对坐标应在 `#init` 方法中设置。这一点仍然成立，因为此处提到的这些值不是预计算坐标，而是静态值和相对化坐标。
 
-The image values are static and non-changing, as they represent the background texture size. To make things easier when rendering, two additional values (`leftPos` and `topPos`) are precomputed in the `init` method, marking the top left corner of where the background will be rendered. The label coordinates are relative to these values.
+图像相关的值是静态且不变的，因为它们代表背景纹理的大小。为便于渲染，另外两个值（`leftPos` 和 `topPos`）在 `init` 方法中预计算，标记背景将被渲染处的左上角。标签坐标相对于这些值。
 
-The `leftPos` and `topPos` is also used as a convenient way to render the background as they already represent the position to pass into `GuiGraphicsExtractor#blit`.
+`leftPos` 和 `topPos` 也可作为渲染背景的便捷方式，因为它们已经代表了要传入 `GuiGraphicsExtractor#blit` 的位置。
 :::
 
 ```java
@@ -653,13 +653,13 @@ public MyContainerScreen(MyMenu menu, Inventory playerInventory, Component title
 }
 ```
 
-### Menu Access
+### 访问菜单 {#menu-access}
 
-As the menu is passed into the screen, any values that were within the menu and synced (either through slots, data slots, or a custom system) can now be accessed through the `menu` field.
+由于菜单被传入界面，菜单中任何已被同步的值（无论是通过槽位、数据槽位还是自定义系统）现在都可以通过 `menu` 字段访问。
 
-### Container Tick
+### 容器 tick {#container-tick}
 
-Container screens tick within the `#tick` method when the player is alive and looking at the screen via `#containerTick`. This essentially takes the place of `tick` within container screens, with its most common usage being to tick the recipe book.
+当玩家存活并看着界面时，容器界面在 `#tick` 方法内通过 `#containerTick` 进行 tick。它在容器界面中实质上取代了 `tick`，最常见的用途是对配方书进行 tick。
 
 ```java
 // In some AbstractContainerScreen subclass
@@ -671,11 +671,11 @@ protected void containerTick() {
 }
 ```
 
-### Rendering the Container Screen
+### 渲染容器界面 {#rendering-the-container-screen}
 
-The container screen uses all three strata to submit its elements. First, the background stratum submits the background texture by overriding `#extractBackground`. Then, the element stratum submits the widgets like before within `#extractContents`, followed by labels in `#extractLabels`. Finally, `AbstractContainerScreen` sets up the tooltip to be submitted during the hoverable strata via `extractTooltip`.
+容器界面使用全部三个层组来提交其元素。首先，背景层组通过重写 `#extractBackground` 提交背景纹理。然后，元素层组像之前一样在 `#extractContents` 内提交控件，其后是 `#extractLabels` 中的标签。最后，`AbstractContainerScreen` 通过 `extractTooltip` 设置在可悬停层组期间提交的工具提示。
 
-Starting with the background, `extractBackground` is called to submit the background elements of the screen to the background stratum.
+从背景开始，`extractBackground` 被调用以将界面的背景元素提交到背景层组。
 
 ```java
 // In some AbstractContainerScreen subclass
@@ -704,7 +704,7 @@ protected void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int 
 }
 ```
 
-`extractLabels` is called to submit any text after the widgets in the render stratum. This calls `text` with the screen font to submit the associated components.
+`extractLabels` 被调用，以在渲染层组中控件之后提交任何文本。它使用界面字体调用 `text` 来提交关联的组件。
 
 ```java
 // In some AbstractContainerScreen subclass
@@ -721,12 +721,12 @@ protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mous
 ```
 
 :::note
-When submitting the label, you do **not** need to specify the `leftPos` and `topPos` offset. Those have already been translated within the `Matrix3x2fStack` so everything within this method is submitted relative to those coordinates.
+提交标签时，你**不**需要指定 `leftPos` 和 `topPos` 偏移。它们已经在 `Matrix3x2fStack` 内被平移过了，因此此方法内的一切都是相对于那些坐标提交的。
 :::
 
-## Registering an AbstractContainerScreen
+## 注册 AbstractContainerScreen {#registering-an-abstractcontainerscreen}
 
-To use an `AbstractContainerScreen` with a menu, it needs to be registered. This can be done by calling `register` within the `RegisterMenuScreensEvent` on the [**mod event bus**][modbus].
+要将 `AbstractContainerScreen` 与菜单配合使用，需要将其注册。这可以通过在 [**mod 事件总线**][modbus]上的 `RegisterMenuScreensEvent` 内调用 `register` 来完成。
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client

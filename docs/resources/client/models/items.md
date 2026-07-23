@@ -1,19 +1,19 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Client Items
+# 客户端物品 {#client-items}
 
-Client Items are the in-code representation of how an `ItemStack` should be submitted for rendering within the game, specifying what models to use given what state. The client items are located within the `items` subdirectory within the [`assets` folder][assets], specified by the relative location within `DataComponents#ITEM_MODEL`. By default, this is the registry name of the object (e.g. `minecraft:apple` would be located at `assets/minecraft/items/apple.json` by default).
+客户端物品（Client Item）是在代码中对某个 `ItemStack` 应如何被提交以在游戏内渲染的表示，用于指定在给定状态下使用哪些模型。客户端物品位于 [`assets` 文件夹][assets]内的 `items` 子目录中，具体位置由 `DataComponents#ITEM_MODEL` 中的相对位置指定。默认情况下，这就是该对象的注册名（例如 `minecraft:apple` 默认位于 `assets/minecraft/items/apple.json`）。
 
-The client items are stored within the `ModelManager`, which can be accessed through `Minecraft.getInstance().modelManager`. Then, you can call `ModelManager#getItemModel` or `getItemProperties` to get the client item information by its [`Identifier`][rl].
+客户端物品存储在 `ModelManager` 中，可通过 `Minecraft.getInstance().modelManager` 访问。随后，你可以调用 `ModelManager#getItemModel` 或 `getItemProperties`，按其 [`Identifier`][rl] 获取客户端物品信息。
 
 :::warning
-These are not to be confused with the actual [models that are baked and actually rendered][models] in-game.
+不要把它们与游戏内[实际被烘焙并真正渲染的模型][models]相混淆。
 :::
 
-## Overview
+## 概述 {#overview}
 
-The JSON of a client item can be broken into two parts: the model, defined by `model`; and the properties, defined by `properties`. The `model` is responsible for defining what model JSONs to use when submitting the `ItemStack` for rendering in a given context. The `properties`, on the other hand, is responsible for settings used by the renderer.
+客户端物品的 JSON 可分为两部分：由 `model` 定义的模型，以及由 `properties` 定义的属性。`model` 负责定义在给定上下文中提交 `ItemStack` 进行渲染时使用哪些模型 JSON；而 `properties` 则负责定义渲染器所使用的各项设置。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -82,11 +82,11 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-More information about how item models are submitted for rendering can be found [below][itemmodel].
+关于物品模型如何被提交以进行渲染的更多信息，可参见[下文][itemmodel]。
 
-## A Basic Model
+## 基础模型 {#a-basic-model}
 
-The `type` field within `model` determines how to choose the model being submitted to render for the item. The simplest type is handled by `minecraft:model` (or `CuboidItemModelWrapper`), which functionally defines the model JSON being submitted to render, relative to the `models` directory (e.g. `assets/<namespace>/models/<path>.json`).
+`model` 中的 `type` 字段决定了如何为该物品选择要提交渲染的模型。最简单的类型由 `minecraft:model`（即 `CuboidItemModelWrapper`）处理，其作用是定义要提交渲染的模型 JSON，路径相对于 `models` 目录（例如 `assets/<namespace>/models/<path>.json`）。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -129,9 +129,9 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-### Local Transforms
+### 局部变换 {#local-transforms}
 
-Most client item models can specify a `Transformation` for the item model, similar to model JSONs. These `Transformation`s are applied after the model JSON transform for the associated display context. This is set through the `minecraft:model` type `transformation` field.
+大多数客户端物品模型都可以为物品模型指定一个 `Transformation`，类似于模型 JSON。这些 `Transformation` 会在对应显示上下文的模型 JSON 变换之后应用。它通过 `minecraft:model` 类型的 `transformation` 字段设置。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -217,9 +217,9 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-### Tinting
+### 染色 {#tinting}
 
-Like most models, client items can change the color of the specified texture based on the properties of the stack. As such, the `minecraft:model` type has the `tints` field to define the opaque colors to apply. These are known as `ItemTintSource`s, which are defined in `ItemTintSources`. They also have a `type` field to define which source to use. The `tintindex` they are applied to is specified by their index within the list.
+和大多数模型一样，客户端物品可以根据物品堆叠的属性改变指定纹理的颜色。为此，`minecraft:model` 类型提供了 `tints` 字段，用于定义要应用的不透明颜色。它们被称为 `ItemTintSource`，定义在 `ItemTintSources` 中。它们同样有一个 `type` 字段来定义使用哪个来源。它们所应用到的 `tintindex` 由其在列表中的索引指定。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -289,7 +289,7 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-Creating your own `ItemTintSource` is similar to any other codec-based registry object. You make a class that implements `ItemTintSource`, create a `MapCodec` to encode and decode the object, and register the codec to its registry via `RegisterColorHandlersEvent.ItemTintSources` on the [mod event bus][modbus]. The `ItemTintSource` only contains one method `calculate`, which takes in the current `ItemStack`, the level the stack is in, and the entity holding the stack to return an opaque color in ARGB format, where the top 8 bits are 0xFF.
+创建自己的 `ItemTintSource` 与创建其他任何基于 codec 的注册对象类似。你创建一个实现 `ItemTintSource` 的类，创建一个用于编码和解码该对象的 `MapCodec`，并在 [mod 事件总线][modbus]上通过 `RegisterColorHandlersEvent.ItemTintSources` 将该 codec 注册到其注册表。`ItemTintSource` 只包含一个方法 `calculate`，它接收当前的 `ItemStack`、该物品堆叠所在的世界，以及持有该物品堆叠的实体，返回一个 ARGB 格式的不透明颜色，其中高 8 位为 0xFF。
 
 ```java
 public record DamageBar(int defaultColor) implements ItemTintSource {
@@ -381,9 +381,9 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-## Composite Models
+## 组合模型 {#composite-models}
 
-Sometimes, you may want to register multiple models for a single item. While this can be done directly with the [composite model loader][composite], for item models, there is a custom `minecraft:composite` type which takes a list of models to submit for rendering.
+有时，你可能想为单个物品注册多个模型。这虽然可以直接用[组合模型加载器][composite]实现，但对于物品模型，还有一个自定义的 `minecraft:composite` 类型，它接收一个要提交渲染的模型列表。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -449,13 +449,13 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-## Property Models
+## 属性模型 {#property-models}
 
-Some items change their state depending on the data stored in their stack (e.g., pulling a bow, breaking an elytra, a clock when in a given dimension, etc.). To allow models to change based on state, item models can specify a property to keep track of and select a model based on that condition. There are three different types of property models: range dispatch, select, and conditional. Each of these act as a expression for some float, switch case, and boolean respectively.
+某些物品会根据其物品堆叠中存储的数据改变状态（例如拉弓、鞘翅破损、时钟在特定维度中的表现等）。为了让模型能够依据状态变化，物品模型可以指定一个要追踪的属性，并据此条件选择模型。属性模型共有三种不同类型：范围分派（range dispatch）、选择（select）和条件（conditional）。它们分别相当于针对某个浮点数的表达式、switch case 以及布尔值。
 
-### Range Dispatch Models
+### 范围分派模型 {#range-dispatch-models}
 
-Range dispatch models have the type define some `RangeSelectItemModelProperty` to get some float to switch the model on. Each entry then has some threshold value which the float must be greater than to submit for rendering. The model chosen is the one with the closest threshold value that is not over the property value (e.g., if the property values is `4` with thresholds `3` and `5`, then the model associated with `3` will be drawn, and if the value was `6`, then the model associated with `5` would be drawn). The available `RangeSelectItemModelProperty`s to use can be found in `RangeSelectItemModelProperties`.
+范围分派模型让其 type 定义某个 `RangeSelectItemModelProperty`，以获取一个用于切换模型的浮点数。随后每个条目都有一个阈值，浮点数必须大于该阈值才会被提交渲染。所选的模型是阈值最接近且不超过属性值的那一个（例如，若属性值为 `4`，阈值为 `3` 和 `5`，则绘制与 `3` 关联的模型；若属性值为 `6`，则绘制与 `5` 关联的模型）。可用的 `RangeSelectItemModelProperty` 可在 `RangeSelectItemModelProperties` 中找到。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -572,7 +572,7 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-Creating your own `RangeSelectItemModelProperty` is similar to any other codec-based registry object. You make a class that implements `RangeSelectItemModelProperty`, create a `MapCodec` to encode and decode the object, and register the codec to its registry via `RegisterRangeSelectItemModelPropertyEvent` on the [mod event bus][modbus]. The `RangeSelectItemModelProperty` only contains one method `get`, which takes in the current `ItemStack`, the level the stack is in, the entity holding the stack, and some seeded value to return an arbitrary float to be interpreted by the ranged dispatch model.
+创建自己的 `RangeSelectItemModelProperty` 与创建其他任何基于 codec 的注册对象类似。你创建一个实现 `RangeSelectItemModelProperty` 的类，创建一个用于编码和解码该对象的 `MapCodec`，并在 [mod 事件总线][modbus]上通过 `RegisterRangeSelectItemModelPropertyEvent` 将该 codec 注册到其注册表。`RangeSelectItemModelProperty` 只包含一个方法 `get`，它接收当前的 `ItemStack`、该物品堆叠所在的世界、持有该物品堆叠的实体，以及某个种子值，返回一个任意浮点数，供范围分派模型解读。
 
 ```java
 public record AppliedEnchantments() implements RangeSelectItemModelProperty {
@@ -712,9 +712,9 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-### Select Models
+### 选择模型 {#select-models}
 
-Select models are similar to range dispatch models, but they change switch based on some value defined by a `SelectItemModelProperty`, like a switch statement for an enum. The model chosen is the property which exactly matches the value in the switch case. The available `SelectItemModelProperty`s to use can be found in `SelectItemModelProperties`.
+选择模型与范围分派模型类似，但它根据 `SelectItemModelProperty` 所定义的某个值来切换，就像针对枚举的 switch 语句。所选的模型是与 switch case 中的值精确匹配的那一个。可用的 `SelectItemModelProperty` 可在 `SelectItemModelProperties` 中找到。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -820,7 +820,7 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-Creating your own `SelectItemModelProperty` is similar to a codec-based registry object. You make a class that implements `SelectItemModelProperty<T>`, create a `Codec` to serialize and deserialize the property value, create a `MapCodec` to encode and decode the object, and register the codec to its registry via `RegisterSelectItemModelPropertyEvent` on the [mod event bus][modbus]. The `SelectItemModelProperty` has a generic `T` that represents the value to switch on. It only contains one method `get`, which takes in the current `ItemStack`, the level the stack is in, the entity holding the stack, some seeded value, and the display context of the item to return an arbitrary `T` to be interpreted by the select model.
+创建自己的 `SelectItemModelProperty` 与创建基于 codec 的注册对象类似。你创建一个实现 `SelectItemModelProperty<T>` 的类，创建一个用于序列化和反序列化属性值的 `Codec`，创建一个用于编码和解码该对象的 `MapCodec`，并在 [mod 事件总线][modbus]上通过 `RegisterSelectItemModelPropertyEvent` 将该 codec 注册到其注册表。`SelectItemModelProperty` 带有一个泛型 `T`，代表用于切换的值。它只包含一个方法 `get`，它接收当前的 `ItemStack`、该物品堆叠所在的世界、持有该物品堆叠的实体、某个种子值以及该物品的显示上下文，返回一个任意的 `T`，供选择模型解读。
 
 ```java
 // The select property class
@@ -964,9 +964,9 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-### Conditional Models
+### 条件模型 {#conditional-models}
 
-Conditional models are the simplest out of the three. The type defines some `ConditionalItemModelProperty` to get a boolean to switch the model on. The model chosen based on whether the returned boolean is true or false. The available `ConditionalItemModelProperty`s to use can be found in `ConditionalItemModelProperties`.
+条件模型是三者中最简单的。其 type 定义某个 `ConditionalItemModelProperty`，以获取一个用于切换模型的布尔值。所选的模型取决于返回的布尔值为 true 还是 false。可用的 `ConditionalItemModelProperty` 可在 `ConditionalItemModelProperties` 中找到。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -1035,7 +1035,7 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-Creating your own `ConditionalItemModelProperty` is similar to any other codec-based registry object. You make a class that implements `ConditionalItemModelProperty`, create a `MapCodec` to encode and decode the object, and register the codec to its registry via `RegisterConditionalItemModelPropertyEvent` on the [mod event bus][modbus]. The `RangeSelectItemModelProperty` only contains one method `get`, which takes in the current `ItemStack`, the level the stack is in, the entity holding the stack, some seeded value, and the display context of the item to return an arbitrary boolean to be interpreted by the conditional model (`on_true` or `on_false`).
+创建自己的 `ConditionalItemModelProperty` 与创建其他任何基于 codec 的注册对象类似。你创建一个实现 `ConditionalItemModelProperty` 的类，创建一个用于编码和解码该对象的 `MapCodec`，并在 [mod 事件总线][modbus]上通过 `RegisterConditionalItemModelPropertyEvent` 将该 codec 注册到其注册表。`RangeSelectItemModelProperty` 只包含一个方法 `get`，它接收当前的 `ItemStack`、该物品堆叠所在的世界、持有该物品堆叠的实体、某个种子值以及该物品的显示上下文，返回一个任意布尔值，供条件模型解读（`on_true` 或 `on_false`）。
 
 ```java
 public record BarVisible() implements ConditionalItemModelProperty {
@@ -1132,9 +1132,9 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-## Special Models
+## 特殊模型 {#special-models}
 
-Not all models can be represented using the basic model JSON. Some models can have dynamic components, or use existing `Model`s created for a [`BlockEntityRenderer`][ber]. In these instances, there is a special model type which allows the user to specify what [features] to submit for rendering. These are known as `SpecialModelRenderer`s, which are defined within `SpecialModelRenderers`.
+并非所有模型都能用基础的模型 JSON 表示。有些模型可能包含动态组件，或使用为 [`BlockEntityRenderer`][ber] 创建的现有 `Model`。在这些情况下，有一种特殊模型类型，允许用户指定要提交渲染的 [feature][features]。它们被称为 `SpecialModelRenderer`，定义在 `SpecialModelRenderers` 中。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -1201,15 +1201,15 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-Creating your own `SpecialModelRenderer` is broken into three parts: the `SpecialModelRenderer` instance used to submit the [features] used to render the item, the `SpecialModelRenderer.Unbaked` instance used to read and write to JSON, and the registration to use the renderer when as an item or, if necessary, when as a block.
+创建自己的 `SpecialModelRenderer` 分为三部分：用于提交渲染物品所需 [feature][features] 的 `SpecialModelRenderer` 实例、用于读写 JSON 的 `SpecialModelRenderer.Unbaked` 实例，以及将该渲染器注册为物品使用（必要时也注册为方块使用）。
 
-First, there is the `SpecialModelRenderer`. This works similarly to any other renderer class (e.g. block entity renderers, entity renderers). It should take in the static data used during the submission process (e.g., the `Model` subclass, the `SpriteId` of the texture, etc.). There are two methods to be aware of. First, there is `extractArgument`. This is used to limit the amount of data available to the `submit` method by only supplying what is necessary from the `ItemStack`.
+首先是 `SpecialModelRenderer`。它的工作方式与其他任何渲染器类（例如方块实体渲染器、实体渲染器）类似。它应接收提交过程中使用的静态数据（例如 `Model` 子类、纹理的 `SpriteId` 等）。有两个方法需要注意。第一个是 `extractArgument`。它用于只从 `ItemStack` 中提供必要的数据，从而限制 `submit` 方法可用的数据量。
 
 :::note
-If you don't know what data you may need, you can just have this return the `ItemStack` in question. If you need no data from the stack, you can instead use `NoDataSpecialModelRenderer`, which implements this method for you.
+如果你不确定可能需要哪些数据，可以让它直接返回相应的 `ItemStack`。如果你不需要来自物品堆叠的任何数据，则可以改用 `NoDataSpecialModelRenderer`，它已为你实现了该方法。
 :::
 
-Next is the `submit` method. This takes in value returned from `extractArgument`, the pose stack, the collector used to submit the desired features, the packed light, the overlay texture, if the stack is foiled (e.g. enchanted), and the outline color. All feature submissions should happen in this method.
+接下来是 `submit` 方法。它接收 `extractArgument` 返回的值、pose stack、用于提交所需 feature 的收集器、打包光照、覆盖层纹理、物品堆叠是否带有附魔光效（例如已附魔），以及轮廓颜色。所有 feature 的提交都应在该方法中进行。
 
 ```java
 public record ExampleSpecialRenderer(SpriteGetter spriteGetter, Model.Simple model, SpriteId sprite) implements SpecialModelRenderer<Boolean> {
@@ -1232,7 +1232,7 @@ public record ExampleSpecialRenderer(SpriteGetter spriteGetter, Model.Simple mod
 }
 ```
 
-Next is the `SpecialModelRenderer.Unbaked` instance. This should contain data that can be read from a file to determine what to pass into the special renderer. This also contains two methods: `bake`, which is used to construct the special renderer instance; and `type`, which defines the `MapCodec` to use for encoding/decoding to file.
+接下来是 `SpecialModelRenderer.Unbaked` 实例。它应包含可从文件读取的数据，用于决定要传入特殊渲染器的内容。它同样包含两个方法：`bake`，用于构造特殊渲染器实例；以及 `type`，用于定义读写文件时所使用的 `MapCodec`。
 
 ```java
 public record ExampleSpecialRenderer(SpriteGetter spriteGetter, Model.Simple model, SpriteId sprite) implements SpecialModelRenderer<Boolean> {
@@ -1261,7 +1261,7 @@ public record ExampleSpecialRenderer(SpriteGetter spriteGetter, Model.Simple mod
 }
 ```
 
-Finally, we register the objects to their necessary locations. For the client items, this is done via `RegisterSpecialModelRendererEvent` on the [mod event bus][modbus]. If the special renderer should also be used as part of a `BlockEntityRenderer`, such as when rendering in some item-like context (e.g., enderman holding the block), then an `Unbaked` version for the block should be registered via `RegisterBlockModelsEvent` on the [mod event bus][modbus].
+最后，我们把这些对象注册到必要的位置。对于客户端物品，这通过 [mod 事件总线][modbus]上的 `RegisterSpecialModelRendererEvent` 完成。如果该特殊渲染器还应作为 `BlockEntityRenderer` 的一部分使用，例如在某种类似物品的上下文中渲染（如末影人手持方块），则应在 [mod 事件总线][modbus]上通过 `RegisterBlockModelsEvent` 为该方块注册一个 `Unbaked` 版本。
 
 ```java
 // In some event handler class
@@ -1346,12 +1346,12 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-## Dynamic Fluid Container
+## 动态流体容器 {#dynamic-fluid-container}
 
-NeoForge adds an item model that constructs a dynamic fluid container, capable of re-texturing itself at runtime to match the contained fluid.
+NeoForge 添加了一种物品模型，用于构建动态流体容器，它能够在运行时重新贴图以匹配所容纳的流体。
 
 :::note
-For the fluid tint to apply to the fluid texture, the item in question must have a `Capabilities.FluidHandler.ITEM` attached. If your item does not directly use `BucketItem` (not a subtype either), then you need to [register the capability to your item][capability].
+为了让流体染色作用于流体纹理，相应物品必须附加了 `Capabilities.FluidHandler.ITEM`。如果你的物品没有直接使用 `BucketItem`（也不是其子类型），那么你需要[为你的物品注册该 Capability][capability]。
 :::
 
 <Tabs>
@@ -1460,27 +1460,27 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-## Manually Submitting an Item for Rendering
+## 手动提交物品进行渲染 {#manually-submitting-an-item-for-rendering}
 
-If you need to submit an item [feature][features], such as in some `BlockEntityRenderer` or `EntityRenderer`, it can be achieved through three steps. First, the renderer in question creates an `ItemStackRenderState` to hold the state of the stack. Then, the `ItemModelResolver` updates the `ItemStackRenderState` using one of its methods to update the state to the current item being submitted. Finally, the item is submitted via `ItemStackRenderState#submit`.
+如果你需要提交一个物品 [feature][features]，例如在某个 `BlockEntityRenderer` 或 `EntityRenderer` 中，可以通过三个步骤实现。首先，相应的渲染器创建一个 `ItemStackRenderState` 来保存物品堆叠的状态。然后，`ItemModelResolver` 使用其某个方法更新 `ItemStackRenderState`，把状态更新为当前正在提交的物品。最后，通过 `ItemStackRenderState#submit` 提交该物品。
 
-The `ItemStackRenderState` keeps track of the data used for drawing. Each 'model' is given its own `ItemStackRenderState.LayerRenderState`, which contains the `BakedQuad`s to render, along with its render type, foil status, tint information, animated flag, extents, and any special renderers used. Layers are created using the `newLayer` method, and cleared for rendering using the `clear` method. If a predefined number of layers is used, then `ensureCapacity` is used to make sure there are the necessary number of `LayerRenderStates` to render properly.
+`ItemStackRenderState` 负责追踪绘制所用的数据。每个“模型”都拥有自己的 `ItemStackRenderState.LayerRenderState`，其中包含要渲染的 `BakedQuad`，以及它的渲染类型、附魔光效状态、染色信息、动画标志、范围（extents）以及所用的任何特殊渲染器。图层通过 `newLayer` 方法创建，并通过 `clear` 方法清空以便渲染。如果使用了预定数量的图层，则用 `ensureCapacity` 确保有足够数量的 `LayerRenderStates` 以正确渲染。
 
 :::note
-[Screens][screens] use the subclass `TrackingItemStackRenderState` to hold model identity elements for caching the rendered state across frames.
+[界面][screens]使用子类 `TrackingItemStackRenderState` 来保存模型标识元素，以便跨帧缓存渲染状态。
 :::
 
-`ItemModelResolver` is responsible for updating the `ItemStackRenderState`. This is done through either `updateForLiving` for items held by living entities, `updateForNonLiving` for items held by other kinds of entities, and `updateForTopItem` for all other cases. These methods take in the render state, stack to render, and current display context. The other parameters update information about the held hand, level, item owner, and seeded value. Each method calls `ItemStackRenderState#clear` before calling `update` on the `ItemModel` obtained from  `DataComponents#ITEM_MODEL`. The `ItemModelResolver` can always be obtained via `Minecraft#getItemModelResolver` if you are not within some renderer context (e.g., `BlockEntityRenderer`, `EntityRenderer`).
+`ItemModelResolver` 负责更新 `ItemStackRenderState`。这通过以下方法完成：生物实体持有的物品用 `updateForLiving`，其他类型实体持有的物品用 `updateForNonLiving`，其余所有情况用 `updateForTopItem`。这些方法接收渲染状态、要渲染的物品堆叠以及当前显示上下文。其余参数则更新关于所持之手、世界、物品持有者和种子值的信息。每个方法都会先调用 `ItemStackRenderState#clear`，再对从 `DataComponents#ITEM_MODEL` 获取的 `ItemModel` 调用 `update`。如果你不在某个渲染器上下文中（例如 `BlockEntityRenderer`、`EntityRenderer`），也总是可以通过 `Minecraft#getItemModelResolver` 获取 `ItemModelResolver`。
 
-## Custom Item Model Definitions
+## 自定义物品模型定义 {#custom-item-model-definitions}
 
-Creating your own `ItemModel` is broken into three parts: the `ItemModel` instance used to update the render state, the `ItemModel.Unbaked` instance used to read and write to JSON, and the registration to use the `ItemModel`.
+创建自己的 `ItemModel` 分为三部分：用于更新渲染状态的 `ItemModel` 实例、用于读写 JSON 的 `ItemModel.Unbaked` 实例，以及注册以使用该 `ItemModel`。
 
 :::warning
-Please make sure to check that your required item model can not be created with the existing systems above. In most cases, it is not necessary to create a custom `ItemModel`.
+请务必确认你所需的物品模型无法用上文已有的系统实现。在大多数情况下，无需创建自定义 `ItemModel`。
 :::
 
-First, there is the `ItemModel`. This is responsible for updating the `ItemStackRenderState` such that the item is drawn correctly. It should take in the static data used during the submission process (e.g., the list of `BakedQuad`s, property information, etc.). The only method is `update`, which takes in the render state, stack, model resolver, display context, level, item owner, and some seeded value to update the `ItemStackRenderState`. `ItemStackRenderState` should be the only parameter modified, with the rest treated as read-only data.
+首先是 `ItemModel`。它负责更新 `ItemStackRenderState`，使物品被正确绘制。它应接收提交过程中使用的静态数据（例如 `BakedQuad` 列表、属性信息等）。唯一的方法是 `update`，它接收渲染状态、物品堆叠、模型解析器、显示上下文、世界、物品持有者以及某个种子值，用于更新 `ItemStackRenderState`。`ItemStackRenderState` 应是唯一被修改的参数，其余参数都应视为只读数据。
 
 ```java
 public record ExampleModelWrapper(QuadCollection quads, List<ItemTintSource> tints, ModelRenderProperties properties, Matrix4fc transformation) implements ItemModel {
@@ -1532,7 +1532,7 @@ public record ExampleModelWrapper(QuadCollection quads, List<ItemTintSource> tin
 }
 ```
 
-Next is the `ItemModel.Unbaked` instance. This should contain data that can be read from a file to determine what to pass into the item model. This also contains two methods: `bake`, which is used to construct the `ItemModel` instance; and `type`, which defines the `MapCodec` to use for encoding/decoding to file.
+接下来是 `ItemModel.Unbaked` 实例。它应包含可从文件读取的数据，用于决定要传入物品模型的内容。它同样包含两个方法：`bake`，用于构造 `ItemModel` 实例；以及 `type`，用于定义读写文件时所使用的 `MapCodec`。
 
 ```java
 public record ExampleModelWrapper(QuadCollection quads, List<ItemTintSource> tints, ModelRenderProperties properties, Matrix4fc transformation) implements ItemModel {
@@ -1579,7 +1579,7 @@ public record ExampleModelWrapper(QuadCollection quads, List<ItemTintSource> tin
 }
 ```
 
-Then, we register the map codec via `RegisterItemModelsEvent` on the [mod event bus][modbus].
+然后，我们在 [mod 事件总线][modbus]上通过 `RegisterItemModelsEvent` 注册该 map codec。
 
 ```java
 // In some event handler class
@@ -1594,7 +1594,7 @@ public static void registerItemModels(RegisterItemModelsEvent event) {
 }
 ```
 
-Finally, we can use the `ItemModel` in our JSON or as part of the datagen process.
+最后，我们就可以在 JSON 中使用该 `ItemModel`，或将其作为数据生成流程的一部分。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>

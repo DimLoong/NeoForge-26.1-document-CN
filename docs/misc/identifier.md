@@ -1,41 +1,41 @@
-# Identifiers
+# Identifier {#identifiers}
 
-`Identifier`s are one of the most important things in Minecraft. They are used as keys in [registries][registries], as identifiers for data or resource files, as references to models in code, and in a lot of other places. An `Identifier` consists of two parts: a namespace and a path, separated by a `:`.
+`Identifier` 是 Minecraft 中最重要的东西之一。它们被用作[注册表][registries]中的键，用作数据或资源文件的标识符，用作代码中对模型的引用，以及许多其他场景。一个 `Identifier` 由两部分组成：命名空间和路径，两者以 `:` 分隔。
 
-The namespace denotes what mod, resource pack or datapack the location refers to. For example, a mod with the mod id `examplemod` will use the `examplemod` namespace. Minecraft uses the `minecraft` namespace. Extra namespaces can be defined at will simply by creating a corresponding data folder, this is usually done by datapacks to keep their logic separate from the point where they integrate with vanilla.
+命名空间表明该位置所指向的是哪个 Mod、资源包或数据包。例如，一个 mod id 为 `examplemod` 的 Mod 将使用 `examplemod` 命名空间。Minecraft 使用 `minecraft` 命名空间。只需创建相应的数据文件夹，就可以随意定义额外的命名空间，数据包通常这样做，以便将它们自己的逻辑与其和原版集成的地方分隔开来。
 
-The path is a reference to whatever object you want, inside your namespace. For example, `minecraft:cow` is a reference to something named `cow` in the `minecraft` namespace - usually this location would be used to get the cow entity from the entity registry. Another example would be `examplemod:example_item`, which would probably be used to get your mod's `example_item` from the item registry.
+路径是对你想要的任意对象的引用，位于你的命名空间之内。例如，`minecraft:cow` 是对 `minecraft` 命名空间中某个名为 `cow` 的东西的引用——通常该位置会被用来从实体注册表中获取 cow 实体。另一个例子是 `examplemod:example_item`，它很可能被用来从物品注册表中获取你 Mod 的 `example_item`。
 
-`Identifier`s may only contain lowercase letters, digits, underscores, dots and hyphens. Paths may additionally contain forward slashes. Note that due to Java module restrictions, mod ids may not contain hyphens, which by extension means that mod namespaces may not contain hyphens either (they are still permitted in paths).
+`Identifier` 只能包含小写字母、数字、下划线、点和连字符。路径还可以额外包含正斜杠。请注意，由于 Java 模块的限制，mod id 不能包含连字符，这也就意味着 Mod 的命名空间同样不能包含连字符（它们在路径中仍然是允许的）。
 
 :::info
-An `Identifier` on its own says nothing about what kind of objects we are using it for. Objects named `minecraft:dirt` exist in multiple places, for example. It is up to whatever receives the `Identifier` to associate an object with it.
+`Identifier` 本身并不说明我们要将其用于何种对象。例如，名为 `minecraft:dirt` 的对象存在于多个地方。将某个对象与 `Identifier` 关联起来，取决于接收该 `Identifier` 的一方。
 :::
 
-A new `Identifier` can be created by calling `Identifier.fromNamespaceAndPath("examplemod", "example_item")` or `Identifier.parse("examplemod:example_item")`. If `withDefaultNamespace` is used, the string will be used as the path, and `minecraft` will be used as the namespace. So for example, `Identifier.withDefaultNamespace("example_item")` will result in `minecraft:example_item`.
+可以通过调用 `Identifier.fromNamespaceAndPath("examplemod", "example_item")` 或 `Identifier.parse("examplemod:example_item")` 创建一个新的 `Identifier`。如果使用 `withDefaultNamespace`，则该字符串会被用作路径，命名空间则使用 `minecraft`。因此举例来说，`Identifier.withDefaultNamespace("example_item")` 会得到 `minecraft:example_item`。
 
-The namespace and path of an `Identifier` can be retrieved using `Identifier#getNamespace()` and `#getPath()`, respectively, and the combined form can be retrieved through `Identifier#toString`.
+`Identifier` 的命名空间和路径可以分别通过 `Identifier#getNamespace()` 和 `#getPath()` 获取，而其组合形式可以通过 `Identifier#toString` 获取。
 
-`Identifier`s are immutable. All utility methods on `Identifier`, such as `withPrefix` or `withSuffix`, return a new `Identifier`.
+`Identifier` 是不可变的。`Identifier` 上的所有工具方法，例如 `withPrefix` 或 `withSuffix`，都会返回一个新的 `Identifier`。
 
-## Resolving `Identifier`s
+## 解析 `Identifier` {#resolving-identifiers}
 
-Some places, for example registries, use `Identifier`s directly. Some other places, however, will resolve the `Identifier` as needed. For example:
+有些地方，例如注册表，会直接使用 `Identifier`。而另一些地方则会按需解析 `Identifier`。例如：
 
-- `Identifier`s are used as identifiers for GUI backgrounds. For example, the furnace GUI uses the identifier `minecraft:textures/gui/container/furnace.png`. This maps to the file `assets/minecraft/textures/gui/container/furnace.png` on disk. Note that the `.png` suffix is required in this identifier.
-- `Identifier`s are used as identifiers for block models. For example, the block model of dirt uses the identifier `minecraft:block/dirt`. This maps to the file `assets/minecraft/models/block/dirt.json` on disk. Note that the `.json` suffix is not required here. Note as well that this identifier automatically maps into the `models` subfolder.
-- `Identifier`s are used as identifiers for client items. For example, the client item of the apple uses the identifier `minecraft:apple` (as defined by `DataComponents#ITEM_MODEL`). This maps to the file `assets/minecraft/items/apple.json`. Note that the `.json` suffix is not required here. Note as well that this identifier automatically maps into the `items` subfolder.
-- `Identifier`s are used as identifiers for recipes. For example, the iron block crafting recipe uses the identifier `minecraft:iron_block`. This maps to the file `data/minecraft/recipe/iron_block.json` on disk. Note that the `.json` suffix is not required here. Note as well that this identifier automatically maps into the `recipe` subfolder.
+- `Identifier` 被用作 GUI 背景的标识符。例如，熔炉 GUI 使用标识符 `minecraft:textures/gui/container/furnace.png`。它映射到磁盘上的文件 `assets/minecraft/textures/gui/container/furnace.png`。注意此标识符中需要 `.png` 后缀。
+- `Identifier` 被用作方块模型的标识符。例如，泥土的方块模型使用标识符 `minecraft:block/dirt`。它映射到磁盘上的文件 `assets/minecraft/models/block/dirt.json`。注意这里不需要 `.json` 后缀。另外注意此标识符会自动映射到 `models` 子文件夹中。
+- `Identifier` 被用作客户端物品的标识符。例如，苹果的客户端物品使用标识符 `minecraft:apple`（由 `DataComponents#ITEM_MODEL` 定义）。它映射到文件 `assets/minecraft/items/apple.json`。注意这里不需要 `.json` 后缀。另外注意此标识符会自动映射到 `items` 子文件夹中。
+- `Identifier` 被用作配方的标识符。例如，铁块的合成配方使用标识符 `minecraft:iron_block`。它映射到磁盘上的文件 `data/minecraft/recipe/iron_block.json`。注意这里不需要 `.json` 后缀。另外注意此标识符会自动映射到 `recipe` 子文件夹中。
 
-Whether the `Identifier` expects a file suffix, or what exactly the identifier resolves to, depends on the use case.
+`Identifier` 是否需要文件后缀，或者它究竟解析成什么，取决于具体的用例。
 
-## `ResourceKey`s
+## `ResourceKey` {#resourcekeys}
 
-`ResourceKey`s combine a registry id with a registry name. An example would be a registry key with the registry id `minecraft:item` and the registry name `minecraft:diamond_sword`. Unlike an `Identifier`, `ResourceKey`s actually refer to a unique element, thus being able to clearly identify an element. They are most commonly used in contexts where many different registries come in contact with one another. A common use case are datapacks, especially worldgen.
+`ResourceKey` 将一个注册表 id 与一个注册名组合起来。一个例子是注册表 id 为 `minecraft:item`、注册名为 `minecraft:diamond_sword` 的资源键。与 `Identifier` 不同，`ResourceKey` 实际上指向一个唯一的元素，因此能够明确地标识某个元素。它们最常用于许多不同注册表相互接触的场景。一个常见用例是数据包，尤其是世界生成。
 
-A new `ResourceKey` can be created through the static method `ResourceKey#create(ResourceKey<? extends Registry<T>>, Identifier)`. The second parameter here is the registry name, while the first parameter is what is known as a registry key. Registry keys are a special kind of `ResourceKey` whose registry is the root registry (i.e. the registry of all other registries). A registry key can be created via `ResourceKey#createRegistryKey(Identifier)` with the desired registry's id.
+可以通过静态方法 `ResourceKey#create(ResourceKey<? extends Registry<T>>, Identifier)` 创建一个新的 `ResourceKey`。这里第二个参数是注册名，第一个参数则是所谓的注册表键（registry key）。注册表键是一种特殊的 `ResourceKey`，其注册表是根注册表（即所有其他注册表所在的注册表）。可以通过 `ResourceKey#createRegistryKey(Identifier)` 并传入所需注册表的 id 来创建一个注册表键。
 
-`ResourceKey`s are interned at creation. This means that comparing by reference equality (`==`) is possible and encouraged, but their creation is comparatively expensive.
+`ResourceKey` 在创建时会被驻留（intern）。这意味着可以并鼓励使用引用相等（`==`）进行比较，但它们的创建开销相对较大。
 
 [registries]: ../concepts/registries.md
 [sides]: ../concepts/sides.md

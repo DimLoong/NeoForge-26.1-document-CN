@@ -1,12 +1,12 @@
-# Textures
+# 纹理 {#textures}
 
-All textures in Minecraft are PNG files located within a namespace's `textures` folder. JPG, GIF and other image formats are not supported. The path of [identifiers] referring to textures is generally relative to the `textures` folder, so for example, the identifier `examplemod:block/example_block` refers to the texture file at `assets/examplemod/textures/block/example_block.png`.
+Minecraft 中的所有纹理都是 PNG 文件，位于某个命名空间的 `textures` 文件夹内。JPG、GIF 及其他图片格式不受支持。指向纹理的 [identifier][identifiers] 路径通常相对于 `textures` 文件夹，因此举例来说，标识符 `examplemod:block/example_block` 指向的纹理文件位于 `assets/examplemod/textures/block/example_block.png`。
 
-Textures should generally be in sizes that are powers of two, for example 16x16 or 32x32. Unlike older versions, modern Minecraft natively supports block and item texture sizes greater than 16x16. For textures that are not in powers of two that you render yourself anyway (for example GUI backgrounds), create an empty file in the next available power-of-two size (often 256x256), and add your texture in the top left corner of that file, leaving the rest of the file empty. The actual size of the drawn texture can then be set in the code that uses the texture.
+纹理的尺寸通常应为 2 的幂，例如 16x16 或 32x32。与旧版本不同，现代 Minecraft 原生支持大于 16x16 的方块和物品纹理尺寸。对于那些尺寸不是 2 的幂、且反正由你自行渲染的纹理（例如 GUI 背景），请新建一个尺寸为下一个可用的 2 的幂（通常是 256x256）的空文件，把你的纹理放在该文件的左上角，其余部分留空。绘制纹理的实际尺寸随后可在使用该纹理的代码中设置。
 
-## Texture Metadata
+## 纹理元数据 {#texture-metadata}
 
-Texture metadata can be specified in a file named exactly the same as the texture, with an additional `.mcmeta` suffix. For example, an animated texture at `textures/block/example.png` would need an accompanying `textures/block/example.png.mcmeta` file. The `.mcmeta` file has the following format (all optional):
+纹理元数据可以在一个与纹理同名、但额外带有 `.mcmeta` 后缀的文件中指定。例如，位于 `textures/block/example.png` 的动画纹理需要一个配套的 `textures/block/example.png.mcmeta` 文件。`.mcmeta` 文件的格式如下（全部可选）：
 
 ```json5
 {
@@ -70,11 +70,11 @@ Texture metadata can be specified in a file named exactly the same as the textur
 }
 ```
 
-## Animated Textures
+## 动画纹理 {#animated-textures}
 
-Minecraft natively supports animated textures for blocks and items. Animated textures consist of a texture file where the different animation stages are located below each other (for example, an animated 16x16 texture with 8 phases would be represented through a 16x128 PNG file).
+Minecraft 原生支持方块和物品的动画纹理。动画纹理由一个纹理文件构成，其中不同的动画阶段依次上下排列（例如，一个含 8 个阶段的 16x16 动画纹理会以一个 16x128 的 PNG 文件来表示）。
 
-To actually be animated and not just be displayed as a distorted texture, there must be an `animation` object in the texture metadata. The sub-object can be empty, but may contain the following optional entries:
+要真正实现动画，而不是被显示为一张变形的纹理，纹理元数据中必须包含一个 `animation` 对象。该子对象可以为空，但也可以包含以下可选条目：
 
 ```json5
 {

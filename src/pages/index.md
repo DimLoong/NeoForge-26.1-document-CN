@@ -1,57 +1,59 @@
 import Card from "../theme/Card.tsx";
 
-# NeoForged Documentation
+# NeoForged 文档
 
-This is the official documentation for [NeoForged], the Minecraft modding API.
+这是 [NeoForged] 的官方文档，NeoForged 是 Minecraft 的 Mod 开发 API。
 
-This documentation is _only_ for NeoForged, **this is not a Java tutorial**.
+本文档_仅_面向 NeoForged，**并非 Java 教程**。
 
-If you would like to contribute to the docs, read [Contributing to the Docs][contributing].
+如果你想为文档做贡献，请阅读[参与文档贡献][contributing]。
+
+> 说明：这是本地简体中文阅读版，仅供个人学习。
 
 <div class="container">
     <div class="row">
         <div class="col category">
             <Card
-                title="NeoForge Documentation"
-                body="Learn how to create your first mod using NeoForge, and discover the vast APIs it provides."
+                title="NeoForge 文档"
+                body="学习如何使用 NeoForge 创建你的第一个 Mod，并探索它提供的丰富 API。"
                 link="/docs/gettingstarted/"
-                linkTitle="Get Started"
+                linkTitle="开始阅读"
             />
         </div>
     </div>
     <div class="row">
         <div class="col category">
             <Card
-                title="Toolchain Features"
-                body="Learn about the features NeoForged provides through its Gradle plugins."
+                title="工具链特性"
+                body="了解 NeoForged 通过其 Gradle 插件提供的各项特性。"
                 link="/toolchain/docs/"
-                linkTitle="Learn More"
+                linkTitle="了解更多"
             />
         </div>
         <div class="col category">
             <Card
-                title="Primers"
-                body="Read about the changes between Minecraft releases and how to update your mod accordingly."
+                title="版本导读"
+                body="了解 Minecraft 各版本之间的变化，以及如何相应地更新你的 Mod。"
                 link="/primer/docs/"
-                linkTitle="Read More"
+                linkTitle="阅读更多"
             />
         </div>
     </div>
     <div class="row">
         <div class="col category">
             <Card
-                title="User Guide"
-                body="Learn how to install and use NeoForge in your client or server environment."
+                title="用户指南"
+                body="了解如何在客户端或服务端环境中安装和使用 NeoForge。"
                 link="/user/docs/"
-                linkTitle="Get Started"
+                linkTitle="开始阅读"
             />
         </div>
         <div class="col category">
             <Card
-                title="Modpack Development"
-                body="Learn how to create and debug modpacks with NeoForge mods."
+                title="整合包开发"
+                body="了解如何使用 NeoForge Mod 创建和调试整合包。"
                 link="/modpack/docs/"
-                linkTitle="Get Started"
+                linkTitle="开始阅读"
             />
         </div>
     </div>

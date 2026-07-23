@@ -1,31 +1,31 @@
 ---
 sidebar_position: 4
 ---
-# Data Attachments
+# 数据附加 {#data-attachments}
 
-The data attachment system allows mods to attach and store additional data on block entities, chunks, entities, and levels.
+数据附加（Data Attachment）系统允许 Mod 在方块实体、区块、实体和世界上附加并存储额外数据。
 
-_To store additional level data, you can use [SavedData][saveddata]._
+_若要存储额外的世界数据，可以使用 [SavedData][saveddata]。_
 
 :::note
-Data attachments for item stacks have been superceeded by vanilla's [data components][datacomponents].
+针对物品堆叠的数据附加已被原版的[数据组件][datacomponents]取代。
 :::
 
-## Creating an attachment type
+## 创建附加类型 {#creating-an-attachment-type}
 
-To use the system, you need to register an `AttachmentType`. The attachment type contains the following configuration:
+要使用该系统，你需要注册一个 `AttachmentType`。附加类型包含以下配置：
 
-- A default value supplier to create the instance when the data is first accessed.
-- An optional serializer if the attachment should be persisted.
-- (If a serializer was configured) The `copyOnDeath` flag to automatically copy entity data on death (see below).
+- 一个默认值 Supplier，用于在数据首次被访问时创建实例。
+- 一个可选的序列化器，供附加数据需要持久化时使用。
+- （如果配置了序列化器）`copyOnDeath` 标志，用于在实体死亡时自动复制实体数据（见下文）。
 
 :::tip
-If you don't want your attachment to persist, do not provide a serializer.
+如果你不希望附加数据持久化，就不要提供序列化器。
 :::
 
-There are a few ways to provide an attachment serializer: directly implementing `IAttachmentSerializer`, implementing [`ValueIOSerializable`][valueio] and using the static `AttachmentType#serializable` method to create the builder, or providing a map codec to the builder.
+提供附加数据序列化器有几种方式：直接实现 `IAttachmentSerializer`，实现 [`ValueIOSerializable`][valueio] 并使用静态方法 `AttachmentType#serializable` 来创建 builder，或者向 builder 提供一个 map codec。
 
-In any case, the attachment **must be registered** to the `NeoForgeRegistries.ATTACHMENT_TYPES` registry. Here is an example:
+无论采用哪种方式，附加类型都**必须注册**到 `NeoForgeRegistries.ATTACHMENT_TYPES` 注册表。以下是一个示例：
 
 ```java
 // Create the DeferredRegister for attachment types
@@ -48,9 +48,9 @@ private static final Supplier<AttachmentType<SomeCache>> SOME_CACHE = ATTACHMENT
 ATTACHMENT_TYPES.register(modBus);
 ```
 
-## Using the attachment type
+## 使用附加类型 {#using-the-attachment-type}
 
-Once the attachment type is registered, it can be used on any holder object. Calling `getData` if no data is present will attach a new default instance.
+附加类型注册完成后，就可以在任意 holder 对象上使用它。如果没有数据存在，调用 `getData` 会附加一个新的默认实例。
 
 ```java
 // Get the ItemStacksResourceHandler if it already exists, else attach a new one:
@@ -60,7 +60,7 @@ int playerMana = player.getData(MANA);
 // And so on...
 ```
 
-If attaching a default instance is not desired, a `hasData` check can be added:
+如果不希望附加默认实例，可以先加上 `hasData` 检查：
 
 ```java
 // Check if the chunk has the HANDLER attachment before doing anything.
@@ -70,7 +70,7 @@ if (chunk.hasData(HANDLER)) {
 }
 ```
 
-The data can also be updated with `setData`:
+数据还可以用 `setData` 更新：
 
 ```java
 // Increment mana by 10.
@@ -78,13 +78,13 @@ player.setData(MANA, player.getData(MANA) + 10);
 ```
 
 :::important
-Usually, block entities and chunks need to be marked as dirty when they are modified (with `setChanged` and `setUnsaved(true)`). This is done automatically for calls to `setData`:
+通常，方块实体和区块在被修改时需要被标记为脏（dirty），即调用 `setChanged` 和 `setUnsaved(true)`。对于 `setData` 的调用，这会自动完成：
 
 ```java
 chunk.setData(MANA, chunk.getData(MANA) + 10); // will call setUnsaved automatically
 ```
 
-but if you modify some data that you obtained from `getData` (including a newly created default instance) then you must mark block entities and chunks as dirty explicitly:
+但如果你修改的是从 `getData` 获得的某些数据（包括新创建的默认实例），那么你必须显式地把方块实体和区块标记为脏：
 
 ```java
 var mana = chunk.getData(MUTABLE_MANA);
@@ -93,11 +93,11 @@ chunk.setUnsaved(true); // must be done manually because we did not use setData
 ```
 :::
 
-## Sharing data with the client
+## 与客户端共享数据 {#sharing-data-with-the-client}
 
-To sync block entity, chunk, level, or entity attachments to a client, you can implement `sync` in the builder. Attachments are then sent to the client when the attachment is default-created through `AttachmentHolder#getData`, updated through `AttachmentHolder#setData`, or removed through `AttachmentHolder#removeData`. If the data should be sent at other times, then `AttachmentHolder#syncData` can be called with the `AttachmentType` to sync.
+要将方块实体、区块、世界或实体的附加数据同步到客户端，你可以在 builder 中实现 `sync`。这样，当附加数据通过 `AttachmentHolder#getData` 被默认创建、通过 `AttachmentHolder#setData` 被更新，或通过 `AttachmentHolder#removeData` 被移除时，附加数据就会被发送到客户端。如果需要在其他时刻发送数据，则可以用要同步的 `AttachmentType` 调用 `AttachmentHolder#syncData`。
 
-`AttachmentType.Builder#sync` has three overloads; however, they each create an `AttachmentSyncHandler<T>`, where `T` is the type of the data attachment. The handler has three methods: two to `read` and `write` to the network, and one to determine whether a given player can see the data broadcasted by the holder (`sendToPlayer`). The sync handler is ignored if the data attachment is removed.
+`AttachmentType.Builder#sync` 有三个重载；不过它们各自都会创建一个 `AttachmentSyncHandler<T>`，其中 `T` 是数据附加的类型。该处理器有三个方法：两个用于向网络进行 `read` 和 `write`，一个用于判断给定玩家是否能看到该 holder 广播的数据（`sendToPlayer`）。如果附加数据被移除，同步处理器将被忽略。
 
 ```java
 public class ExampleSyncHandler implements AttachmentSyncHandler<ExampleData> {
@@ -150,7 +150,7 @@ public class ExampleSyncHandler implements AttachmentSyncHandler<ExampleData> {
 }
 ```
 
-The two other overloads which delegate to `AttachmentSyncHandler` take in a [`StreamCodec`][streamcodec] for `read` and `write`, and an optional predicate for `sendToPlayer`.
+另外两个委托给 `AttachmentSyncHandler` 的重载，为 `read` 和 `write` 接收一个 [`StreamCodec`][streamcodec]，并为 `sendToPlayer` 接收一个可选的断言（predicate）。
 
 ```java
 // Assume ExampleData has some stream codec STREAM_CODEC
@@ -179,16 +179,16 @@ public static final Supplier<AttachmentType<ExampleData>> WITH_PREDICATE = ATTAC
 ```
 
 :::note
-Using the `StreamCodec` overloads means that the entire data attachment will be synced each time, ignoring any data that was previously on the client.
+使用 `StreamCodec` 重载意味着每次都会同步整个数据附加，忽略客户端上先前已有的任何数据。
 :::
 
-## Copying data on player death
+## 玩家死亡时复制数据 {#copying-data-on-player-death}
 
-By default, [entity] data attachments are not copied on player death. To automatically copy an attachment on player death, set `copyOnDeath` in the attachment builder.
+默认情况下，[实体][entity]数据附加不会在玩家死亡时被复制。要在玩家死亡时自动复制某个附加数据，请在附加数据 builder 中设置 `copyOnDeath`。
 
-More complex handling can be implemented via `PlayerEvent.Clone` by reading the data from the original entity and assigning it to the new entity. In this event, the `#isWasDeath` method can be used to distinguish between respawning after death and returning from the End. This is important because the data will already exist when returning from the End, so care has to be taken to not duplicate values in this case.
+更复杂的处理可以通过 `PlayerEvent.Clone` 实现，即从原实体读取数据并将其赋给新实体。在该事件中，可以用 `#isWasDeath` 方法来区分死亡后重生和从末地返回。这一点很重要，因为从末地返回时数据已经存在，所以必须小心，避免在这种情况下重复复制值。
 
-For example:
+例如：
 
 ```java
 @SubscribeEvent // on the game event bus

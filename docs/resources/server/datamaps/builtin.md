@@ -1,10 +1,10 @@
-# Built-In Data Maps
+# 内置数据映射 {#built-in-data-maps}
 
-NeoForge provides various built-in [data maps][datamap] for common use cases, replacing hardcoded vanilla fields. Vanilla values are shipped by data map files in NeoForge, so there is no functional difference to the player.
+NeoForge 为常见用例提供了各种内置[数据映射][datamap]，用以替代硬编码的原版字段。原版的值由 NeoForge 中的数据映射文件提供，因此对玩家而言没有任何功能上的差异。
 
-## `neoforge:acceptable_villager_distances`
+## `neoforge:acceptable_villager_distances` {#neoforgeacceptable_villager_distances}
 
-Allows configuring the maximum block distance that villagers will notice an entity, as a replacement for `VillagerHostilesSensor.ACCEPTABLE_DISTANCE_FROM_HOSTILES` (which will be ignored in 26.2). This data map is located at `neoforge/data_maps/entity_type/acceptable_villager_distances.json` and its objects have the following structure:
+允许配置村民察觉某实体的最大方块距离，用以替代 `VillagerHostilesSensor.ACCEPTABLE_DISTANCE_FROM_HOSTILES`（它将在 26.2 中被忽略）。该数据映射位于 `neoforge/data_maps/entity_type/acceptable_villager_distances.json`，其对象具有以下结构：
 
 ```json5
 {
@@ -13,7 +13,7 @@ Allows configuring the maximum block distance that villagers will notice an enti
 }
 ```
 
-Example:
+示例：
 
 ```json5
 {
@@ -26,9 +26,9 @@ Example:
 }
 ```
 
-## `neoforge:compostables`
+## `neoforge:compostables` {#neoforgecompostables}
 
-Allows configuring composter values, as a replacement for `ComposterBlock.COMPOSTABLES` (which is now ignored). This data map is located at `neoforge/data_maps/item/compostables.json` and its objects have the following structure:
+允许配置堆肥桶的值，用以替代 `ComposterBlock.COMPOSTABLES`（现已被忽略）。该数据映射位于 `neoforge/data_maps/item/compostables.json`，其对象具有以下结构：
 
 ```json5
 {
@@ -39,7 +39,7 @@ Allows configuring composter values, as a replacement for `ComposterBlock.COMPOS
 }
 ```
 
-Example:
+示例：
 
 ```json5
 {
@@ -52,9 +52,9 @@ Example:
 }
 ```
 
-## `neoforge:furnace_fuels`
+## `neoforge:furnace_fuels` {#neoforgefurnace_fuels}
 
-Allows configuring item burn times. This data map is located at `neoforge/data_maps/item/furnace_fuels.json` and its objects have the following structure:
+允许配置物品的燃烧时间。该数据映射位于 `neoforge/data_maps/item/furnace_fuels.json`，其对象具有以下结构：
 
 ```json5
 {
@@ -63,7 +63,7 @@ Allows configuring item burn times. This data map is located at `neoforge/data_m
 }
 ```
 
-Example:
+示例：
 
 ```json5
 {
@@ -77,11 +77,11 @@ Example:
 ```
 
 :::info
-NeoForge additionally adds the `IItemExtension#getBurnTime` method to be overridden in custom items, overruling this data map. `#getBurnTime` should only be used in scenarios where the datamap does not suffice, for example [data component][datacomponent]-dependent burn times.
+NeoForge 额外添加了可在自定义物品中重写的 `IItemExtension#getBurnTime` 方法，它会覆盖此数据映射。`#getBurnTime` 只应在数据映射不足以满足需求的场景下使用，例如依赖[数据组件][datacomponent]的燃烧时间。
 :::
 
 :::warning
-Vanilla adds an implicit burn time of 300 ticks (15 seconds) for `#minecraft:logs` and `#minecraft:planks`, and then hardcodes the removal of crimson and warped items from that. This means that if you add another non-flammable wood, you should add a removal for that wood type's items from this map, like so:
+原版为 `#minecraft:logs` 和 `#minecraft:planks` 添加了 300 刻（15 秒）的隐式燃烧时间，然后硬编码地把绯红和诡异物品从中移除。这意味着，如果你添加了另一种不可燃的木材，你应该把该木材类型的物品从此映射中移除，如下所示：
 
 ```json5
 {
@@ -100,9 +100,9 @@ Vanilla adds an implicit burn time of 300 ticks (15 seconds) for `#minecraft:log
 ```
 :::
 
-## `neoforge:monster_room_mobs`
+## `neoforge:monster_room_mobs` {#neoforgemonster_room_mobs}
 
-Allows configuring the mobs that may appear in the mob spawner in a monster room, as a replacement for `MonsterRoomFeature#MOBS` (which is now ignored). This data map is located at `neoforge/data_maps/entity_type/monster_room_mobs.json` and its objects have the following structure:
+允许配置可能出现在怪物房间刷怪笼中的生物，用以替代 `MonsterRoomFeature#MOBS`（现已被忽略）。该数据映射位于 `neoforge/data_maps/entity_type/monster_room_mobs.json`，其对象具有以下结构：
 
 ```json5
 {
@@ -111,7 +111,7 @@ Allows configuring the mobs that may appear in the mob spawner in a monster room
 }
 ```
 
-Example:
+示例：
 
 ```json5
 {
@@ -124,9 +124,9 @@ Example:
 }
 ```
 
-## `neoforge:oxidizables`
+## `neoforge:oxidizables` {#neoforgeoxidizables}
 
-Allows configuring oxidation stages, as a replacement for `WeatheringCopper#NEXT_BY_BLOCK`. This data map is also used to build a reverse deoxidation map (for scraping with an axe). It is located at `neoforge/data_maps/block/oxidizables.json` and its objects have the following structure:
+允许配置氧化阶段，用以替代 `WeatheringCopper#NEXT_BY_BLOCK`。该数据映射还被用于构建反向的去氧化映射（用斧刮除时用到）。它位于 `neoforge/data_maps/block/oxidizables.json`，其对象具有以下结构：
 
 ```json5
 {
@@ -136,10 +136,10 @@ Allows configuring oxidation stages, as a replacement for `WeatheringCopper#NEXT
 ```
 
 :::note
-Custom blocks must implement `WeatheringCopperFullBlock` or `WeatheringCopper` and call `changeOverTime` in `randomTick` to oxidize naturally.
+自定义方块必须实现 `WeatheringCopperFullBlock` 或 `WeatheringCopper`，并在 `randomTick` 中调用 `changeOverTime` 才能自然氧化。
 :::
 
-Example:
+示例：
 
 ```json5
 {
@@ -152,9 +152,9 @@ Example:
 }
 ```
 
-## `neoforge:parrot_imitations`
+## `neoforge:parrot_imitations` {#neoforgeparrot_imitations}
 
-Allows configuring the sounds produced by parrots when they want to imitate a mob, as a replacement for `Parrot#MOB_SOUND_MAP` (which is now ignored). This data map is located at `neoforge/data_maps/entity_type/parrot_imitations.json` and its objects have the following structure:
+允许配置鹦鹉在想要模仿某生物时发出的声音，用以替代 `Parrot#MOB_SOUND_MAP`（现已被忽略）。该数据映射位于 `neoforge/data_maps/entity_type/parrot_imitations.json`，其对象具有以下结构：
 
 ```json5
 {
@@ -163,7 +163,7 @@ Allows configuring the sounds produced by parrots when they want to imitate a mo
 }
 ```
 
-Example:
+示例：
 
 ```json5
 {
@@ -176,9 +176,9 @@ Example:
 }
 ```
 
-## `neoforge:raid_hero_gifts`
+## `neoforge:raid_hero_gifts` {#neoforgeraid_hero_gifts}
 
-Allows configuring the gift that a villager with a certain `VillagerProfession` may gift you if you stop the raid, as a replacement for `GiveGiftToHero#GIFTS` (which is now ignored). This data map is located at `neoforge/data_maps/villager_profession/raid_hero_gifts.json` and its objects have the following structure:
+允许配置在你阻止袭击后，具有特定 `VillagerProfession` 的村民可能赠予你的礼物，用以替代 `GiveGiftToHero#GIFTS`（现已被忽略）。该数据映射位于 `neoforge/data_maps/villager_profession/raid_hero_gifts.json`，其对象具有以下结构：
 
 ```json5
 {
@@ -187,7 +187,7 @@ Allows configuring the gift that a villager with a certain `VillagerProfession` 
 }
 ```
 
-Example:
+示例：
 
 ```json5
 {
@@ -200,9 +200,9 @@ Example:
 }
 ```
 
-## `neoforge:strippables`
+## `neoforge:strippables` {#neoforgestrippables}
 
-Allows configuring the block a block will turn into when stripped (right clicked with an axe, or an item with the item ability `ItemAbilities#AXE_STRIP`), as a replacement for `AxeItem#STRIPPABLES` (which will be ignored in 26.2). This data map is located at `neoforge/data_maps/block/strippables.json` and its objects have the following structure:
+允许配置方块在被剥皮（用斧右键点击，或用带有 `ItemAbilities#AXE_STRIP` 物品能力的物品）时会变成的方块，用以替代 `AxeItem#STRIPPABLES`（它将在 26.2 中被忽略）。该数据映射位于 `neoforge/data_maps/block/strippables.json`，其对象具有以下结构：
 
 ```json5
 {
@@ -211,7 +211,7 @@ Allows configuring the block a block will turn into when stripped (right clicked
 }
 ```
 
-Example:
+示例：
 
 ```json5
 {
@@ -224,9 +224,9 @@ Example:
 }
 ```
 
-## `neoforge:vibration_frequencies`
+## `neoforge:vibration_frequencies` {#neoforgevibration_frequencies}
 
-Allows configuring the sculk vibration frequencies emitted by game events, as a replacement for `VibrationSystem#VIBRATION_FREQUENCY_FOR_EVENT` (which is now ignored). This data map is located at `neoforge/data_maps/game_event/vibration_frequencies.json` and its objects have the following structure:
+允许配置游戏事件发出的幽匿振动频率，用以替代 `VibrationSystem#VIBRATION_FREQUENCY_FOR_EVENT`（现已被忽略）。该数据映射位于 `neoforge/data_maps/game_event/vibration_frequencies.json`，其对象具有以下结构：
 
 ```json5
 {
@@ -235,7 +235,7 @@ Allows configuring the sculk vibration frequencies emitted by game events, as a 
 }
 ```
 
-Example:
+示例：
 
 ```json5
 {
@@ -248,9 +248,9 @@ Example:
 }
 ```
 
-## `neoforge:villager_types`
+## `neoforge:villager_types` {#neoforgevillager_types}
 
-Allows configuring the villager type that will spawn based on its biome, as a replacement for `VillagerType#BY_BIOME` (which will be ignored in 26.2). It is located at `neoforge/data_maps/worldgen/biome/villager_types.json` and its objects have the following structure:
+允许根据生物群系配置将生成的村民类型，用以替代 `VillagerType#BY_BIOME`（它将在 26.2 中被忽略）。它位于 `neoforge/data_maps/worldgen/biome/villager_types.json`，其对象具有以下结构：
 
 ```json5
 {
@@ -261,7 +261,7 @@ Allows configuring the villager type that will spawn based on its biome, as a re
 }
 ```
 
-Example:
+示例：
 
 ```json5
 {
@@ -274,9 +274,9 @@ Example:
 }
 ```
 
-## `neoforge:waxables`
+## `neoforge:waxables` {#neoforgewaxables}
 
-Allows configuring the block a block will turn into when waxed (right clicked with a honeycomb), as a replacement for `HoneycombItem#WAXABLES`. This data map is also used to build a reverse dewaxing map (for scraping with an axe). It is located at `neoforge/data_maps/block/waxables.json` and its objects have the following structure:
+允许配置方块在被打蜡（用蜜脾右键点击）时会变成的方块，用以替代 `HoneycombItem#WAXABLES`。该数据映射还被用于构建反向的去蜡映射（用斧刮除时用到）。它位于 `neoforge/data_maps/block/waxables.json`，其对象具有以下结构：
 
 ```json5
 {
@@ -285,7 +285,7 @@ Allows configuring the block a block will turn into when waxed (right clicked wi
 }
 ```
 
-Example:
+示例：
 
 ```json5
 {

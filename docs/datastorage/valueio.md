@@ -1,13 +1,13 @@
 ---
 sidebar_position: 3
 ---
-# Value I/O
+# 值 I/O {#value-io}
 
-The Value I/O system is a standardized serialization method to manipulate data of some backing object, such as [`CompoundTag`s for NBT][nbt].
+值 I/O（Value I/O）系统是一种标准化的序列化方法，用于操作某个后备对象中的数据，例如[用于 NBT 的 `CompoundTag`][nbt]。
 
-## Inputs and Outputs
+## 输入与输出 {#inputs-and-outputs}
 
-The Value I/O system is made up of two parts: a `ValueOutput` that writes to the object during serialization, and a `ValueInput` that reads from the object during deserialization. Implementing methods typically take in the `ValueOutput` or `ValueInput` as its only parameter, returning nothing. The value I/O expects the backing object to be a dictionary of string keys to object values. Using the provided methods, the value I/O then reads or writes information to the backing object.
+值 I/O 系统由两部分组成：`ValueOutput` 在序列化时向对象写入数据，`ValueInput` 在反序列化时从对象读取数据。实现方法通常只接收 `ValueOutput` 或 `ValueInput` 作为唯一参数，并且不返回任何值。值 I/O 期望后备对象是一个由字符串键映射到对象值的字典。借助所提供的方法，值 I/O 便可从后备对象读取信息或向其写入信息。
 
 ```java
 // For some BlockEntity subclass
@@ -37,9 +37,9 @@ protected void readAdditionalSaveData(ValueInput input) {
 }
 ```
 
-### Primitives
+### 基本类型 {#primitives}
 
-Value I/O contains methods for reading and writing certain primitives. `ValueOutput` methods are prefixed with `put*`, taking in the key and the primitive value. `ValueInput` methods are named as `get*Or`, taking in the key and a default if none is present.
+值 I/O 提供了读写某些基本类型的方法。`ValueOutput` 方法以 `put*` 为前缀，接收键与基本类型的值。`ValueInput` 方法命名为 `get*Or`，接收键与一个在不存在时使用的默认值。
 
 | Java Type | `ValueOutput` | `ValueInput`                 |
 |:---------:|:-------------:|:----------------------------:|
@@ -53,7 +53,7 @@ Value I/O contains methods for reading and writing certain primitives. `ValueOut
 | `String`  | `putString`   | `getString`\*, `getStringOr` |
 | `int[]`   | `putIntArray` | `getIntArray`\*              |
 
-\* These `ValueInput` methods return an `Optional`-wrapped primitive instead of taking and passing back some fallback.
+\* 这些 `ValueInput` 方法返回用 `Optional` 包装的基本类型，而不是接收并回传某个回退值。
 
 ```java
 // For some BlockEntity subclass
@@ -92,9 +92,9 @@ protected void loadAdditional(ValueInput input) {
 }
 ```
 
-### Codecs
+### Codec {#codecs}
 
-[`Codec`s][codec] can also be used to store and read values from the value I/O. In vanilla, all `Codec`s are handled using a `RegistryOps`, allowing the storage of datapack entries. `ValueOutput#store` and `storeNullable` take in the key, the codec to write the object, and the object itself. `storeNullable` will not write anything if the object is `null`. `ValueInput#read` can read the object by taking in the key and the codec, returning an `Optional`-wrapped object.
+[`Codec`][codec] 也可用于向值 I/O 存储值以及从中读取值。在原版中，所有 `Codec` 都通过 `RegistryOps` 处理，从而支持存储数据包注册项。`ValueOutput#store` 和 `storeNullable` 接收键、用于写入对象的 codec 以及对象本身。当对象为 `null` 时，`storeNullable` 不会写入任何内容。`ValueInput#read` 通过接收键与 codec 来读取对象，返回一个用 `Optional` 包装的对象。
 
 ```java
 // For some BlockEntity subclass
@@ -115,7 +115,7 @@ protected void loadAdditional(ValueInput input) {
 }
 ```
 
-`ValueOutput` and `ValueInput` also provide a `store` / `read` method for `MapCodec`s. Compared to the `Codec`, the `MapCodec` variant merges the values onto the current root.
+`ValueOutput` 和 `ValueInput` 还为 `MapCodec` 提供了 `store` / `read` 方法。与 `Codec` 相比，`MapCodec` 变体会把值合并到当前根节点上。
 
 ```java
 // For some BlockEntity subclass
@@ -144,14 +144,14 @@ protected void loadAdditional(ValueInput input) {
 ```
 
 :::warning
-The `MapCodec` will write any keys to the value access, potentially overwriting existing data. Make sure that any keys within the `MapCodec` are distinct from other keys.
+`MapCodec` 会向值访问写入任意键，可能覆盖已有数据。请确保 `MapCodec` 内的所有键与其他键互不相同。
 :::
 
-### Lists
+### 列表 {#lists}
 
-Lists can be created and read from through one of two methods: child value I/Os or [`Codec`s].
+列表可以通过两种方法之一创建与读取：子值 I/O，或 [`Codec`]。
 
-A list is created via `ValueOutput#childrenList`, taking in some key. This returns a `ValueOutput.ValueOutputList`, which acts as a write-only list of value objects. A new value object can be added to the list via `ValueOutputList#addChild`. This returns a `ValueOutput` to write the value object data to. The list can then be read using `ValueInput#childrenList`, or `childrenListOrEmpty` to default to an empty list when not present. These methods return a `ValueInput.ValueInputList`, which acts as a read-only iterable or stream (via `stream`).
+列表通过 `ValueOutput#childrenList` 创建，接收某个键。它返回一个 `ValueOutput.ValueOutputList`，其行为如同一个只写的值对象列表。可以通过 `ValueOutputList#addChild` 向列表添加一个新的值对象。该方法返回一个 `ValueOutput`，用于写入该值对象的数据。随后可以通过 `ValueInput#childrenList` 读取列表，或使用 `childrenListOrEmpty` 在不存在时默认返回空列表。这些方法返回一个 `ValueInput.ValueInputList`，其行为如同一个只读的可迭代对象或流（通过 `stream`）。
 
 ```java
 // For some BlockEntity subclass
@@ -183,10 +183,10 @@ protected void loadAdditional(ValueInput input) {
 }
 ```
 
-`Codec`s provide a list variant for data objects via `ValueOutput#list`. This takes in a key and some `Codec`, returning a `ValueOutput.TypedOutputList`. A `TypedOutputList` is the same as `ValueOutputList`, except it operates on the data object instead of using another value I/O. Elements can be added to the list via `TypedOutputList#add`. Then, similarly, the list can then be read using `ValueInput#list` or `listOrEmpty`, returning a `TypedValueInput`.
+`Codec` 通过 `ValueOutput#list` 为数据对象提供了一个列表变体。它接收一个键和某个 `Codec`，返回一个 `ValueOutput.TypedOutputList`。`TypedOutputList` 与 `ValueOutputList` 相同，区别在于它直接操作数据对象，而不是使用另一个值 I/O。可以通过 `TypedOutputList#add` 向列表添加元素。随后同样地，可以通过 `ValueInput#list` 或 `listOrEmpty` 读取列表，返回一个 `TypedValueInput`。
 
 :::note
-The main difference between a `TypedValueOutput` / `TypedValueInput` and a `Codec#listOf` is how errors are handled. For a `Codec#listOf`, a failed entry will result in the entire object being marked as an error `DataResult`. Meanwhile, a typed value I/O handles the error typically through a `ProblemReporter`. In vanilla, `Codec#listOf` provides more flexibility since `ProblemReporter`s are specified when creating the value I/O. However, custom value I/O usage can implement either depending on the use case.
+`TypedValueOutput` / `TypedValueInput` 与 `Codec#listOf` 的主要区别在于错误处理方式。对于 `Codec#listOf`，某个条目失败会导致整个对象被标记为错误的 `DataResult`。而带类型的值 I/O 通常通过 `ProblemReporter` 处理错误。在原版中，`Codec#listOf` 提供了更大的灵活性，因为 `ProblemReporter` 是在创建值 I/O 时指定的。不过，自定义的值 I/O 用法可以根据使用场景选择实现其中任一种。
 :::
 
 ```java
@@ -218,7 +218,7 @@ protected void loadAdditional(ValueInput input) {
 ```
 
 :::warning
-Lists are still written to the `ValueOutput` even when empty. If you don't want to write the list, then the `TypedOutputList` or `ValueOutputList` should check if it `isEmpty`, then call `discard` with the list key.
+即使列表为空，它仍会被写入 `ValueOutput`。如果你不想写入该列表，应让 `TypedOutputList` 或 `ValueOutputList` 检查其是否 `isEmpty`，然后用列表的键调用 `discard`。
 
 ```java
 // For some BlockEntity subclass
@@ -240,9 +240,9 @@ protected void saveAdditional(ValueOutput output) {
 ```
 :::
 
-### Objects
+### 对象 {#objects}
 
-Objects can be created and read from via children. `ValueOutput#child` creates a new `ValueObject` given a key. Then, the object can be read using `ValueInput#child`, or `childOrEmpty` if it should default to an `ValueInput` with an empty backing value.
+对象可以通过子节点创建与读取。`ValueOutput#child` 根据给定的键创建一个新的 `ValueObject`。随后可以通过 `ValueInput#child` 读取该对象，或使用 `childOrEmpty` 在应当默认返回一个带空后备值的 `ValueInput` 时使用。
 
 ```java
 // For some BlockEntity subclass
@@ -273,9 +273,9 @@ protected void loadAdditional(ValueInput input) {
 }
 ```
 
-## ValueIOSerializable
+## ValueIOSerializable {#valueioserializable}
 
-`ValueIOSerializable` is a NeoForge-added interface for objects that can be serialized and deserialized using value I/Os. NeoForge uses this API to handle [data attachments][attachments]. The interface provides two methods: `serialize` to write the object to a `ValueOutput`, and `deserialize` to read the object from a `ValueInput`.
+`ValueIOSerializable` 是 NeoForge 新增的接口，用于那些可以借助值 I/O 序列化和反序列化的对象。NeoForge 使用该 API 来处理[数据附加][attachments]。该接口提供两个方法：`serialize` 将对象写入 `ValueOutput`，`deserialize` 从 `ValueInput` 读取对象。
 
 ```java
 public class ExampleObject implements ValueIOSerializable {
@@ -292,17 +292,17 @@ public class ExampleObject implements ValueIOSerializable {
 }
 ```
 
-`ValueIOSerializable` can also be written and read via the NeoForge-added methods `ValueOutputExtension#putChild` and `ValueInputExtension#readChild`.
+`ValueIOSerializable` 也可以通过 NeoForge 新增的方法 `ValueOutputExtension#putChild` 和 `ValueInputExtension#readChild` 进行写入和读取。
 
-## Implementations
+## 实现 {#implementations}
 
-### NBT
+### NBT {#nbt}
 
-Value I/O for [NBTs][nbt] is handled via `TagValueOutput` and `TagValueInput`.
+针对 [NBT][nbt] 的值 I/O 由 `TagValueOutput` 和 `TagValueInput` 处理。
 
-A `TagValueOutput` can be created via `createWithContext` or `createWithoutContext`, `createWithContext` means that the output has access to the `HolderLookup.Provider`, which provides the all registries entries (static and datapack), while `createWithoutContext` does not provide any datapack access. Vanilla only uses `createWithContext`. Once the `ValueOutput` has been used, the `CompoundTag` can be retrieved via `TagValueOutput#buildResult`. A `TagValueInput`, on the other hand, can be created via `create`, taking in the `HolderLookup.Provider` and the `CompoundTag` the input is accessing.
+`TagValueOutput` 可以通过 `createWithContext` 或 `createWithoutContext` 创建，`createWithContext` 意味着该输出可以访问 `HolderLookup.Provider`，从而提供所有注册项（静态的和数据包的），而 `createWithoutContext` 不提供任何数据包访问权限。原版只使用 `createWithContext`。`ValueOutput` 使用完毕后，可以通过 `TagValueOutput#buildResult` 取得 `CompoundTag`。而 `TagValueInput` 可以通过 `create` 创建，接收 `HolderLookup.Provider` 以及该输入所访问的 `CompoundTag`。
 
-Both value I/Os also take in a `ProblemReporter`. The `ProblemReporter` is used to collect all internal errors during the read/write process. Currently, this only tracks `Codec` errors. How the errors are handled is up to the modder. Vanilla implementations throw if the `ProblemReporter` is not empty.
+两种值 I/O 都还接收一个 `ProblemReporter`。`ProblemReporter` 用于收集读写过程中的所有内部错误。目前它只跟踪 `Codec` 错误。如何处理这些错误由 Mod 开发者决定。原版实现会在 `ProblemReporter` 非空时抛出异常。
 
 ```java
 // Assume we have access to a HolderLookup.Provider lookupProvider

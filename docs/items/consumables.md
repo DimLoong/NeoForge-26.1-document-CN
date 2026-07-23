@@ -1,27 +1,27 @@
 ---
 sidebar_position: 3
 ---
-# Consumables
+# 消耗品 {#consumables}
 
-Consumables are [items][item] which can be used over a period of time, 'consuming' them in the process. Anything that can be eaten or drunk in Minecraft is a consumable of some kind.
+消耗品是可以在一段时间内被使用、并在此过程中被“消耗”掉的[物品][item]。Minecraft 中任何可以吃下或喝下的东西，都是某种消耗品。
 
-## The `Consumable` Data Component
+## `Consumable` 数据组件 {#the-consumable-data-component}
 
-Any item that can be consumed has the [`DataComponents#CONSUMABLE` component][datacomponent]. The backing record `Consumable` defines how the item is consumed and what effects to apply after consumption.
+任何可被消耗的物品都拥有 [`DataComponents#CONSUMABLE` 组件][datacomponent]。作为其后备的 record `Consumable` 定义了物品如何被消耗，以及消耗后要施加什么效果。
 
-A `Consumable` can be created either by directly calling the record constructor or via `Consumable#builder`, which sets the defaults for each field, followed by `build` once finished:
+`Consumable` 既可以通过直接调用 record 构造函数创建，也可以通过 `Consumable#builder` 创建（它会为每个字段设置默认值），并在完成后跟上一次 `build`：
 
-- `consumeSeconds` - A `float` representing the number of seconds needed to fully consume the item. `Item#finishUsingItem` is called after the alloted time passes. Defaults to 1.6 seconds, or 32 ticks.
-- `animation` - Sets the [`ItemUseAnimation`][animation] to play while the item is being used. Defaults to `ItemUseAnimation#EAT`.
-- `sound` - Sets the [`SoundEvent`][sound] to play while consuming the item. This must be a `Holder` instance. Defaults to `SoundEvents#GENERIC_EAT`.
-    - If a vanilla instance is not a `Holder<SoundEvent>`, a `Holder` wrapped version can be obtained by calling `BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundEvent)`.
-- `soundAfterConsume` - Sets the [`SoundEvent`][sound] to player once the item has finished being consumed. This delegates to the [`PlaySoundConsumeEffect`][consumeeffect].
-- `hasConsumeParticles` - When `true`, spawns item [particles] every four ticks and once the item is fully consumed. Defauts to `true`.
-- `onConsume` - Adds a [`ConsumeEffect`][consumeeffect] to apply once the item has fully been consumed via `Item#finishUsingItem`.
+- `consumeSeconds` —— 一个 `float`，表示完全消耗该物品所需的秒数。经过分配的时间后调用 `Item#finishUsingItem`。默认为 1.6 秒，即 32 tick。
+- `animation` —— 设置物品被使用时要播放的 [`ItemUseAnimation`][animation]。默认为 `ItemUseAnimation#EAT`。
+- `sound` —— 设置消耗物品时要播放的 [`SoundEvent`][sound]。它必须是一个 `Holder` 实例。默认为 `SoundEvents#GENERIC_EAT`。
+    - 如果某个原版实例不是 `Holder<SoundEvent>`，可通过调用 `BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundEvent)` 获取其 `Holder` 包装版本。
+- `soundAfterConsume` —— 设置物品消耗完毕后要播放的 [`SoundEvent`][sound]。它委托给 [`PlaySoundConsumeEffect`][consumeeffect]。
+- `hasConsumeParticles` —— 当为 `true` 时，每四 tick 以及物品被完全消耗时都会生成物品[粒子][particles]。默认为 `true`。
+- `onConsume` —— 添加一个 [`ConsumeEffect`][consumeeffect]，在物品通过 `Item#finishUsingItem` 被完全消耗后应用。
 
-Vanilla provides some consumables within their `Consumables` class, such as `#defaultFood` for [food] items and `#defaultDrink` for [potions] and milk buckets.
+Vanilla 在其 `Consumables` 类中提供了一些消耗品，例如用于[食物][food]物品的 `#defaultFood`，以及用于[药水][potions]和奶桶的 `#defaultDrink`。
 
-The `Consumable` component can be added by calling `Item.Properties#component`:
+`Consumable` 组件可通过调用 `Item.Properties#component` 来添加：
 
 ```java
 // Assume there is some DeferredRegister.Items ITEMS
@@ -54,15 +54,15 @@ public static final DeferredItem<Item> CONSUMABLE = ITEMS.registerSimpleItem(
 );
 ```
 
-### `ConsumeEffect`
+### `ConsumeEffect` {#consumeeffect}
 
-When a consumable has finished being used, you may want to trigger some kind of logic to execute like adding a potion effect. These are handled by `ConsumeEffect`s, which are added to the `Consumable` by calling `Consumable.Builder#onConsume`.
+当一个消耗品使用完毕后，你可能想触发某种逻辑来执行，例如添加一个药水效果。这些由 `ConsumeEffect` 处理，它们通过调用 `Consumable.Builder#onConsume` 被添加到 `Consumable` 中。
 
-A list of vanilla effects can be found in `ConsumeEffect`.
+原版效果的列表可在 `ConsumeEffect` 中找到。
 
-Every `ConsumeEffect` has two methods: `getType`, which specifies the registry object `ConsumeEffect.Type`; and `apply`, which is called on the item when it has been fully consumed. `apply` takes three arguments: the `Level` the consuming entity is in, the `ItemStack` the consumable was called on, and the `LivingEntity` consuming the object. When the effect is successfully applied, the method returns `true`, or `false` if it failed.
+每个 `ConsumeEffect` 都有两个方法：`getType`，用于指定注册对象 `ConsumeEffect.Type`；以及 `apply`，它在物品被完全消耗时对物品调用。`apply` 接受三个参数：消耗实体所在的 `Level`、调用该消耗品的 `ItemStack`，以及消耗该对象的 `LivingEntity`。当效果被成功应用时，该方法返回 `true`，失败则返回 `false`。
 
-A `ConsumeEffect` can be created by implementing the interface and [registering] the `ConsumeEffect.Type` with the associated `MapCodec` and `StreamCodec` to `BuiltInRegistries#CONSUME_EFFECT_TYPE`:
+`ConsumeEffect` 可通过实现该接口，并将关联的 `MapCodec` 和 `StreamCodec` 随 `ConsumeEffect.Type` 一起[注册][registering]到 `BuiltInRegistries#CONSUME_EFFECT_TYPE` 来创建：
 
 ```java
 public record UsePortalConsumeEffect(ResourceKey<Level> level)
@@ -112,15 +112,15 @@ Consumable.builder()
     .build();
 ```
 
-### `ItemUseAnimation`
+### `ItemUseAnimation` {#itemuseanimation}
 
-`ItemUseAnimation` is functionally an enum which doesn't define anything besides its id and name. Its uses are hardcoded into `ItemHandRenderer#renderArmWithItem` for first person and `AvatarRenderer#getArmPose` for third person. As such, simply creating a new `ItemUseAnimation` will only function similarly to `ItemUseAnimation#NONE`.
+`ItemUseAnimation` 在功能上是一个枚举，除了 id 和名称之外并不定义任何东西。它的用途被硬编码在用于第一人称的 `ItemHandRenderer#renderArmWithItem` 和用于第三人称的 `AvatarRenderer#getArmPose` 中。因此，仅仅创建一个新的 `ItemUseAnimation` 只会使其行为类似于 `ItemUseAnimation#NONE`。
 
-To apply some animation, you need to implement `IClientItemExtensions#applyForgeHandTransform` for first person and/or `IClientItemExtensions#getArmPose` for third person rendering.
+要应用某种动画，你需要为第一人称实现 `IClientItemExtensions#applyForgeHandTransform`，和/或为第三人称渲染实现 `IClientItemExtensions#getArmPose`。
 
-#### Creating the `ItemUseAnimation`
+#### 创建 `ItemUseAnimation` {#creating-the-itemuseanimation}
 
-First, let's create a new `ItemUseAnimation`. This is done using the [extensible enum][extensibleenum] system:
+首先，让我们创建一个新的 `ItemUseAnimation`。这通过[可扩展枚举][extensibleenum]系统来完成：
 
 ```json5
 {
@@ -140,13 +140,13 @@ First, let's create a new `ItemUseAnimation`. This is done using the [extensible
 }
 ```
 
-Then we can get the enum constant via `valueOf`:
+然后我们可以通过 `valueOf` 获取该枚举常量：
 
 ```java
 public static final ItemUseAnimation EXAMPLE_ANIMATION = ItemUseAnimation.valueOf("EXAMPLEMOD_ITEM_USE_ANIMATION");
 ```
 
-From there, we can then start applying the transforms. To do this, we must create a new `IClientItemExtensions`, implement our desired methods, and register it via `RegisterClientExtensionsEvent` on the [**mod event bus**][modbus]:
+从这里开始，我们就可以着手应用变换了。为此，我们必须创建一个新的 `IClientItemExtensions`，实现我们想要的方法，并通过[**模组事件总线**][modbus]上的 `RegisterClientExtensionsEvent` 注册它：
 
 ```java
 public class ConsumableClientItemExtensions implements IClientItemExtensions {
@@ -165,9 +165,9 @@ public static void registerClientExtensions(RegisterClientExtensionsEvent event)
 }
 ```
 
-#### First Person
+#### 第一人称 {#first-person}
 
-The first person transform, which all consumables have, is implemented via `IClientItemExtensions#applyForgeHandTransform`:
+所有消耗品都具有的第一人称变换，通过 `IClientItemExtensions#applyForgeHandTransform` 实现：
 
 ```java
 public class ConsumableClientItemExtensions implements IClientItemExtensions {
@@ -198,11 +198,11 @@ public class ConsumableClientItemExtensions implements IClientItemExtensions {
 }
 ```
 
-#### Third Person
+#### 第三人称 {#third-person}
 
-The third person transforms, which all but `EAT` and `DRINK` have special logic for, is implemented via `IClientItemExtensions#getArmPose`, where `HumanoidModel.ArmPose` can also be extended for a custom transform.
+第三人称变换（除 `EAT` 和 `DRINK` 之外的所有动画都对其有特殊逻辑）通过 `IClientItemExtensions#getArmPose` 实现，其中 `HumanoidModel.ArmPose` 也可被扩展以实现自定义变换。
 
-As an `ArmPose` requries a lambda as part of its constructor, an `EnumProxy` reference must be used:
+由于 `ArmPose` 的构造函数需要一个 lambda 作为其组成部分，因此必须使用一个 `EnumProxy` 引用：
 
 ```json5
 {
@@ -252,7 +252,7 @@ public class MyClientEnumParams {
 public static final HumanoidModel.ArmPose EXAMPLE_POSE = HumanoidModel.ArmPose.valueOf("EXAMPLEMOD_ARM_POSE");
 ```
 
-Then, the arm pose is set via `IClientItemExtensions#getArmPose`:
+然后，手臂姿势通过 `IClientItemExtensions#getArmPose` 设置：
 
 ```java
 public class ConsumableClientItemExtensions implements IClientItemExtensions {
@@ -279,9 +279,9 @@ public class ConsumableClientItemExtensions implements IClientItemExtensions {
 }
 ```
 
-### Overriding Sounds on Entity
+### 覆盖实体上的声音 {#overriding-sounds-on-entity}
 
-Sometimes, an entity may want to play a different sound while consuming an item. In those instances, the [`LivingEntity`][livingentity] instance can implement `Consumable.OverrideConsumeSound` and have `getConsumeSound` return the `SoundEvent` they want their entity to play.
+有时，某个实体在消耗物品时可能想播放不同的声音。在这些情形下，[`LivingEntity`][livingentity] 实例可以实现 `Consumable.OverrideConsumeSound`，并让 `getConsumeSound` 返回它们希望该实体播放的 `SoundEvent`。
 
 ```java
 public class MyEntity extends LivingEntity implements Consumable.OverrideConsumeSound {
@@ -295,13 +295,13 @@ public class MyEntity extends LivingEntity implements Consumable.OverrideConsume
 }
 ```
 
-## `ConsumableListener`
+## `ConsumableListener` {#consumablelistener}
 
-While consumables and effects that are applied after consumption are useful, sometimes the properties of an effect need to be externally available as other [data components][datacomponents]. For example, cats and wolves also eat [food] and query its nutrition, or item with potion contents query its color for rendering. In these instances, data components implement `ConsumableListener` to provide consumption logic.
+虽然消耗品以及消耗后应用的效果很有用，但有时某个效果的属性需要作为其他[数据组件][datacomponents]对外可用。例如，猫和狼也会吃[食物][food]并查询其营养值，或者带有药水内容的物品会查询其颜色以用于渲染。在这些情形下，数据组件实现 `ConsumableListener` 来提供消耗逻辑。
 
-A `ConsumableListener` only has one method: `#onConsume`, which takes in the current level, the entity consuming the item, the item being consumed, and the `Consumable` instance on the item. `onConsume` is called during `Item#finishUsingItem` when the item has been fully consumed.
+`ConsumableListener` 只有一个方法：`#onConsume`，它接受当前世界、消耗物品的实体、正被消耗的物品，以及物品上的 `Consumable` 实例。`onConsume` 在物品被完全消耗时于 `Item#finishUsingItem` 期间被调用。
 
-Adding your own `ConsumableListener` is simply [registering a new data component][datacompreg] and implementing `ConsumableListener`.
+添加你自己的 `ConsumableListener`，只需[注册一个新的数据组件][datacompreg]并实现 `ConsumableListener` 即可。
 
 ```java
 public record MyConsumableListener() implements ConsumableListener {
@@ -315,15 +315,15 @@ public record MyConsumableListener() implements ConsumableListener {
 }
 ```
 
-### Food
+### 食物 {#food}
 
-Food is one type of `ConsumableListener` that is part of the hunger system. All of the functionality for food items is already handled within the `Item` class, so simply adding the `FoodProperties` to `DataComponents#FOOD` along with a consumable is all that's needed. There is a helper method called `food` which takes in the `FoodProperties` and the `Consumable` object, or `Consumables#DEFAULT_FOOD` if none is specified.
+食物是 `ConsumableListener` 的一种类型，属于饥饿系统的一部分。食物物品的所有功能都已在 `Item` 类中处理妥当，因此只需将 `FoodProperties` 连同一个消耗品一起添加到 `DataComponents#FOOD`，就是所需的全部操作。有一个名为 `food` 的辅助方法，它接受 `FoodProperties` 和 `Consumable` 对象，若未指定则使用 `Consumables#DEFAULT_FOOD`。
 
-`FoodProperties` can be created either by directly calling the record constructor or via `new FoodProperties.Builder()`, followed by `build` once finished:
+`FoodProperties` 既可以通过直接调用 record 构造函数创建，也可以通过 `new FoodProperties.Builder()` 创建，并在完成后跟上一次 `build`：
 
-- `nutrition` - Sets how many hunger points are restored. Counts in half hunger points, so for example, Minecraft's steak restores 8 hunger points.
-- `saturationModifier` - The saturation modifier used in calculating the [saturation value][hunger] restored when eating this food. The calculation is `min(2 * nutrition * saturationModifier, playerNutrition)`, meaning that using `0.5` will make the effective saturation value the same as the nutrition value.
-- `alwaysEdible` - Whether this item can always be eaten, even if the hunger bar is full. `false` by default, `true` for golden apples and other items that provide bonuses beyond just filling the hunger bar.
+- `nutrition` —— 设置恢复多少饥饿点数。以半个饥饿点数计，例如 Minecraft 的牛排恢复 8 个饥饿点数。
+- `saturationModifier` —— 用于计算吃下这种食物时恢复的[饱和度值][hunger]的饱和度修饰符。计算方式为 `min(2 * nutrition * saturationModifier, playerNutrition)`，这意味着使用 `0.5` 会使有效饱和度值与营养值相同。
+- `alwaysEdible` —— 该物品是否总是可以吃下，即使饥饿条已满。默认为 `false`，对金苹果以及其他能提供超出单纯填充饥饿条之外益处的物品为 `true`。
 
 ```java
 // Assume there is some DeferredRegister.Items ITEMS
@@ -346,13 +346,13 @@ public static final DeferredItem<Item> FOOD = ITEMS.registerSimpleItem(
 );
 ```
 
-For examples, or to look at the various values used by Minecraft, have a look at the `Foods` class.
+若需示例，或想查看 Minecraft 所使用的各种数值，可参阅 `Foods` 类。
 
-To get the `FoodProperties` for an item, call `ItemStack.get(DataComponents.FOOD)`. This may return null, since not every item is edible. To determine whether an item is edible, null-check the result of the `getFoodProperties` call.
+要获取某个物品的 `FoodProperties`，调用 `ItemStack.get(DataComponents.FOOD)`。由于并非每个物品都可食用，这可能返回 null。要确定某个物品是否可食用，对 `getFoodProperties` 调用的结果进行 null 检查。
 
-### Potion Contents
+### 药水内容 {#potion-contents}
 
-The contents of a [potion][potions] via `PotionContents` is another `ConsumableListener` whose effects are applied on consumption. They contain an optional potion to apply, an optional tint for the potion color, a list of custom [`MobEffectInstance`s][mobeffectinstance] to apply alongside the potion, and an optional translation key to use when getting the stack name. The modder needs to override `Item#getName` if not a subtype of `PotionItem`.
+通过 `PotionContents` 表示的[药水][potions]内容是另一种 `ConsumableListener`，其效果在消耗时被应用。它们包含：一个可选的要应用的药水、一个可选的药水颜色染色、一个要与药水一同应用的自定义 [`MobEffectInstance`][mobeffectinstance] 列表，以及一个在获取堆叠名称时使用的可选翻译键。如果不是 `PotionItem` 的子类型，Mod 开发者需要重写 `Item#getName`。
 
 [animation]: #itemuseanimation
 [consumeeffect]: #consumeeffect

@@ -1,9 +1,9 @@
-# BlockEntityRenderer
+# BlockEntityRenderer {#blockentityrenderer}
 
-A `BlockEntityRenderer`, often abbreviated as BER, is used to 'render' [blocks][block] in a way that cannot be represented with a [static baked model][model] (JSON, OBJ, others). For example, this could be used to dynamically render container contents of a chest-like block. A block entity renderer requires the block to have a [`BlockEntity`][blockentity], even if the block does not store any data otherwise.
+`BlockEntityRenderer`，常缩写为 BER，用于以静态[烘焙模型][model]（JSON、OBJ 等）无法表现的方式来“渲染”[方块][block]。例如，它可用于动态渲染类箱子方块的容器内容物。方块实体渲染器要求方块拥有一个 [`BlockEntity`][blockentity]，即便该方块本身并不存储任何数据。
 
 
-BERs directly implements the `BlockEntityRenderer`, which submits its [features] for rendering:
+BER 直接实现 `BlockEntityRenderer`，后者提交其[地物][features]以供渲染：
 
 ```java
 // The generic type in the superinterface should be set to what block entity
@@ -41,7 +41,7 @@ public class MyBlockEntityRenderer implements BlockEntityRenderer<MyBlockEntity,
 }
 ```
 
-Now that we have our BER, we also need to register and connect it to its owning block entity. This is done in [`EntityRenderersEvent.RegisterRenderers`][event] like so:
+现在有了 BER，我们还需要注册它并将其与所属的方块实体关联起来。这是在 [`EntityRenderersEvent.RegisterRenderers`][event] 中完成的，如下所示：
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client
@@ -57,7 +57,7 @@ public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderer
 
 :::note
 
-In the event that you do not need the provider context in your BER, you can also remove the constructor:
+如果你的 BER 中不需要提供器上下文，也可以移除该构造函数：
 
 ```java
 public class MyBlockEntityRenderer implements BlockEntityRenderer<MyBlockEntity, MyBlockEntityRenderState> {
@@ -77,9 +77,9 @@ public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderer
 
 :::
 
-## Block Entity Render States
+## 方块实体渲染状态 {#block-entity-render-states}
 
-As mentioned in the above example, block entity render states are used to extract the values used for rendering from the actual block entity's values. They are functionally mutable data storage objects extended from `BlockEntityRenderState`:
+正如上面的示例中所提到的，方块实体渲染状态用于从实际方块实体的值中提取出渲染所需的值。它们在功能上是可变的数据存储对象，扩展自 `BlockEntityRenderState`：
 
 ```java
 public class MyBlockEntityRenderState extends BlockEntityRenderState {
@@ -87,13 +87,13 @@ public class MyBlockEntityRenderState extends BlockEntityRenderState {
 }
 ```
 
-The values should then be populated from the `BlockEntity` subclass within `BlockEntityRenderer#extractRenderState`.
+随后，这些值应在 `BlockEntityRenderer#extractRenderState` 中从 `BlockEntity` 子类填充进来。
 
-## Item Block Rendering
+## 物品方块渲染 {#item-block-rendering}
 
-As not all block entities with renderers can be represented by static item models, a special renderer can be created to more dynamically control the process. This is done using [`SpecialModelRenderer`s][special]. In these cases, both a special model renderer must be created to submit the desired [features], and a corresponding registered special block model renderer for scenarios when the block itself is being submitted for rendering rather than an item variant (e.g., enderman carrying a block).
+由于并非所有带渲染器的方块实体都能用静态物品模型来表现，可以创建一个特殊的渲染器来更动态地控制这一过程。这是通过 [`SpecialModelRenderer`][special] 完成的。在这些情况下，既需要创建一个特殊模型渲染器来提交所需的[地物][features]，也需要一个对应的、已注册的特殊方块模型渲染器，以应对方块本身（而非某个物品变体）被提交渲染的场景（例如末影人搬运方块）。
 
-Please refer to the [client item documentation][special] for more information.
+更多信息请参阅[客户端物品文档][special]。
 
 [block]: ../blocks/index.md
 [blockentity]: index.md

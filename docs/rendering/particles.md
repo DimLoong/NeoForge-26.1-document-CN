@@ -1,39 +1,39 @@
-# Client Particles
+# 客户端粒子 {#client-particles}
 
-Particles are visual effects that polish the game and add immersion. Being mostly visual in nature, critical parts exist only on the physical (and logical) client [side].
+粒子是用于润色游戏、增强沉浸感的视觉效果。由于其本质上主要是视觉性的，关键部分只存在于物理（以及逻辑）客户[端][side]。
 
-This article covers the rendering-specific aspects of the particle. For more information on particles types, which are typically used to spawn particles; and particle descriptions, which can specify a particle's sprites, see the companion [particle types][particletype] article. 
+本文涵盖粒子中与渲染相关的方面。有关粒子类型（通常用于生成粒子）和粒子描述（可指定粒子的精灵图）的更多信息，请参阅配套的[粒子类型][particletype]一文。
 
-## The `Particle` class
+## `Particle` 类 {#the-particle-class}
 
-A `Particle` defines the client representation of what is spawned in the world and displayed to the player. Most properties and basic physics are controlled by fields such as `gravity`, `lifetime`, `hasPhysics`, `friction`, etc. The only two methods that are commonly overridden are `tick` and `move`, both of which do exactly as their name implies. As such, most custom particles are often short, consisting only a of a constructor that sets the desired fields with the occasional override in the two methods.
+`Particle` 定义了在世界中生成并展示给玩家的对象的客户端表示。大多数属性和基础物理由 `gravity`、`lifetime`、`hasPhysics`、`friction` 等字段控制。通常只有两个方法会被重写，即 `tick` 和 `move`，二者的作用正如其名。因此，大多数自定义粒子往往很短，仅包含一个用于设置所需字段的构造函数，偶尔在这两个方法中加以重写。
 
-The two most common methods for constructing a particle are through subclassing `SingleQuadParticle` for one of its implementations (e.g. `SimpleAnimatedParticle`), which which blits a look-facing texture to the screen; or directly subclassing `Particle`, which gives full control of the [features] being submitted for rendering.
+构造粒子最常见的两种方式：一是继承 `SingleQuadParticle` 的某个实现（例如 `SimpleAnimatedParticle`），它会将一张始终朝向摄像机的纹理绘制（blit）到屏幕上；二是直接继承 `Particle`，从而完整掌控提交渲染的各项[功能][features]。
 
-## A Single Quad
+## 单个四边形 {#a-single-quad}
 
-Particles that extend `SingleQuadParticle` draw a single quad with some atlas sprite to the screen. There are many helpers provided in the class, from setting the size of the particle (via the `quadSize` field or `scale` method), to tinting the texture (via `setColor` and `setAlpha`). However, the two most important things about a quad particle is the `TextureAtlasSprite` used as the texture, and where that sprite is obtained and rendered through `SingleQuadParticle.Layer`.
+继承 `SingleQuadParticle` 的粒子会用某张图集精灵将单个四边形绘制到屏幕上。该类提供了许多辅助方法，从设置粒子大小（通过 `quadSize` 字段或 `scale` 方法），到为纹理着色（通过 `setColor` 和 `setAlpha`）。不过，关于四边形粒子最重要的两件事是：用作纹理的 `TextureAtlasSprite`，以及该精灵通过 `SingleQuadParticle.Layer` 从何处获取并如何渲染。
 
-First, the `TextureAtlasSprite` is passed into the constructor, either as itself or more likely a `SpriteSet`, representing the texture over its lifetime. Initially, the sprite is set to the protected `sprite` field, but it can be updated during `tick` by calling `setSprite` or `setSpriteFromAge`, respectively.
+首先，`TextureAtlasSprite` 会传入构造函数，既可以是它本身，更常见的则是代表粒子整个生命周期纹理的 `SpriteSet`。初始时，精灵被赋给受保护的 `sprite` 字段，但可以在 `tick` 期间分别通过调用 `setSprite` 或 `setSpriteFromAge` 来更新。
 
 :::tip
-If the `age` or `lifetime` field is updated in the particle constructor, `setSpriteFromAge` should be called to display the appropriate texture.
+如果在粒子构造函数中更新了 `age` 或 `lifetime` 字段，应当调用 `setSpriteFromAge` 以显示相应的纹理。
 :::
 
-Then, during the [feature submission process][features], the `SingleQuadParticle.Layer` determines what atlas to use along with the pipeline used to draw the quad to the screen. Vanilla provides six layers by default:
+随后，在[功能提交过程][features]中，`SingleQuadParticle.Layer` 决定使用哪张图集，以及用于将四边形绘制到屏幕的管线。原版默认提供六种层：
 
-| Layer                | Texture Atlas | For                                                    |
+| 层                    | 纹理图集      | 用途                                                   |
 |:--------------------:|:-------------:|:-------------------------------------------------------|
-| `OPAQUE_TERRAIN`     | Blocks        | Particles that use block textures with no transparency |
-| `TRANSLUCENT_TERRAIN`| Blocks        | Particles that use block textures with transparency    |
-| `OPAQUE_ITEMS`       | Items         | Particles that use item textures with no transparency  |
-| `TRANSLUCENT_ITEMS`  | Items         | Particles that use item textures with transparency     |
-| `OPAQUE`             | Particles     | Particles with no transparency                         |
-| `TRANSLUCENT`        | Particles     | Particles with transparency                            |
+| `OPAQUE_TERRAIN`     | 方块          | 使用不透明方块纹理的粒子                                |
+| `TRANSLUCENT_TERRAIN`| 方块          | 使用带透明度方块纹理的粒子                              |
+| `OPAQUE_ITEMS`       | 物品          | 使用不透明物品纹理的粒子                                |
+| `TRANSLUCENT_ITEMS`  | 物品          | 使用带透明度物品纹理的粒子                              |
+| `OPAQUE`             | 粒子          | 不透明的粒子                                            |
+| `TRANSLUCENT`        | 粒子          | 带透明度的粒子                                          |
 
-For ease of convenience, if using one of the vanilla layers, you can call `SingleQuadParticle.Layer#bySprite` and pass in the texture to determine what layer your particle should be in.
+为方便起见，如果使用其中某个原版层，可以调用 `SingleQuadParticle.Layer#bySprite` 并传入纹理，以确定你的粒子应归属哪个层。
 
-Custom layers can be easily created by calling the constructor.
+自定义层可以通过调用构造函数轻松创建。
 
 ```java
 public class MyQuadParticle extends SingleQuadParticle {
@@ -82,12 +82,12 @@ public class MyQuadParticle extends SingleQuadParticle {
 ```
 
 :::warning
-Particles whose `SingleQuadParticle.Layer` uses `TextureAtlas#LOCATION_PARTICLES` must have an associated [particle description][description]. Otherwise, the textures required by the particle will not be added to the atlas.
+`SingleQuadParticle.Layer` 使用 `TextureAtlas#LOCATION_PARTICLES` 的粒子必须具有关联的[粒子描述][description]。否则，粒子所需的纹理不会被添加到图集中。
 :::
 
-## Particle Groups and Render States
+## 粒子组与渲染状态 {#particle-groups-and-render-states}
 
-If a particle requires something more complex than a quad, then it will need its own `ParticleGroup<P>`, where `P` is the type of the `Particle`. `ParticleGroup`s are responsible for ticking a defined subset of `Particle`s, removing them once `Particle#isAlive` returns false. Each group can queue up to 16,384 particles, evicting the oldest once full. 
+如果某个粒子需要比四边形更复杂的东西，那么它就需要自己的 `ParticleGroup<P>`，其中 `P` 是 `Particle` 的类型。`ParticleGroup` 负责对一组指定的 `Particle` 进行 tick，并在 `Particle#isAlive` 返回 false 时将其移除。每个组最多可排入 16,384 个粒子，满了之后会逐出最早的粒子。
 
 ```java
 // Let's assume we have the following particle class
@@ -127,7 +127,7 @@ public class ComplexParticleGroup extends ParticleGroup<ComplexParticle> {
 }
 ```
 
-Once a `Particle` has been added to the `ParticleGroup`, it is extracted during [feature submission][features] to a `ParticleGroupRenderState` via `ParticleGroup#extractRenderState`. `ParticleGroupRenderState` is a mix between a render state containing the extracted particle and a handler to submit the particle elements for rendering (via `#submit`).
+一旦 `Particle` 被添加到 `ParticleGroup`，它会在[功能提交][features]期间通过 `ParticleGroup#extractRenderState` 被提取为一个 `ParticleGroupRenderState`。`ParticleGroupRenderState` 兼具两种角色：既是一个包含所提取粒子的渲染状态，又是一个用于提交粒子元素以供渲染的处理器（通过 `#submit`）。
 
 ```java
 // The particle group render state
@@ -167,7 +167,7 @@ public class ComplexParticleGroup extends ParticleGroup<ComplexParticle> {
 }
 ```
 
-On its own, a `Particle` does not know what `ParticleGroup` it belongs to, nor does the `ParticleEngine` know that the group exists. These are all linked together using a `ParticleRenderType`: a unique identifier for the group. The `ParticleRenderType` is linked to the `ParticleGroup` via the [client-side][side] [mod bus][modbus] [event] `RegisterParticleGroupsEvent`. Then, a `Particle` can use the group by setting `Particle#getGroup` to the created type.
+单凭自身，`Particle` 并不知道自己属于哪个 `ParticleGroup`，`ParticleEngine` 也不知道该组的存在。这些都通过 `ParticleRenderType`（组的唯一标识符）联系在一起。`ParticleRenderType` 通过[客户端][side][mod 总线][modbus][事件][event] `RegisterParticleGroupsEvent` 与 `ParticleGroup` 关联。随后，`Particle` 可以通过将 `Particle#getGroup` 设为所创建的类型来使用该组。
 
 ```java
 // Create the render type
@@ -192,9 +192,9 @@ public class ComplexParticle extends Particle {
 }
 ```
 
-## `ParticleProvider`
+## `ParticleProvider` {#particleprovider}
 
-Once a particle for some particle type has been created, the particle type must be linked through a `ParticleProvider`. `ParticleProvider` is a client-only class responsible for actually creating our `Particle`s from the `ParticleEngine` via `createParticle`. While more elaborate code can be included here, many particle providers are as simple as this:
+为某个粒子类型创建了粒子之后，还必须通过 `ParticleProvider` 将粒子类型关联起来。`ParticleProvider` 是一个仅客户端的类，负责通过 `createParticle` 实际从 `ParticleEngine` 创建我们的 `Particle`。虽然这里可以包含更精细的代码，但许多粒子提供器都简单如下：
 
 ```java
 // The generic type of ParticleProvider must match the type of the particle type this provider is for.
@@ -221,7 +221,7 @@ public class MyQuadParticleProvider implements ParticleProvider<SimpleParticleTy
 }
 ```
 
-Your particle provider must then be associated with the particle type in the [client-side][side] [mod bus][modbus] [event] `RegisterParticleProvidersEvent`:
+随后，必须在[客户端][side][mod 总线][modbus][事件][event] `RegisterParticleProvidersEvent` 中把你的粒子提供器与粒子类型关联起来：
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client
@@ -236,7 +236,7 @@ public static void registerParticleProviders(RegisterParticleProvidersEvent even
 ```
 
 :::warning
-If `registerSpriteSet` is used, then the particle type must also have an associated [particle description][description]. Otherwise, an exception will be thrown stating it 'Failed to load description'.
+如果使用了 `registerSpriteSet`，那么粒子类型还必须具有关联的[粒子描述][description]。否则将抛出异常，提示“Failed to load description”。
 :::
 
 [description]: ../resources/client/particles.md

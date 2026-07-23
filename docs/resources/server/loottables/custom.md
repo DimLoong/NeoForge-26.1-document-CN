@@ -1,12 +1,12 @@
-# Custom Loot Objects
+# 自定义战利品对象 {#custom-loot-objects}
 
-Due to the complexity of the loot table system, there are several [registries] at work, all of which can be used by a modder to add more behavior.
+由于战利品表系统较为复杂，其背后有若干[注册表][registries]在发挥作用，Mod 开发者都可以利用它们来添加更多行为。
 
-All loot table related registries follow a similar pattern. To add a new registry entry, you generally extend some class or implement some interface that holds your functionality. Then, you define a [codec] for serialization, and register that codec to the corresponding registry, using `DeferredRegister` like normal. This goes along with the "one base object, many instances" approach most registries (for example also blocks/blockstates and items/item stacks) use.
+所有与战利品表相关的注册表都遵循类似的模式。要添加一个新的注册项，你通常需要继承某个类或实现某个接口来承载你的功能。然后，你为序列化定义一个 [Codec][codec]，并像往常一样使用 `DeferredRegister` 把该 Codec 注册到对应的注册表。这与大多数注册表（例如方块/方块状态、物品/物品堆叠）所采用的“一个基础对象，多个实例”思路一致。
 
-## Custom Loot Entries
+## 自定义战利品项 {#custom-loot-entries}
 
-To create a custom loot entry, extend `LootPoolEntryContainer` or one of its two direct subclasses, `LootPoolSingletonContainer` or `CompositeEntryBase`. For the sake of example, we want to create a loot entry that returns the drops of a [entity] - this is purely for example purposes, in practice it would be more ideal to directly reference the other loot table. Let's start by creating our loot entry class:
+要创建自定义战利品项，需继承 `LootPoolEntryContainer` 或其两个直接子类之一：`LootPoolSingletonContainer` 或 `CompositeEntryBase`。为便于举例，我们想创建一个返回某个[实体][entity]掉落物的战利品项——这纯粹是为了举例，实际中直接引用另一张战利品表会更理想。我们先来创建战利品项类：
 
 ```java
 // We extend LootPoolSingletonContainer since we have a "finite" set of drops.
@@ -60,7 +60,7 @@ public class EntityLootEntry extends LootPoolSingletonContainer {
 }
 ```
 
-We then use the map codec in [registration][registries]:
+随后我们在[注册][registries]中使用这个映射 Codec：
 
 ```java
 public static final DeferredRegister<MapCodec<? extends LootPoolEntryContainer>> LOOT_POOL_ENTRY_TYPES =
@@ -70,9 +70,9 @@ public static final Supplier<MapCodec<EntityLootEntry>> ENTITY_LOOT =
         LOOT_POOL_ENTRY_TYPES.register("entity_loot", () -> EntityLootEntry.CODEC);
 ```
 
-## Custom Number Providers
+## 自定义数值提供器 {#custom-number-providers}
 
-To create a custom number provider, implement the `NumberProvider` interface. For the sake of example, let's assume we want to create a number provider that changes the sign of the provided number:
+要创建自定义数值提供器，需实现 `NumberProvider` 接口。为便于举例，假设我们想创建一个将所提供数字变号的数值提供器：
 
 ```java
 // We accept another number provider as our base.
@@ -109,7 +109,7 @@ public record InvertedSignProvider(NumberProvider base) implements NumberProvide
 }
 ```
 
-Like with custom loot entries, we then use this codec in [registration][registries]:
+和自定义战利品项一样，我们随后在[注册][registries]中使用这个 Codec：
 
 ```java
 public static final DeferredRegister<MapCodec<? extends NumberProvider>> LOOT_NUMBER_PROVIDER_TYPES =
@@ -119,9 +119,9 @@ public static final Supplier<MapCodec<? extends NumberProvider>> INVERTED_SIGN =
         LOOT_NUMBER_PROVIDER_TYPES.register("inverted_sign", () -> InvertedSignProvider.CODEC);
 ```
 
-## Custom Level-Based Values
+## 自定义基于等级的值 {#custom-level-based-values}
 
-Custom `LevelBasedValue`s can be created by implementing the `LevelBasedValue` interface in a record. Again, for the sake of example, let's assume that we want to invert the output of another `LevelBasedValue`:
+自定义 `LevelBasedValue` 可以通过在一个 record 中实现 `LevelBasedValue` 接口来创建。同样为便于举例，假设我们想将另一个 `LevelBasedValue` 的输出取反：
 
 ```java
 public record InvertedSignLevelBasedValue(LevelBasedValue base) implements LevelBaseValue {
@@ -143,7 +143,7 @@ public record InvertedSignLevelBasedValue(LevelBasedValue base) implements Level
 }
 ```
 
-And again, we then use the codec in [registration][registries]:
+同样，我们随后在[注册][registries]中使用这个 Codec：
 
 ```java
 public static final DeferredRegister<MapCodec<? extends LevelBasedValue>> LEVEL_BASED_VALUES =
@@ -153,9 +153,9 @@ public static final Supplier<MapCodec<InvertedSignLevelBasedValue>> INVERTED_SIG
         LEVEL_BASED_VALUES.register("inverted_sign", () -> InvertedSignLevelBasedValue.CODEC);
 ```
 
-## Custom Loot Conditions
+## 自定义战利品条件 {#custom-loot-conditions}
 
-To get started, we create our loot item condition class that implements `LootItemCondition`. For the sake of example, let's assume we only want the condition to pass if the player killing the mob has a certain xp level:
+要开始，我们创建一个实现 `LootItemCondition` 的战利品物品条件类。为便于举例，假设我们只想在击杀该生物的玩家拥有一定经验等级时让该条件通过：
 
 ```java
 public record HasXpLevelCondition(int level) implements LootItemCondition {
@@ -187,7 +187,7 @@ public record HasXpLevelCondition(int level) implements LootItemCondition {
 }
 ```
 
-We can [register][registries] the map codec to the registry:
+我们可以把映射 Codec [注册][registries]到注册表：
 
 ```java
 public static final DeferredRegister<MapCodec<? extends LootItemCondition>> LOOT_CONDITION_TYPES =
@@ -197,9 +197,9 @@ public static final Supplier<MapCodec<HasXpLevelCondition>> MIN_XP_LEVEL =
         LOOT_CONDITION_TYPES.register("min_xp_level", () -> HasXpLevelCondition.CODEC);
 ```
 
-## Custom Loot Functions
+## 自定义战利品函数 {#custom-loot-functions}
 
-To get started, we create our own class extending `LootItemFunction`. `LootItemFunction` extends `BiFunction<ItemStack, LootContext, ItemStack>`, so what we want is to use the existing item stack and the loot context to return a new, modified item stack. However, almost all loot functions don't directly extend `LootItemFunction`, but extend `LootItemConditionalFunction` instead. This class has built-in functionality for applying loot conditions to the function - the function is only applied if the loot conditions apply. For the sake of example, let's apply a random enchantment with a specified level to the item:
+要开始，我们创建自己的类来继承 `LootItemFunction`。`LootItemFunction` 继承 `BiFunction<ItemStack, LootContext, ItemStack>`，所以我们要做的就是利用现有的物品堆叠和战利品上下文返回一个新的、被修改过的物品堆叠。不过，几乎所有战利品函数都不直接继承 `LootItemFunction`，而是继承 `LootItemConditionalFunction`。该类内置了为函数应用战利品条件的功能——只有当战利品条件满足时函数才会被应用。为便于举例，我们给物品应用一个具有指定等级的随机附魔：
 
 ```java
 // Code adapted from vanilla's EnchantRandomlyFunction class.
@@ -252,7 +252,7 @@ public class RandomEnchantmentWithLevelFunction extends LootItemConditionalFunct
 }
 ```
 
-We can then [register][registries] the map codec to the registry:
+随后我们可以把映射 Codec [注册][registries]到注册表：
 
 ```java
 public static final DeferredRegister<MapCodec<? extends LootItemFunction>> LOOT_FUNCTION_TYPES =

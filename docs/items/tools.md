@@ -1,32 +1,32 @@
 ---
 sidebar_position: 4
 ---
-# Tools
+# 工具 {#tools}
 
-Tools are [items][item] whose primary use is to break [blocks][block]. Many mods add new tool sets (for example copper tools) or new tool types (for example hammers).
+工具是主要用途为破坏[方块][block]的[物品][item]。许多 Mod 会添加新的工具套装（例如铜制工具）或新的工具类型（例如锤子）。
 
-## Custom Tool Sets
+## 自定义工具套装 {#custom-tool-sets}
 
-A tool set typically consists of six items: a pickaxe, an axe, a shovel, a hoe, a sword, and a spear (swords and spears aren't tools in the classical sense, but are included here for consistency as well). All of these tools are implemented using a combination of the following fourteen [data components][datacomponents]:
+一套工具通常由六件物品组成：一把镐、一把斧、一把锹、一把锄、一把剑和一把矛（剑和矛严格来说并不算传统意义上的工具，但为保持一致性也一并列于此）。所有这些工具都通过以下十四个[数据组件][datacomponents]的组合来实现：
 
-- `DataComponents#MAX_DAMAGE` and `#DAMAGE` for durability
-- `#MAX_STACK_SIZE` to set the stack size to `1`
-- `#REPAIRABLE` for repairing a tool in an anvil
-- `#ENCHANTABLE` for the maximum [enchanting][enchantment] value
-- `#ATTRIBUTE_MODIFIERS` for attack damage and attack speed
-- `#TOOL` for mining information
-- `#WEAPON` for damage taken by the item and shield disabling
-- `#ATTACK_RANGE` for attack range while swinging the weapon
-- `#DAMAGE_TYPE` for the damage type to deal
-- `#MINIMUM_ATTACK_CHARGE` for the minimum amount of ticks required before an attack can be made with this weapon
-- `#SWING_ANIMATION` for the animation to play when swinging the weapon
-- `#PIERCING_WEAPON` for a stab attack with multiple entities
-- `#KINETIC_WEAPON` for a item-use attack with multiple entities based on momentum
-- `#USE_EFFECTS` for applying some effects to the entity when using the item
+- `DataComponents#MAX_DAMAGE` 和 `#DAMAGE`，用于耐久度
+- `#MAX_STACK_SIZE`，用于将堆叠数量设为 `1`
+- `#REPAIRABLE`，用于在铁砧中修复工具
+- `#ENCHANTABLE`，用于最大[附魔][enchantment]值
+- `#ATTRIBUTE_MODIFIERS`，用于攻击伤害和攻击速度
+- `#TOOL`，用于挖掘信息
+- `#WEAPON`，用于物品受到的损耗以及禁用盾牌
+- `#ATTACK_RANGE`，用于挥动武器时的攻击范围
+- `#DAMAGE_TYPE`，用于要造成的伤害类型
+- `#MINIMUM_ATTACK_CHARGE`，用于使用此武器发动攻击前所需的最少 tick 数
+- `#SWING_ANIMATION`，用于挥动武器时播放的动画
+- `#PIERCING_WEAPON`，用于对多个实体的穿刺攻击
+- `#KINETIC_WEAPON`，用于基于动量、对多个实体的物品使用攻击
+- `#USE_EFFECTS`，用于在使用物品时对实体施加一些效果
 
-Commonly, each tool is setup using `Item.Properties#tool`, `#sword`, `#spear`, or one of tool's delegates (`pickaxe`, `axe`, `hoe`, `shovel`). These are typically handled by passing in the utility record `ToolMaterial`. Note that other items usually considered tools, such as shears, do not have their common mining logic implemented through data components. Instead, they directly extend `Item` and handle the mining by overriding the relevant methods. Interact behavior (right-click by default) also does not have a data component, meaning that shovels, axes, and hoes have their own tool classes `ShovelItem`, `AxeItem`, and `HoeItem` respectively.
+通常，每件工具都通过 `Item.Properties#tool`、`#sword`、`#spear` 或 tool 的某个委托方法（`pickaxe`、`axe`、`hoe`、`shovel`）来设置。这些通常通过传入工具记录 `ToolMaterial` 来处理。注意，其他一些通常被视作工具的物品，例如剪刀，其常见的挖掘逻辑并不通过数据组件实现。相反，它们直接继承 `Item` 并通过重写相关方法来处理挖掘。交互行为（默认为右键）同样没有数据组件，这意味着锹、斧、锄各自拥有自己的工具类，分别为 `ShovelItem`、`AxeItem` 和 `HoeItem`。
 
-To create a standard set of tools, you must first define a `ToolMaterial`. Reference values can be found within the constants in `ToolMaterial`. This example uses copper tools, you can use your own material here and adjust the values as needed.
+要创建一套标准工具，你必须首先定义一个 `ToolMaterial`。参考数值可在 `ToolMaterial` 中的常量里找到。本示例使用铜制工具，你可以在此使用自己的材料并根据需要调整数值。
 
 ```java
 // We place copper somewhere between stone and iron.
@@ -50,7 +50,7 @@ public static final ToolMaterial COPPER_MATERIAL = new ToolMaterial(
 );
 ```
 
-Now that we have our `ToolMaterial`, we can use it for [registering] tools. All `tool` delegates have the same three parameters:
+现在我们有了 `ToolMaterial`，就可以用它来[注册][registering]工具了。所有 `tool` 委托方法都具有相同的三个参数：
 
 ```java
 // ITEMS is a DeferredRegister.Items
@@ -107,16 +107,16 @@ public static final DeferredItem<Item> COPPER_SPEAR = ITEMS.registerItem(
 ```
 
 :::note
-`tool` takes in two additional parameters: the `TagKey` representing what blocks can be mined, and the number of seconds that blockers (e.g., shields) are disabled for when hit.
+`tool` 接受两个额外参数：表示哪些方块可被挖掘的 `TagKey`，以及格挡者（例如盾牌）在被命中时被禁用的秒数。
 :::
 
-### Tags
+### 标签 {#tags}
 
-When creating a `ToolMaterial`, it is assigned a block [tag][tags] containing blocks that will not drop anything if broken with this tool. For example, the `minecraft:incorrect_for_stone_tool` tag contains blocks like Diamond Ore, and the `minecraft:incorrect_for_iron_tool` tag contains blocks like Obsidian and Ancient Debris. To make it easier to assign blocks to their incorrect mining levels, a tag also exists for blocks that need this tool to be mined. For example, the `minecraft:needs_iron_tool` tag contains blocks like Diamond Ore, and the `minecraft:needs_diamond_tool` tag contains blocks like Obsidian and Ancient Debris.
+创建 `ToolMaterial` 时，会为其指定一个方块[标签][tags]，其中包含用此工具破坏时不会掉落任何东西的方块。例如，`minecraft:incorrect_for_stone_tool` 标签包含钻石矿石之类的方块，`minecraft:incorrect_for_iron_tool` 标签包含黑曜石和远古残骸之类的方块。为了更方便地将方块分配到其正确的挖掘等级，还存在一个用于标示需要此工具才能挖掘的方块的标签。例如，`minecraft:needs_iron_tool` 标签包含钻石矿石之类的方块，`minecraft:needs_diamond_tool` 标签包含黑曜石和远古残骸之类的方块。
 
-You can reuse one of the incorrect tags for your tool if you're fine with that. For example, if we wanted our copper tools to just be more durable stone tools, we'd pass in `BlockTags#INCORRECT_FOR_STONE_TOOL`.
+如果你不介意，可以为你的工具复用某个现有的“incorrect”标签。例如，如果我们希望铜制工具就是更耐用的石制工具，那就传入 `BlockTags#INCORRECT_FOR_STONE_TOOL`。
 
-Alternatively, we can create our own tag, like so:
+或者，我们也可以创建自己的标签，如下所示：
 
 ```java
 // This tag will allow us to add these blocks to the incorrect tags that cannot mine them
@@ -126,7 +126,7 @@ public static final TagKey<Block> NEEDS_COPPER_TOOL = TagKey.create(BuiltInRegis
 public static final TagKey<Block> INCORRECT_FOR_COPPER_TOOL = TagKey.create(BuiltInRegistries.BLOCK.key(), Identifier.fromNamespaceAndPath(MOD_ID, "incorrect_for_cooper_tool"));
 ```
 
-And then, we populate our tag. For example, let's make copper able to mine gold ores, gold blocks and redstone ore, but not diamonds or emeralds. (Redstone blocks are already mineable by stone tools.) The tag file is located at `src/main/resources/data/mod_id/tags/block/needs_copper_tool.json` (where `mod_id` is your mod id):
+然后，我们填充自己的标签。例如，让我们使铜工具能够挖掘金矿石、金块和红石矿石，但不能挖掘钻石或绿宝石。（红石块本来就可以用石制工具挖掘。）该标签文件位于 `src/main/resources/data/mod_id/tags/block/needs_copper_tool.json`（其中 `mod_id` 是你的 mod id）：
 
 ```json5
 {
@@ -141,7 +141,7 @@ And then, we populate our tag. For example, let's make copper able to mine gold 
 }
 ```
 
-Then, for our tag to pass into the material, we can provide a negative constraint for any tools that are incorrect for stone tools but within our copper tools tag. The tag file is located at `src/main/resources/data/mod_id/tags/block/incorrect_for_cooper_tool.json`:
+然后，为了得到要传入材料的标签，我们可以设置一个负向约束，涵盖那些对石制工具而言不正确、但又在我们铜工具标签内的工具。该标签文件位于 `src/main/resources/data/mod_id/tags/block/incorrect_for_cooper_tool.json`：
 
 ```json5
 {
@@ -154,47 +154,47 @@ Then, for our tag to pass into the material, we can provide a negative constrain
 }
 ```
 
-Finally, we can pass our tag into our material instance, as seen above.
+最后，我们可以把标签传入材料实例，如上文所示。
 
-If you want to check if a tool can make a block state drop its blocks, call `Tool#isCorrectForDrops`. The `Tool` can be obtained by calling `ItemStack#get` with `DataComponents#TOOL`.
+如果你想检查某个工具是否能使某个方块状态掉落其方块，调用 `Tool#isCorrectForDrops`。可通过以 `DataComponents#TOOL` 调用 `ItemStack#get` 来获取 `Tool`。
 
-## Custom Tools
+## 自定义工具 {#custom-tools}
 
-Custom tools can be created by adding a `Tool` [data component][datacomponents] (via `DataComponents#TOOL`) to the list of default components on your item via `Item.Properties#component`.
+自定义工具可以通过 `Item.Properties#component` 向物品的默认组件列表中添加一个 `Tool` [数据组件][datacomponents]（通过 `DataComponents#TOOL`）来创建。
 
-A `Tool` contains a list of `Tool.Rule`s, the default mining speed when holding the tool (`1` by default), and the amount of damage the tool should take when mining a block (`1` by default). A `Tool.Rule` contains three pieces of information: a `HolderSet` of blocks to apply the rule to, an optional speed at which to mine the blocks in the set, and an optional boolean at which to determine whether these blocks can drop from this tool. If the optional are not set, then the other rules will be checked. The default behavior if all rules fail is the default mining speed and that the block cannot be dropped.
+一个 `Tool` 包含一个 `Tool.Rule` 列表、持有工具时的默认挖掘速度（默认为 `1`）以及挖掘一个方块时工具应受到的损耗量（默认为 `1`）。一个 `Tool.Rule` 包含三条信息：一个应用该规则的方块 `HolderSet`、一个可选的挖掘该集合中方块的速度、以及一个可选的布尔值以决定这些方块能否从此工具掉落。如果这些可选值未设置，则会检查其余规则。若所有规则都不匹配，则默认行为是采用默认挖掘速度且方块不可掉落。
 
 :::note
-A `HolderSet` can be created from a `TagKey` via `Registry#getOrThrow`.
+`HolderSet` 可通过 `Registry#getOrThrow` 从 `TagKey` 创建。
 :::
 
-Creating any tool or multitool-like item (i.e. an item that combines two or more tools into one, e.g. an axe and a pickaxe as one item) is possible without using any of the existing `ToolMaterial` references. It can be implemented using a combination of the following parts:
+创建任何工具或类多功能工具的物品（即将两个或更多工具合为一体的物品，例如把斧和镐合为一件物品）都可以在不使用任何现有 `ToolMaterial` 引用的情况下实现。它可以通过以下各部分的组合来实现：
 
-- Adding a `Tool` with your own rules by setting `DataComponents#TOOL` via `Item.Properties#component`.
-- Adding [attribute modifiers][attributemodifier] to the item (e.g. attack damage, attack speed) via `Item.Properties#attributes`.
-- Adding item durability via `Item.Properties#durability`.
-- Allowing the item to be repaired via `Item.Properties#repariable`.
-- Allowing the item to be enchanted via `Item.Properties#enchantable`.
-- Allowing the item to be used as a weapon and potentially disable blockers by setting `DataComponents#WEAPON` via `Item.Properties#component`.
-- Overriding `IItemExtension#canPerformAction` to determine what [`ItemAbility`s][itemability] the item can perform.
-- Calling `IBlockExtension#getToolModifiedState` if you want your item to modify the block state on right click based on the `ItemAbility`s.
-- Adding your tool to some of the `minecraft:enchantable/*` `ItemTags` so that your item can have certain enchantments applied to it.
-- Adding your tool to some of the `minecraft:*_preferred_weapons` tags to allow mobs to favor your weapon to pickup and use.
+- 通过 `Item.Properties#component` 设置 `DataComponents#TOOL`，添加一个带有你自己规则的 `Tool`。
+- 通过 `Item.Properties#attributes` 为物品添加[属性修饰符][attributemodifier]（例如攻击伤害、攻击速度）。
+- 通过 `Item.Properties#durability` 为物品添加耐久度。
+- 通过 `Item.Properties#repariable` 允许物品被修复。
+- 通过 `Item.Properties#enchantable` 允许物品被附魔。
+- 通过 `Item.Properties#component` 设置 `DataComponents#WEAPON`，允许物品作为武器使用并可能禁用格挡者。
+- 重写 `IItemExtension#canPerformAction` 以确定物品能执行哪些[`ItemAbility`][itemability]。
+- 如果你希望物品在右键时基于 `ItemAbility` 修改方块状态，则调用 `IBlockExtension#getToolModifiedState`。
+- 将你的工具加入某些 `minecraft:enchantable/*` `ItemTags`，以便物品能被施加某些附魔。
+- 将你的工具加入某些 `minecraft:*_preferred_weapons` 标签，以让生物更倾向于拾取并使用你的武器。
 
-For shields, you can apply the [`DataComponents#EQUIPPABLE`][equippable] data component for the offhand and `DataComponents#BLOCKS_ATTACKS` for reducing damage to the held entity when active.
+对于盾牌，你可以为副手应用 [`DataComponents#EQUIPPABLE`][equippable] 数据组件，并用 `DataComponents#BLOCKS_ATTACKS` 在激活时减少对手持实体造成的伤害。
 
-## `ItemAbility`s
+## `ItemAbility` {#itemabilitys}
 
-`ItemAbility`s are an abstraction over what an item can and cannot do. This includes both left-click and right-click behavior. NeoForge provides default `ItemAbility`s in the `ItemAbilities` class:
+`ItemAbility` 是对物品能做什么、不能做什么的一层抽象。这既包括左键行为，也包括右键行为。NeoForge 在 `ItemAbilities` 类中提供了默认的 `ItemAbility`：
 
-- Axe right-click abilities for stripping (logs), scraping (oxidized copper), and unwaxing (waxed copper).
-- Shovel right-click abilities for flattening (dirt paths) and dousing (campfires).
-- Shear abilities for digging (breaking blocks), harvesting (honeycombs), removing armor (armored wolves), carving (pumpkins), disarming (tripwires), and trimming (stop plants from growing).
-- Abilities for sword sweeping, hoe tilling, fishing rod casting, trident throwing, brush brushing, firestarter lighting, and spyglass scoping.
+- 斧的右键能力：剥皮（原木）、刮除（氧化的铜）和去蜡（涂蜡的铜）。
+- 锹的右键能力：铲平（土径）和熄灭（营火）。
+- 剪刀能力：挖掘（破坏方块）、收获（蜂巢）、移除盔甲（披甲的狼）、雕刻（南瓜）、解除（绊线）和修剪（阻止植物生长）。
+- 剑横扫、锄耕地、钓鱼竿抛竿、三叉戟投掷、刷子刷除、打火石点燃和望远镜观察等能力。
 
-To create your own `ItemAbility`s, use `ItemAbility#get` - it will create a new `ItemAbility` if needed. Then, in a custom tool type, override `IItemExtension#canPerformAction` as needed.
+要创建你自己的 `ItemAbility`，使用 `ItemAbility#get`——它会在需要时创建一个新的 `ItemAbility`。然后，在自定义工具类型中，按需重写 `IItemExtension#canPerformAction`。
 
-To query if an `ItemStack` can perform a certain `ItemAbility`, call `IItemStackExtension#canPerformAction`. Note that this works on any `Item`, not just tools.
+要查询某个 `ItemStack` 是否能执行某个 `ItemAbility`，调用 `IItemStackExtension#canPerformAction`。注意，这适用于任何 `Item`，而不仅仅是工具。
 
 [block]: ../blocks/index.md
 [datacomponents]: datacomponents.md

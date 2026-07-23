@@ -1,22 +1,22 @@
-# Tags
+# 标签 {#tags}
 
-A tag is, simply put, a list of registered objects of the same type. They are loaded from data files and can be used for membership checks. For example, crafting sticks will accept any combination of wooden planks (items tagged with `minecraft:planks`). Tags are often distinguished from "regular" objects by prefixing them with a `#` (for example `#minecraft:planks`, but `minecraft:oak_planks`).
+简单来说，标签（Tag）就是一组相同类型的已注册对象。它们从数据文件中加载，可用于成员检查。例如，合成木棍会接受任意组合的木板（带有 `minecraft:planks` 标签的物品）。标签通常通过在前面加上 `#` 来与"普通"对象区分（例如 `#minecraft:planks`，而 `minecraft:oak_planks` 则不带）。
 
-Any [registry] can have tag files - while blocks and items are the most common use cases, other registries such as fluids, entity types or damage types often utilize tags as well. You can also create your own tags if you need them.
+任何[注册表][registry]都可以拥有标签文件——虽然方块和物品是最常见的用例，但流体、实体类型或伤害类型等其他注册表也经常使用标签。如果需要，你也可以创建自己的标签。
 
-Tags are located at `data/<tag_namespace>/tags/<registry_path>/<tag_path>.json` for Minecraft registries, and `data/<tag_namespace>/tags/<registry_namespace>/<registry_path>/<tag_path>.json` for non-Minecraft registries. For example, to modify the `minecraft:planks` item tag, you would place your tag file at `data/minecraft/tags/item/planks.json`.
+对于 Minecraft 注册表，标签位于 `data/<tag_namespace>/tags/<registry_path>/<tag_path>.json`；对于非 Minecraft 注册表，则位于 `data/<tag_namespace>/tags/<registry_namespace>/<registry_path>/<tag_path>.json`。例如，要修改 `minecraft:planks` 物品标签，你需要把标签文件放在 `data/minecraft/tags/item/planks.json`。
 
 :::info
-Unlike most other NeoForge data files, NeoForge-added tags do generally not use the `neoforge` namespace. Instead, they use the `c` namespace (e.g. `c:ingots/gold`). This is because the tags are unified between NeoForge and the Fabric mod loader, at the request of many modders developing on multiple loaders.
+与大多数其他 NeoForge 数据文件不同，NeoForge 添加的标签通常不使用 `neoforge` 命名空间，而是使用 `c` 命名空间（例如 `c:ingots/gold`）。这是因为标签在 NeoForge 与 Fabric mod 加载器之间是统一的，这是应众多在多个加载器上开发的 Mod 开发者的请求而做的。
 
-There are a few exceptions to this rule for some tags that tie closely into NeoForge systems. This includes many [damage type][damagetype] tags, for example.
+此规则有少数例外，针对一些与 NeoForge 系统紧密结合的标签。例如许多[伤害类型][damagetype]标签就属于此类。
 :::
 
-Overriding tag files is generally additive instead of replacing. This means that if two datapacks specify tag files with the same id, the contents of both files will be merged (unless otherwise specified). This behavior sets tags apart from most other data files, which instead replace any and all existing values.
+覆盖标签文件通常是叠加而非替换。这意味着，如果两个数据包指定了相同 id 的标签文件，两个文件的内容将被合并（除非另有说明）。这一行为使标签有别于大多数其他数据文件——后者会替换掉所有已有的值。
 
-## Tag File Format
+## 标签文件格式 {#tag-file-format}
 
-Tag files have the following syntax:
+标签文件的语法如下：
 
 ```json5
 {
@@ -47,28 +47,28 @@ Tag files have the following syntax:
 }
 ```
 
-## Finding and Naming Tags
+## 查找与命名标签 {#finding-and-naming-tags}
 
-When you try to find an existing tag, it is generally recommended to follow these steps:
+当你试图查找一个已有标签时，通常建议遵循以下步骤：
 
-- Have a look at Minecraft's tags and see if the tag you're looking for is there. Minecraft's tags can be found in `BlockTags`, `ItemTags`, `EntityTypeTags` etc.
-- If not, have a look at NeoForge's tags and see if the tag you're looking for is there. NeoForge's tags can be found in `Tags.Blocks`, `Tags.Items`, `Tags.EntityTypes`, etc.
-- Otherwise, assume the tag is not specified in Minecraft or NeoForge, and thus you need to create your own tag.
+- 看看 Minecraft 的标签，检查你想找的标签是否在其中。Minecraft 的标签可在 `BlockTags`、`ItemTags`、`EntityTypeTags` 等中找到。
+- 若没有，看看 NeoForge 的标签，检查你想找的标签是否在其中。NeoForge 的标签可在 `Tags.Blocks`、`Tags.Items`、`Tags.EntityTypes` 等中找到。
+- 否则，就假定 Minecraft 或 NeoForge 中没有指定该标签，因此你需要创建自己的标签。
 
-When creating your own tag, you should ask yourself the following questions:
+创建自己的标签时，你应该问自己以下问题：
 
-- Does this modify my mod's behavior? If yes, the tag should be in your mod's namespace. (This is common e.g. for my-thing-can-spawn-on-this-block kind of tags.)
-- Would other mods want to use this tag as well? If yes, the tag should be in the `c` namespace. (This is common e.g. for new metals or gems.)
-- Otherwise, use your mod's namespace.
+- 这会修改我自己 Mod 的行为吗？如果是，标签应放在你 Mod 的命名空间下。（例如"我的某物可以在此方块上生成"这类标签就很常见。）
+- 其他 Mod 是否也会想使用这个标签？如果是，标签应放在 `c` 命名空间下。（例如新的金属或宝石就很常见。）
+- 否则，使用你 Mod 的命名空间。
 
-Naming the tag itself also has some conventions to follow:
+标签本身的命名也有一些约定需要遵循：
 
-- Use the plural form. E.g.: `minecraft:planks`, `c:ingots`.
-- Use folders for multiple objects of the same type, and an overall tag for each folder. E.g.: `c:ingots/iron`, `c:ingots/gold`, and `c:ingots` containing both. (Note: This is a NeoForge convention, Minecraft does not follow this convention for most tags.)
+- 使用复数形式。例如：`minecraft:planks`、`c:ingots`。
+- 为同类型的多个对象使用文件夹，并为每个文件夹设一个总体标签。例如：`c:ingots/iron`、`c:ingots/gold`，以及包含二者的 `c:ingots`。（注意：这是 NeoForge 的约定，Minecraft 对大多数标签并不遵循此约定。）
 
-## Using Tags
+## 使用标签 {#using-tags}
 
-To reference tags in code, you must create a `TagKey<T>`, where `T` is the type of tag (`Block`, `Item`, `EntityType<?>`, etc.), using a [registry key][regkey] and an [identifier][identifier]:
+要在代码中引用标签，你必须创建一个 `TagKey<T>`，其中 `T` 是标签的类型（`Block`、`Item`、`EntityType<?>` 等），使用一个[注册表键][regkey]和一个[标识符][identifier]：
 
 ```java
 public static final TagKey<Block> MY_TAG = TagKey.create(
@@ -80,10 +80,10 @@ public static final TagKey<Block> MY_TAG = TagKey.create(
 ```
 
 :::warning
-Since `TagKey` is a record, its constructor is public. However, the constructor should not be used directly, as doing so can lead to various issues, for example when looking up tag entries.
+由于 `TagKey` 是一个 record，其构造器是公开的。然而，不应直接使用该构造器，因为这样做可能导致各种问题，例如在查找标签条目时。
 :::
 
-We can then use our tag to perform various operations on it. Let's start with the most obvious one: check whether an object is in the tag. The following examples will assume block tags, but the functionality is the exact same for every type of tag (unless otherwise specified):
+然后我们就可以用我们的标签对其执行各种操作。先从最明显的一个开始：检查某个对象是否在标签中。以下示例假定为方块标签，但除非另有说明，其功能对每种类型的标签都完全相同：
 
 ```java
 // Check whether dirt is in our tag.
@@ -91,7 +91,7 @@ We can then use our tag to perform various operations on it. Let's start with th
 boolean isInTag = level.registryAccess().lookupOrThrow(BuiltInRegistries.BLOCK).getOrThrow(MY_TAG).stream().anyMatch(holder -> holder.is(Items.DIRT));
 ```
 
-Since this is a very verbose statement, especially when used often, `BlockState` and `ItemStack` - the two most common users of the tag system - each define a `#is` helper method, used like so:
+由于这个语句非常冗长，尤其是在频繁使用时，`BlockState` 和 `ItemStack`——标签系统最常见的两个使用者——各自定义了一个 `#is` 辅助方法，用法如下：
 
 ```java
 // Check whether the blockState's block is in our tag.
@@ -100,16 +100,16 @@ boolean isInBlockTag = blockState.is(MY_TAG);
 boolean isInItemTag = itemStack.is(MY_ITEM_TAG);
 ```
 
-If needed, we can also get ourselves a set of tag entries to stream, like so:
+如果需要，我们也可以获取一组标签条目来进行流式处理，如下所示：
 
 ```java
 // Assume access to Level level
 Stream<Holder<Block>> blocksInTag = level.registryAccess().lookupOrThrow(BuiltInRegistries.BLOCK).getOrThrow(MY_TAG).stream();
 ```
 
-### Tags for Static Registries During Bootstrap
+### 引导期间静态注册表的标签 {#tags-for-static-registries-during-bootstrap}
 
-Sometimes, you need to get access to a `HolderSet` during the registry process. In [data component contexts][datacomponent], a `HolderLookup.Provider` is provided as part of the initializer to resolve:
+有时，你需要在注册过程中访问一个 `HolderSet`。在[数据组件上下文][datacomponent]中，初始化器会提供一个 `HolderLookup.Provider` 用于解析：
 
 ```java
 Item.Properties props = new Item.Properties().delayedComponent(
@@ -123,20 +123,20 @@ Item.Properties props = new Item.Properties().delayedComponent(
 );
 ```
 
-Outside of the data component context, for static registries **only**, you can obtain the necessary `HolderGetter` via `BuiltInRegistries#acquireBootstrapRegistrationLookup`:
+在数据组件上下文之外，**仅**对静态注册表而言，你可以通过 `BuiltInRegistries#acquireBootstrapRegistrationLookup` 获取所需的 `HolderGetter`：
 
 ```java
 // Assume access to Level level
 HolderSet<Block> blockTag = BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK).getOrThrow(MY_TAG);
 ```
 
-## Datagen
+## 数据生成 {#datagen}
 
-Like many other JSON files, tags can be [datagenned][datagen]. Each kind of tag has its own datagen base class - one class for block tags, one for item tags, etc. -, and as such, we need one class for each kind of tag as well. All of these classes extend from the `TagsProvider<T>` base class, with `T` again being the type of the tag (`Block`, `Item`, etc.) The `TagsProvider`s are then further grouped into two main categories: `IntrinsicHolderTagsProvider<T>` for typically static registry objects, allowing you to directly pass the object to the tag; and `KeyTagProvider` for typically datapack registry objects, allowing you to pass the `ResourceKey` of an object to the tag. There is also an additional category `HolderTagProvider<T>` for `Holder`-wrapped static registry objects, though this is only used by vanilla for potion tags.
+与许多其他 JSON 文件一样，标签可以进行[数据生成][datagen]。每种标签都有自己的数据生成基类——方块标签一个类，物品标签一个类，等等——因此我们每种标签也需要一个类。所有这些类都继承自 `TagsProvider<T>` 基类，`T` 同样是标签的类型（`Block`、`Item` 等）。`TagsProvider` 进一步归为两大类：`IntrinsicHolderTagsProvider<T>`，用于通常是静态注册表的对象，允许你直接把对象传给标签；以及 `KeyTagProvider`，用于通常是数据包注册表的对象，允许你把对象的 `ResourceKey` 传给标签。此外还有一个额外类别 `HolderTagProvider<T>`，用于以 `Holder` 包装的静态注册表对象，不过它目前仅被原版用于药水标签。
 
-The following table shows a list of tag providers for different objects:
+下表列出了不同对象的标签提供器：
 
-| Type                       | Tag Provider Class                     | Provider Type                 |
+| 类型                        | 标签提供器类                            | 提供器类型                     |
 |----------------------------|----------------------------------------|-------------------------------|
 | `BannerPattern`            | `BannerPatternTagsProvider`            | `KeyTagProvider`              |
 | `Biome`                    | `BiomeTagsProvider`                    | `KeyTagProvider`              |
@@ -160,9 +160,9 @@ The following table shows a list of tag providers for different objects:
 | `WorldPreset`              | `WorldPresetTagsProvider`              | `KeyTagProvider`              |
 
 
-\* These providers are provided by NeoForge.
+\* 这些提供器由 NeoForge 提供。
 
-For the sake of example, let's assume that we want to generate block tags (an intrinsic holder):
+举例来说，假设我们想生成方块标签（一个 intrinsic holder 类型）：
 
 ```java
 public class MyBlockTagsProvider extends BlockTagsProvider {
@@ -204,7 +204,7 @@ public class MyBlockTagsProvider extends BlockTagsProvider {
 }
 ```
 
-This example results in the following tag JSON:
+该示例会生成以下标签 JSON：
 
 ```json5
 {
@@ -238,7 +238,7 @@ This example results in the following tag JSON:
 }
 ```
 
-Like all data providers, add each tag provider to the `GatherDataEvent`s:
+与所有数据提供器一样，把每个标签提供器添加到 `GatherDataEvent` 中：
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -249,9 +249,9 @@ public static void gatherData(GatherDataEvent.Client event) {
 }
 ```
 
-### Custom Tag Providers
+### 自定义标签提供器 {#custom-tag-providers}
 
-A custom tag provider, whether for an existing or custom [registry], can be created by simply extending `TagsProvider<T>`, where `T` is the registry object you are generating a tag for.
+无论是针对现有还是自定义[注册表][registry]，自定义标签提供器都可以通过直接继承 `TagsProvider<T>` 来创建，其中 `T` 是你要为其生成标签的注册表对象。
 
 ```java
 public class MyRecipeTypeTagsProvider extends TagsProvider<RecipeType<?>> {
@@ -266,7 +266,7 @@ public class MyRecipeTypeTagsProvider extends TagsProvider<RecipeType<?>> {
 }
 ```
 
-From here, tags are generated from the provider by creating a `TagBuilder` via `getOrCreateRawBuilder`. The builder contains methods to add or remove elements and tags by their `Identifier`. Additionally, the builder can specify the `replace` property via `setReplace`:
+从这里开始，通过 `getOrCreateRawBuilder` 创建一个 `TagBuilder` 即可从提供器生成标签。该 builder 包含用于按 `Identifier` 添加或移除元素和标签的方法。此外，builder 可以通过 `setReplace` 指定 `replace` 属性：
 
 ```java
 public class MyRecipeTypeTagsProvider extends TagsProvider<RecipeType<?>> {
@@ -299,7 +299,7 @@ public class MyRecipeTypeTagsProvider extends TagsProvider<RecipeType<?>> {
 }
 ```
 
-Currently, the entire tag is being constructed from `Identifier`s. However, specifying the raw identifier every time can become tedious, especially when the `ResourceKey` or the direct object is available. That's where `TagAppender` comes in. `TagAppender<E, T>` is functionally a wrapper around a `TagBuilder` that takes in some arbitrary entry object `E` and converts it into `TagBuilder` calls for the registry object `T`. The `TagAppender` can be remapped into any arbitrary object via `map`, provided there is a way to convert the new object type into the previous entry object `E`. This is basically what `KeyTagProvider` and `IntrinsicHolderTagsProvider` are doing. They provide a method `tag` that creates a `TagAppender` that maps `ResourceKey`s to `Identifier`s or direct objects to `Identifier`s, respectively:
+目前，整个标签都是由 `Identifier` 构建的。然而，每次都指定原始标识符会变得繁琐，尤其是在已有 `ResourceKey` 或直接对象可用时。这时 `TagAppender` 就派上用场了。`TagAppender<E, T>` 在功能上是对 `TagBuilder` 的一个包装，它接收某种任意条目对象 `E`，并将其转换为针对注册表对象 `T` 的 `TagBuilder` 调用。只要存在将新对象类型转换为先前条目对象 `E` 的方法，`TagAppender` 就可以通过 `map` 重新映射为任意对象。这基本上就是 `KeyTagProvider` 和 `IntrinsicHolderTagsProvider` 所做的事情。它们提供一个 `tag` 方法，分别创建一个把 `ResourceKey` 映射为 `Identifier`、或把直接对象映射为 `Identifier` 的 `TagAppender`：
 
 ```java
 
@@ -391,9 +391,9 @@ public class MyRecipeTypeTagsProvider extends TagsProvider<RecipeType<?>> {
 }
 ```
 
-#### Copying Tag Contents
+#### 复制标签内容 {#copying-tag-contents}
 
-NeoForge provides a special type of `IntrinsicHolderTagsProvider` called `BlockTagCopyingItemTagProvider`, intended for item tags that mirror the contents of its associated block tags. Instead of using the `TagAppender`, instead call `copy`, passing the block tag to copy to the item tag.
+NeoForge 提供了一种特殊的 `IntrinsicHolderTagsProvider`，名为 `BlockTagCopyingItemTagProvider`，用于让物品标签镜像其关联方块标签的内容。此时不使用 `TagAppender`，而是调用 `copy`，将要复制的方块标签传给物品标签。
 
 ```java
 public class ExampleBlockTagCopyingItemTagProvider extends BlockTagCopyingItemTagProvider {
@@ -417,7 +417,7 @@ public class ExampleBlockTagCopyingItemTagProvider extends BlockTagCopyingItemTa
 }
 ```
 
-Like all data providers, the copying tag provider must be added to `GatherDataEvent`s:
+与所有数据提供器一样，复制标签提供器必须添加到 `GatherDataEvent` 中：
 
 ```java
 @SubscribeEvent // on the mod event bus

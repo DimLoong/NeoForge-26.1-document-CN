@@ -1,95 +1,95 @@
-# Models
+# 模型 {#models}
 
-Models are JSON files that determine the visual shape and texture(s) of a block or item. A model consists of cuboid elements, each with their own size, that then get assigned a texture to each face.
+模型是决定方块或物品视觉形状与纹理的 JSON 文件。一个模型由若干长方体元素组成，每个元素都有各自的尺寸，随后为每个面各自指定一张纹理。
 
-Items use the associated model(s) defined by its [client item][citems] while blocks use the associated model in the [blockstate file][bsfile]. These locations are relative to the `models` directory, so a model referenced by the name `examplemod:item/example_model` would be defined by the JSON at `assets/examplemod/models/item/example_model.json`.
+物品使用其 [客户端物品][citems] 所定义的关联模型，而方块则使用 [blockstate 文件][bsfile] 中的关联模型。这些位置相对于 `models` 目录，因此名为 `examplemod:item/example_model` 的模型引用，其定义在 `assets/examplemod/models/item/example_model.json` 的 JSON 中。
  
-## Specification
+## 规范 {#specification}
 
-_See also: [Model][mcwikimodel] on the [Minecraft Wiki][mcwiki]_
+_另见：[Minecraft Wiki][mcwiki] 上的 [Model][mcwikimodel]_
 
-A model is a JSON file with the following optional properties in the root tag:
+模型是一个 JSON 文件，其根标签中可包含以下可选属性：
 
-- `loader`: NeoForge-added. Sets a custom model loader. See [Model Loaders][custommodelloader] for more information.
-- `parent`: Sets a parent model, in the form of a [resource location][rl] relative to the `models` folder. All parent properties will be applied and then overridden by the properties set in the declaring model. Common parents include:
-    - `minecraft:block/block`: The common parent of all block models.
-    - `minecraft:block/cube`: Parent of all models that use a 1x1x1 cube model.
-    - `minecraft:block/cube_all`: Variant of the cube model that uses the same texture on all six sides, for example cobblestone or planks.
-    - `minecraft:block/cube_bottom_top`: Variant of the cube model that uses the same texture on all four horizontal sides, and separate textures on the top and the bottom. Common examples include sandstone or chiseled quartz.
-    - `minecraft:block/cube_column`: Variant of the cube model that has a side texture and a bottom and top texture. Examples include wooden logs, as well as quartz and purpur pillars.
-    - `minecraft:block/cross`: Model that uses two planes with the same texture, one rotated 45° clockwise and the other rotated 45° counter-clockwise, forming an X when viewed from above (hence the name). Examples include most plants, e.g. grass, saplings and flowers.
-    - `minecraft:item/generated`: Parent for classic 2D flat item models. Used by most items in the game. Ignores an `elements` block since its quads are generated from the textures.
-    - `minecraft:item/handheld`: Parent for 2D flat item models that appear to be actually held by the player. Used predominantly by tools. Submodel of `item/generated`, which causes it to ignore the `elements` block as well.
-    - Block items commonly (but not always) use their corresponding block models for their [item model][itemmodels]. For example, the cobblestone client item uses the `minecraft:block/cobblestone` model.
-- `ambientocclusion`: Whether to enable [ambient occlusion][ao] or not. Only effective on block models. Defaults to `true`. If your custom block model has weird shading, try setting this to `false`.
-- `gui_light`: Can be `"front"` or `"side"`. If `"front"`, light will come from the front, useful for flat 2D models. If `"side"`, light will come from the side, useful for 3D models (especially block models). Defaults to `"side"`. Only effective on item models.
-- `textures`: A sub-object that maps names (known as material variables) to `Material`s. Material variables can then be used in [elements]. They can also be specified in elements, but left unspecified in order for child models to specify them.
-    - `sprite`: The [location of the texture][textures].
-    - `force_translucent`: When `true`, forces the face this texture is applied to render in the 'translucent' layer. When `false`:
-        - If the texture only has opaque pixels (alpha `255`), the face will render in the 'solid' layer
-        - If the texture has pixels that are either opaque or completely transparent (alpha either `0` or `255`), the face will render in the 'cutout' layer
-        - Otherwise, the face will render in the 'translucent' layer
-
-:::tip
-Block models should additionally specify a `particle` texture. This texture is used when falling on, running across, or breaking the block. 
-
-Item models can also use layer textures, named `layer0`, `layer1`, etc., where layers with a higher index are rendered above those with a lower index (e.g. `layer1` would be rendered above `layer0`). Only works if the parent is `item/generated`, and only works for up to 5 layers (`layer0` through `layer4`).
-:::
-
-- `elements`: A list of cuboid [elements].
-- `display`: A sub-object that holds the different display options for different [perspectives], see linked article for possible keys. Only effective on item models, but often specified in block models so that item models can inherit the display options. Every perspective is an optional sub-object that may contain the following options, which are applied in that order:
-    - `translation`: The translation of the model, specified as `[x, y, z]`.
-    - `rotation`: The rotation of the model, specified as `[x, y, z]`.
-    - `scale`: The scale of the model, specified as `[x, y, z]`.
-    - `right_rotation`: NeoForge-added. A second rotation that is applied after scaling, specified as `[x, y, z]`.
-- `transform`: See [Root Transforms][roottransforms].
+- `loader`：NeoForge 新增。设置自定义模型加载器。详见 [模型加载器][custommodelloader]。
+- `parent`：设置父模型，形式为相对于 `models` 文件夹的 [资源标识符][rl]。父模型的所有属性都会被应用，随后被声明模型中所设的属性覆盖。常见的父模型包括：
+    - `minecraft:block/block`：所有方块模型的公共父模型。
+    - `minecraft:block/cube`：所有使用 1x1x1 立方体模型的模型的父模型。
+    - `minecraft:block/cube_all`：立方体模型的变体，六个面使用同一张纹理，例如圆石或木板。
+    - `minecraft:block/cube_bottom_top`：立方体模型的变体，四个水平面使用同一张纹理，顶面和底面各用单独的纹理。常见例子包括砂岩或錾制石英块。
+    - `minecraft:block/cube_column`：立方体模型的变体，具有一个侧面纹理以及底面和顶面纹理。例子包括木质原木，以及石英柱和紫珀柱。
+    - `minecraft:block/cross`：使用两个平面、且它们使用同一张纹理的模型，一个顺时针旋转 45°、另一个逆时针旋转 45°，从上往下看形成一个 X（因此得名）。例子包括大多数植物，例如草、树苗和花。
+    - `minecraft:item/generated`：经典 2D 平面物品模型的父模型。游戏中大多数物品都使用它。会忽略 `elements` 块，因为它的四边形（quad）是从纹理生成的。
+    - `minecraft:item/handheld`：看起来像被玩家真正握在手中的 2D 平面物品模型的父模型。主要由工具使用。它是 `item/generated` 的子模型，因此同样会忽略 `elements` 块。
+    - 方块物品通常（但并非总是）在其 [物品模型][itemmodels] 中使用其对应的方块模型。例如，圆石的客户端物品使用 `minecraft:block/cobblestone` 模型。
+- `ambientocclusion`：是否启用 [环境光遮蔽][ao]。仅对方块模型有效。默认为 `true`。如果你的自定义方块模型出现奇怪的着色，可以尝试将其设为 `false`。
+- `gui_light`：可以是 `"front"` 或 `"side"`。若为 `"front"`，光线来自正面，适用于平面 2D 模型；若为 `"side"`，光线来自侧面，适用于 3D 模型（尤其是方块模型）。默认为 `"side"`。仅对物品模型有效。
+- `textures`：一个子对象，将名称（称为材质变量）映射到 `Material`。材质变量随后可在 [元素][elements] 中使用。它们也可以在元素中指定，但可以保持未指定，以便子模型来指定它们。
+    - `sprite`：[纹理的位置][textures]。
+    - `force_translucent`：当为 `true` 时，强制应用了此纹理的面在“translucent”（半透明）层渲染。当为 `false` 时：
+        - 若纹理只有不透明像素（alpha 为 `255`），该面将在“solid”（实心）层渲染
+        - 若纹理的像素要么不透明、要么完全透明（alpha 为 `0` 或 `255`），该面将在“cutout”（镂空）层渲染
+        - 否则，该面将在“translucent”（半透明）层渲染
 
 :::tip
-If you're having trouble finding out how exactly to specify something, have a look at a vanilla model that does something similar.
+方块模型还应额外指定一个 `particle` 纹理。该纹理在落到方块上、在方块上奔跑或破坏方块时使用。
+
+物品模型也可以使用层纹理，命名为 `layer0`、`layer1` 等，索引越高的层渲染在索引越低的层之上（例如 `layer1` 会渲染在 `layer0` 之上）。仅当父模型为 `item/generated` 时有效，且最多只支持 5 层（`layer0` 至 `layer4`）。
 :::
 
-### Elements
-
-An element is a JSON representation of a cuboid object. It has the following properties:
-
-- `from`: The coordinate of the start corner of the cuboid, specified as `[x, y, z]`. Specified in 1/16 block units. For example, `[0, 0, 0]` would be the "bottom left" corner, `[8, 8, 8]` would be the center, and `[16, 16, 16]` would be the "top right" corner of the block.
-- `to`: The coordinate of the end corner of the cuboid, specified as `[x, y, z]`. Like `from`, this is specified in 1/16 block units.
+- `elements`：长方体 [元素][elements] 的列表。
+- `display`：一个子对象，持有不同 [视角][perspectives] 下的不同显示选项，可用的键见所链接的文章。仅对物品模型有效，但常在方块模型中指定，以便物品模型能继承这些显示选项。每个视角都是一个可选的子对象，可包含以下选项，按此顺序应用：
+    - `translation`：模型的平移，指定为 `[x, y, z]`。
+    - `rotation`：模型的旋转，指定为 `[x, y, z]`。
+    - `scale`：模型的缩放，指定为 `[x, y, z]`。
+    - `right_rotation`：NeoForge 新增。在缩放之后应用的第二次旋转，指定为 `[x, y, z]`。
+- `transform`：见 [根变换][roottransforms]。
 
 :::tip
-Values in `from` and `to` are limited by Minecraft to the range `[-16, 32]`. However, it is highly discouraged to exceed `[0, 16]`, as that will lead to lighting and/or culling issues.
+如果你难以弄清楚具体该如何指定某项内容，可以看看某个做了类似事情的原版模型。
 :::
 
-- `neoforge_data`: See [Extra Face Data][extrafacedata].
-- `faces`: An object containing data for of up to 6 faces, named `north`, `south`, `east`, `west`, `up` and `down`, respectively. Every face has the following data:
-    - `uv`: The uv of the face, specified as `[u1, v1, u2, v2]`, where `u1, v1` is the top left uv coordinates and `u2, v2` is the bottom right uv coordinates.
-    - `texture`: The texture to use for the face. Must be a texture variable prefixed with a `#`. For example, if your model had a texture named `wood`, you would use `#wood` to reference that texture. Technically optional, will use the missing texture if absent.
-    - `rotation`: Optional. Rotates the texture clockwise by 90, 180 or 270 degrees.
-    - `cullface`: Optional. Tells the render engine to skip rendering the face when there is a full block touching it in the specified direction. The direction can be `north`, `south`, `east`, `west`, `up` or `down`.
-    - `tintindex`: Optional. Specifies a tint index that may be used by a color handler, see [Tinting][tinting] for more information. Defaults to -1, which means no tinting.
-    - `neoforge_data`: See [Extra Face Data][extrafacedata].
+### 元素 {#elements}
 
-Additionally, it can specify the following optional properties:
+元素是长方体对象的 JSON 表示。它具有以下属性：
 
-- `shade`: Only for block models. Optional. Whether the faces of this element should have direction-dependent shading on it or not. Defaults to true.
-- `rotation`: A rotation of the object, specified as a sub object containing the following data:
-    - `angle`: The rotation angle, in degrees.
-    - `axis`: The axis to rotate around. It is currently not possible to rotate an object around more than one axis.
-    - `origin`: Optional. The origin point to rotate around, specified as `[x, y, z]`. Note that these are absolute values, i.e. they are not relative to the cube's position. If unspecified, will use `[0, 0, 0]`.
+- `from`：长方体起始角的坐标，指定为 `[x, y, z]`。以 1/16 方块为单位。例如，`[0, 0, 0]` 是“左下”角，`[8, 8, 8]` 是中心，`[16, 16, 16]` 是方块的“右上”角。
+- `to`：长方体结束角的坐标，指定为 `[x, y, z]`。与 `from` 一样，以 1/16 方块为单位。
 
-#### Extra Face Data
+:::tip
+`from` 和 `to` 中的值被 Minecraft 限制在 `[-16, 32]` 范围内。然而，强烈不建议超出 `[0, 16]`，因为那会导致光照和/或剔除问题。
+:::
 
-Extra face data (`neoforge_data`) can be applied to both an element and a single face of an element. It is optional in all contexts where it is available. If both element-level and face-level extra face data is specified, the face-level data will override the element-level data. Extra data can specify the following data:
+- `neoforge_data`：见 [额外面数据][extrafacedata]。
+- `faces`：一个对象，包含至多 6 个面的数据，分别命名为 `north`、`south`、`east`、`west`、`up` 和 `down`。每个面具有以下数据：
+    - `uv`：面的 uv，指定为 `[u1, v1, u2, v2]`，其中 `u1, v1` 是左上角 uv 坐标，`u2, v2` 是右下角 uv 坐标。
+    - `texture`：该面所用的纹理。必须是以 `#` 为前缀的纹理变量。例如，如果你的模型有一个名为 `wood` 的纹理，你会用 `#wood` 来引用该纹理。从技术上讲是可选的，若缺失将使用缺失纹理（missing texture）。
+    - `rotation`：可选。将纹理顺时针旋转 90、180 或 270 度。
+    - `cullface`：可选。告诉渲染引擎，当指定方向上有一个完整方块与之相邻时，跳过对该面的渲染。方向可以是 `north`、`south`、`east`、`west`、`up` 或 `down`。
+    - `tintindex`：可选。指定一个 tint 索引，可供颜色处理器使用，详见 [染色][tinting]。默认为 -1，表示不染色。
+    - `neoforge_data`：见 [额外面数据][extrafacedata]。
 
-- `color`: Tints the face with the given color. Must be an ARGB value. Can be specified as a string or as a decimal integer (JSON does not support hex literals). Defaults to `0xFFFFFFFF`. This can be used as a replacement for tinting if the color values are constant.
-- `block_light`: Overrides the block light value used for this face. Defaults to 0.
-- `sky_light`: Overrides the sky light value used for this face. Defaults to 0.
-- `ambient_occlusion`: Disables or enables ambient occlusion for this face. Defaults to the value set in the model.
+此外，它还可以指定以下可选属性：
 
-### Root Transforms
+- `shade`：仅用于方块模型。可选。该元素的各个面是否应带有与方向相关的着色。默认为 true。
+- `rotation`：对象的旋转，指定为一个包含以下数据的子对象：
+    - `angle`：旋转角度，以度为单位。
+    - `axis`：旋转所绕的轴。目前无法让一个对象绕多于一个轴旋转。
+    - `origin`：可选。旋转所绕的原点，指定为 `[x, y, z]`。注意这些是绝对值，即它们不是相对于立方体位置的。若未指定，将使用 `[0, 0, 0]`。
 
-Adding the `transform` property at the top level of a model tells the loader that a transformation to all geometry should be applied right before the rotations in a [blockstate file][bsfile] (for block models) or the transformations in a `display` block (for item models) are applied. This is added by NeoForge.
+#### 额外面数据 {#extra-face-data}
 
-The root transforms can be specified in two ways. The first way would be as a single property named `matrix` containing a transformation 3x4 matrix (row major order, last row is omitted) in the form of a nested JSON array. The matrix is the composition of the translation, left rotation, scale, right rotation and the transformation origin in that order. An example would look like this:
+额外面数据（`neoforge_data`）既可应用于元素，也可应用于元素的单个面。在所有可用的场合它都是可选的。如果同时指定了元素级和面级的额外面数据，面级数据将覆盖元素级数据。额外数据可以指定以下数据：
+
+- `color`：用给定颜色为该面染色。必须是 ARGB 值。可指定为字符串或十进制整数（JSON 不支持十六进制字面量）。默认为 `0xFFFFFFFF`。若颜色值恒定，这可以用作染色的替代方案。
+- `block_light`：覆盖此面所用的方块光照值。默认为 0。
+- `sky_light`：覆盖此面所用的天空光照值。默认为 0。
+- `ambient_occlusion`：为此面禁用或启用环境光遮蔽。默认为模型中所设的值。
+
+### 根变换 {#root-transforms}
+
+在模型顶层添加 `transform` 属性会告诉加载器：应在应用 [blockstate 文件][bsfile] 中的旋转（对于方块模型）或 `display` 块中的变换（对于物品模型）之前，对所有几何体应用一次变换。此项由 NeoForge 添加。
+
+根变换可以用两种方式指定。第一种方式是作为一个名为 `matrix` 的单一属性，包含一个 3x4 变换矩阵（行主序，省略最后一行），以嵌套 JSON 数组的形式给出。该矩阵是平移、左旋转、缩放、右旋转和变换原点按此顺序的复合。示例如下：
 
 ```json5
 {
@@ -104,47 +104,47 @@ The root transforms can be specified in two ways. The first way would be as a si
 }
 ```
 
-The second way is to specify a JSON object containing any combination of the following entries, applied in that order:
+第二种方式是指定一个 JSON 对象，包含以下条目的任意组合，按此顺序应用：
 
-- `translation`: The relative translation. Specified as a three-dimensional vector (`[x, y, z]`) and defaults to `[0, 0, 0]` if absent.
-- `rotation` or `left_rotation`: Rotation around the translated origin to be applied before scaling. Defaults to no rotation. Specified in one of the following ways:
-    - A JSON object with a single axis to rotation mapping, e.g. `{"x": 90}`
-    - An array of JSON objects with a single axis to rotation mapping each, applied in the order they are specified in, e.g. `[{"x": 90}, {"y": 45}, {"x": -22.5}]`
-    - An array with three values that each specify the rotation around each axis, e.g. `[90, 45, -22.5]`
-    - An array with four values directly specifying a quaternion, e.g. `[0.38268346, 0, 0, 0.9238795]` (= 45 degrees around the X axis)
-- `scale`: The scale relative to the translated origin. Specified as a three-dimensional vector (`[x, y, z]`) and defaults to `[1, 1, 1]` if absent.
-- `post_rotation` or `right_rotation`: Rotation around the translated origin to be applied after scaling. Defaults to no rotation. Specified the same as `rotation`.
-- `origin`: Origin point used for rotation and scaling. The transformation is also moved here as a final step. Specified either as a three-dimensional vector (`[x, y, z]`) or using one of the three builtin values `"corner"` (= `[0, 0, 0]`), `"center"` (= `[0.5, 0.5, 0.5]`) or `"opposing-corner"` (= `[1, 1, 1]`, default).
+- `translation`：相对平移。指定为三维向量（`[x, y, z]`），缺省时默认为 `[0, 0, 0]`。
+- `rotation` 或 `left_rotation`：绕平移后原点的旋转，在缩放之前应用。默认为不旋转。可用以下方式之一指定：
+    - 一个仅含单个“轴到旋转”映射的 JSON 对象，例如 `{"x": 90}`
+    - 一个 JSON 对象数组，每个对象含单个“轴到旋转”映射，按其指定顺序应用，例如 `[{"x": 90}, {"y": 45}, {"x": -22.5}]`
+    - 一个含三个值的数组，各自指定绕每个轴的旋转，例如 `[90, 45, -22.5]`
+    - 一个含四个值的数组，直接指定一个四元数，例如 `[0.38268346, 0, 0, 0.9238795]`（= 绕 X 轴旋转 45 度）
+- `scale`：相对于平移后原点的缩放。指定为三维向量（`[x, y, z]`），缺省时默认为 `[1, 1, 1]`。
+- `post_rotation` 或 `right_rotation`：绕平移后原点的旋转，在缩放之后应用。默认为不旋转。指定方式与 `rotation` 相同。
+- `origin`：用于旋转和缩放的原点。作为最后一步，变换也会移动到此处。既可指定为三维向量（`[x, y, z]`），也可使用三个内置值之一：`"corner"`（= `[0, 0, 0]`）、`"center"`（= `[0.5, 0.5, 0.5]`）或 `"opposing-corner"`（= `[1, 1, 1]`，默认值）。
 
-## Blockstate Files
+## Blockstate 文件 {#blockstate-files}
 
-_See also: [Blockstate files][mcwikiblockstate] on the [Minecraft Wiki][mcwiki]_
+_另见：[Minecraft Wiki][mcwiki] 上的 [Blockstate 文件][mcwikiblockstate]_
 
-Blockstate files are used by the game to assign different models to different [blockstates]. There must be exactly one blockstate file per block registered to the game. Specifying block models for blockstates works in three mutually exclusive ways: via variants, multipart, or the NeoForge added definition type.
+游戏使用 blockstate 文件为不同的 [方块状态][blockstates] 分配不同的模型。游戏中注册的每个方块必须恰好有一个 blockstate 文件。为方块状态指定方块模型有三种互斥的方式：通过 variants、通过 multipart，或通过 NeoForge 新增的 definition 类型。
 
-Inside a `variants` block, there is an element for each blockstate. This is the predominant way of associating blockstates with models, used by the vast majority of blocks.
-- The key is the string representation of the blockstate without the block name, so for example `"type=top,waterlogged=false"` for a non-waterlogged top slab, or `""` for a block with no properties. It is worth noting that unused properties may be omitted. For example, if the `waterlogged` property has no influence on the model chosen, two objects `type=top,waterlogged=false` and `type=top,waterlogged=true` may be collapsed into one `type=top` object. This also means that an empty string is valid for every block.
-- The value is either a single model object or an array of model objects. If an array of model objects is used, a model will be randomly chosen from it. A model object consists of the following data:
-    - `type`: NeoForge-added. Sets a custom block state model loader. See [Block State Model Loaders][bsmmodelloader] for more information.
-    - `model`: A path to a model file location, relative to the namespace's `models` folder, for example `minecraft:block/cobblestone`.
-    - `x` and `y`: Rotation of the model on the x-axis/y-axis. Limited to steps of 90 degrees. Optional each, defaults to 0.
-    - `uvlock`: Whether to lock the UVs of the model when rotating or not. Optional, defaults to false.
-    - `weight`: Only useful with arrays of model objects. Gives the object a weight, used when choosing a random model object. Optional, defaults to 1.
+在 `variants` 块中，每个方块状态都有一个元素。这是将方块状态与模型关联起来的主要方式，绝大多数方块都使用它。
+- 键是不含方块名的方块状态的字符串表示，例如非含水的顶部台阶为 `"type=top,waterlogged=false"`，无属性的方块为 `""`。值得注意的是，未使用的属性可以省略。例如，如果 `waterlogged` 属性对所选模型没有影响，那么 `type=top,waterlogged=false` 和 `type=top,waterlogged=true` 两个对象可以合并为一个 `type=top` 对象。这也意味着空字符串对每个方块都是有效的。
+- 值要么是单个模型对象，要么是模型对象的数组。若使用模型对象数组，将从中随机选择一个模型。一个模型对象由以下数据组成：
+    - `type`：NeoForge 新增。设置自定义方块状态模型加载器。详见 [方块状态模型加载器][bsmmodelloader]。
+    - `model`：模型文件位置的路径，相对于命名空间的 `models` 文件夹，例如 `minecraft:block/cobblestone`。
+    - `x` 和 `y`：模型在 x 轴/y 轴上的旋转。限制为 90 度的步进。各自可选，默认为 0。
+    - `uvlock`：旋转时是否锁定模型的 UV。可选，默认为 false。
+    - `weight`：仅在模型对象数组中有用。为对象赋予权重，在随机选择模型对象时使用。可选，默认为 1。
 
-In contrast, inside a `multipart` block, elements are combined depending on the properties of the blockstate. This method is mainly used by fences and walls, who enable the four directional parts based on boolean properties. A multipart element consists of two parts: a `when` block and an `apply` block.
+相比之下，在 `multipart` 块中，元素是根据方块状态的属性来组合的。此方法主要由栅栏和墙使用，它们根据布尔属性来启用四个方向上的部件。一个 multipart 元素由两部分组成：一个 `when` 块和一个 `apply` 块。
 
-- The `when` block specifies either a string representation of a blockstate or a list of properties that must be met for the element to apply. The lists can either be named `"OR"` or `"AND"`, performing the respective logical operation on its contents. Both single blockstate and list values can additionally specify multiple actual values by separating them with `|` (for example `facing=east|facing=west`).
-- The `apply` block specifies the model object or an array of model objects to use. This works exactly like with a `variants` block.
+- `when` 块指定要么是方块状态的字符串表示，要么是元素得以应用所必须满足的属性列表。列表可以命名为 `"OR"` 或 `"AND"`，对其内容执行相应的逻辑运算。单个方块状态值和列表值都还可以通过用 `|` 分隔来额外指定多个实际取值（例如 `facing=east|facing=west`）。
+- `apply` 块指定要使用的模型对象或模型对象数组。其工作方式与 `variants` 块完全相同。
 
-Finally, a `neoforge:definition_type` can specify a custom model loader to register the block state file See [Block State Definition Loaders][bsdmodelloader] for more information.
+最后，`neoforge:definition_type` 可以指定一个自定义模型加载器来注册该方块状态文件。详见 [方块状态定义加载器][bsdmodelloader]。
 
-## Client Items
+## 客户端物品 {#client-items}
 
-[Client items][citems] are used by the game to assign a model or multiple models to the states of the `ItemStack`. While there are some item-specific fields in the model JSON, client items consume models to render based on context, so most of their information has been moved to their own separate [section][citems].
+游戏使用 [客户端物品][citems] 为 `ItemStack` 的各种状态分配一个或多个模型。虽然模型 JSON 中有一些物品专用的字段，但客户端物品会根据上下文消费模型来进行渲染，因此它们的大部分信息已被移至各自单独的 [章节][citems]。
 
-## Tinting
+## 染色 {#tinting}
 
-Some blocks, such as grass or leaves, change their texture color based on their location and/or properties. [Model elements][elements] can specify a tint index on their faces, which will allow a color handler to handle the respective faces. The code side of things works through three events, one for block tint sources, one for block tints based on biome (used in conjunction with the block tint sources), and one for item tint sources. So let's have a look at a block tint source first:
+某些方块（例如草或树叶）会根据其所在位置和/或属性来改变纹理颜色。[模型元素][elements] 可以在其面上指定一个 tint 索引，这将允许一个颜色处理器来处理相应的面。代码这边通过三个事件工作：一个用于方块 tint 源，一个用于基于生物群系的方块 tint（与方块 tint 源配合使用），一个用于物品 tint 源。那么先来看一个方块 tint 源：
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client
@@ -192,7 +192,7 @@ public static void registerBlockColorHandlers(RegisterColorHandlersEvent.BlockTi
 }
 ```
 
-Here is an example for a color resolver:
+下面是一个颜色解析器（color resolver）的示例：
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client
@@ -206,11 +206,11 @@ public static void registerColorResolvers(RegisterColorHandlersEvent.ColorResolv
 }
 ```
 
-For item tinting, please see the [relevant section in the client items article][itemtints].
+关于物品染色，请参见 [客户端物品文章中的相关章节][itemtints]。
 
-## Registering Standalone Models
+## 注册独立模型 {#registering-standalone-models}
 
-Models that are not associated with a block or item in some way, but are still required in other contexts (e.g. [block entity renderers][ber]), can be registered through `ModelEvent.RegisterStandalone`:
+那些不以任何方式与方块或物品相关联、但在其他上下文中仍需使用的模型（例如 [方块实体渲染器][ber]），可以通过 `ModelEvent.RegisterStandalone` 注册：
 
 ```java
 // This can be any type as long as it can be obtained from the ResolvedModel and the ModelBaker

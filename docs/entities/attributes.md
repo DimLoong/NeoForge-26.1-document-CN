@@ -1,73 +1,73 @@
 ---
 sidebar_position: 4
 ---
-# Attributes
+# 属性 {#attributes}
 
-Attributes are special fields of [living entities][livingentity] that determine basic properties such as max health, speed or armor. All attributes are stored as double values and synced automatically. Vanilla offers a wide range of default attributes, and you can also add your own.
+属性（Attribute）是[生物实体][livingentity]的特殊字段，决定最大生命值、速度或护甲等基本属性。所有属性都以 double 值存储，并自动同步。原版提供了范围广泛的默认属性，你也可以添加自己的属性。
 
-Due to legacy implementations, not all attributes work with all entities. For example, flying speed is ignored by ghasts, and jump strength only affects horses, not players.
+由于历史遗留实现，并非所有属性都对所有实体生效。例如，飞行速度会被恶魂忽略，而跳跃力度只影响马，不影响玩家。
 
-## Built-In Attributes
+## 内置属性 {#built-in-attributes}
 
-### Minecraft
+### Minecraft {#minecraft}
 
-The following attributes are in the `minecraft` namespace, and their in-code values can be found in the `Attributes` class.
+以下属性位于 `minecraft` 命名空间中，它们在代码中的值可以在 `Attributes` 类中找到。
 
-| Name                             | In Code                          | Range          | Default Value | Usage                                                                                                                                                                 |
+| 名称                             | 代码中                           | 取值范围       | 默认值        | 用途                                                                                                                                                                 |
 |----------------------------------|----------------------------------|----------------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `armor`                          | `ARMOR`                          | `[0,30]`       | 0             | The armor value of the entity. A value of 1 means half a chestplate icon above the hotbar.                                                                            |
-| `armor_toughness`                | `ARMOR_TOUGHNESS`                | `[0,20]`       | 0             | The armor toughness value of the entity. See [Armor Toughness][toughness] on the [Minecraft Wiki][wiki] for more information.                                         |
-| `attack_damage`                  | `ATTACK_DAMAGE`                  | `[0,2048]`     | 2             | The base attack damage done by the entity, without any weapon or similar item.                                                                                        |
-| `attack_knockback`               | `ATTACK_KNOCKBACK`               | `[0,5]`        | 0             | The extra knockback dealt by the entity. Knockback additionally has a base strength not represented by this attribute.                                                |
-| `attack_speed`                   | `ATTACK_SPEED`                   | `[0,1024]`     | 4             | The attack cooldown of the entity. Higher numbers mean more cooldown, setting this to 0 effectively re-enables pre-1.9 combat.                                        |
-| `block_break_speed`              | `BLOCK_BREAK_SPEED`              | `[0,1024]`     | 1             | How fast the entity can mine blocks, as a multiplicative modifier. See [Mining Speed][miningspeed] for more information.                                              |
-| `block_interaction_range`        | `BLOCK_INTERACTION_RANGE`        | `[0,64]`       | 4.5           | The interaction range in which the entity can interact with blocks, in blocks.                                                                                        |
-| `burning_time`                   | `BURNING_TIME`                   | `[0,1024]`     | 1             | A multiplier for how long the entity will burn when ignited.                                                                                                          |
-| `camera_distance`                | `CAMERA_DISTANCE`                | `[0,32]`       | 4             | The distance of the camera from the entity when in third person, including spectating or riding another entity.                                                        |
-| `explosion_knockback_resistance` | `EXPLOSION_KNOCKBACK_RESISTANCE` | `[0,1]`        | 0             | The explosion knockback resistance of the entity. This is a value in percent, i.e. 0 is no resistance, 0.5 is half resistance, and 1 is full resistance.              |
-| `entity_interaction_range`       | `ENTITY_INTERACTION_RANGE`       | `[0,64]`       | 3             | The interaction range in which the entity can interact with other entities, in blocks.                                                                                |
-| `fall_damage_multiplier`         | `FALL_DAMAGE_MULTIPLIER`         | `[0,100]`      | 1             | A multiplier for fall damage taken by the entity.                                                                                                                     |
-| `flying_speed`                   | `FLYING_SPEED`                   | `[0,1024]`     | 0.4           | A multiplier for flying speed. This is not actually used by all flying entities, and ignored by e.g. ghasts.                                                          |
-| `follow_range`                   | `FOLLOW_RANGE`                   | `[0,2048]`     | 32            | The distance in blocks that the entity will target/follow the player.                                                                                                 |
-| `gravity`                        | `GRAVITY`                        | `[1,1]`        | 0.08          | The gravity the entity is influenced by, in blocks per tick squared.                                                                                                  |
-| `jump_strength`                  | `JUMP_STRENGTH`                  | `[0,32]`       | 0.42          | The jump strength of the entity. Higher value means higher jumping.                                                                                                   |
-| `knockback_resistance`           | `KNOCKBACK_RESISTANCE`           | `[0,1]`        | 0             | The knockback resistance of the entity. This is a value in percent, i.e. 0 is no resistance, 0.5 is half resistance, and 1 is full resistance.                        |
-| `luck`                           | `LUCK`                           | `[-1024,1024]` | 0             | The luck value of the entity. This is used when rolling [loot tables][loottables] to give bonus rolls or otherwise modify the resulting items' quality.               |
-| `max_absorption`                 | `MAX_ABSORPTION`                 | `[0,2048]`     | 0             | The max absorption (yellow hearts) of the entity. A value of 1 means half a heart.                                                                                    |
-| `max_health`                     | `MAX_HEALTH`                     | `[1,1024]`     | 20            | The max health of the entity. A value of 1 means half a heart.                                                                                                        |
-| `mining_efficiency`              | `MINING_EFFICIENCY`              | `[0,1024]`     | 0             | How fast the entity can mine blocks, as an additive modifier, only if the used tool is correct. See [Mining Speed][miningspeed] for more information.                 |
-| `movement_efficiency`            | `MOVEMENT_EFFICIENCY`            | `[0,1]`        | 0             | A linearly-interpolated movement speed bonus applied to the entity when it is walking on blocks that have a slowdown, such as soul sand.                              |
-| `movement_speed`                 | `MOVEMENT_SPEED`                 | `[0,1024]`     | 0.7           | The movement speed of the entity. Higher value means faster.                                                                                                          |
-| `oxygen_bonus`                   | `OXYGEN_BONUS`                   | `[0,1024]`     | 0             | An oxygen bonus for the entity. The higher this is, the longer it takes for the entity to start drowning.                                                             |
-| `safe_fall_distance`             | `SAFE_FALL_DISTANCE`             | `[-1024,1024]` | 3             | The fall distance for the entity that is safe, i.e. the distance in which no fall damage is taken.                                                                    |
-| `scale`                          | `SCALE`                          | `[0.0625,16]`  | 1             | The scale at which the entity is rendered.                                                                                                                            |
-| `sneaking_speed`                 | `SNEAKING_SPEED`                 | `[0,1]`        | 0.3           | A movement speed multiplier applied to the entity when it is sneaking.                                                                                                |
-| `spawn_reinforcements`           | `SPAWN_REINFORCEMENTS_CHANCE`    | `[0,1]`        | 0             | The chance for zombies to spawn other zombies. This is only relevant on hard difficulty, as zombie reinforcements do not occur on normal difficulty or lower.         |
-| `step_height`                    | `STEP_HEIGHT`                    | `[0,10]`       | 0.6           | The step height of the entity, in blocks. If this is 1, the player can walk up 1-block ledges like they were slabs.                                                   |
-| `submerged_mining_speed`         | `SUBMERGED_MINING_SPEED`         | `[0,20]`       | 0.2           | How fast the entity can mine blocks, as a multiplicative modifier, only if the entity is underwater. See [Mining Speed][miningspeed] for more information.            |
-| `sweeping_damage_ratio`          | `SWEEPING_DAMAGE_RATIO`          | `[0,1]`        | 0             | The amount of damage done by sweep attacks, in percent of the main attack. This is a value in percent, i.e. 0 is no damage, 0.5 is half damage, and 1 is full damage. |
-| `tempt_range`                    | `TEMPT_RANGE`                    | `[0,2048]`     | 10            | The range at which the entity can be tempted using items. Mainly for passive animals, e.g. cows or pigs.                                                              |
-| `water_movement_efficiency`      | `WATER_MOVEMENT_EFFICIENCY`      | `[0,1]`        | 0             | A movement speed multiplier that is applied when the entity is underwater.                                                                                            |
-| `waypoint_transmit_range`        | `WAYPOINT_TRANSMIT_RANGE`        | `[0,60000000]` | 0             | The range at which an entity can transmit its location to some waypoint tracker. |
-| `waypoint_receive_range`         | `WAYPOINT_RECEIVE_RANGE`         | `[0,60000000]` | 0             | The range at which an entity can receive another transmitter.                    |
+| `armor`                          | `ARMOR`                          | `[0,30]`       | 0             | 实体的护甲值。值为 1 表示快捷栏上方的半个胸甲图标。                                                                            |
+| `armor_toughness`                | `ARMOR_TOUGHNESS`                | `[0,20]`       | 0             | 实体的护甲韧性值。更多信息见 [Minecraft Wiki][wiki] 上的 [Armor Toughness][toughness]。                                         |
+| `attack_damage`                  | `ATTACK_DAMAGE`                  | `[0,2048]`     | 2             | 实体在不使用武器或类似物品时造成的基础攻击伤害。                                                                        |
+| `attack_knockback`               | `ATTACK_KNOCKBACK`               | `[0,5]`        | 0             | 实体造成的额外击退。击退另有一个基础强度，不由此属性表示。                                                |
+| `attack_speed`                   | `ATTACK_SPEED`                   | `[0,1024]`     | 4             | 实体的攻击冷却。数值越高冷却越长，将其设为 0 实际上会重新启用 1.9 之前的战斗方式。                                        |
+| `block_break_speed`              | `BLOCK_BREAK_SPEED`              | `[0,1024]`     | 1             | 实体挖掘方块的速度，作为乘性修饰值。更多信息见[挖掘速度][miningspeed]。                                              |
+| `block_interaction_range`        | `BLOCK_INTERACTION_RANGE`        | `[0,64]`       | 4.5           | 实体能与方块交互的交互范围，以方块为单位。                                                                        |
+| `burning_time`                   | `BURNING_TIME`                   | `[0,1024]`     | 1             | 实体被点燃后燃烧时长的乘数。                                                                          |
+| `camera_distance`                | `CAMERA_DISTANCE`                | `[0,32]`       | 4             | 处于第三人称（包括旁观或骑乘另一实体）时，摄像机与实体的距离。                                                        |
+| `explosion_knockback_resistance` | `EXPLOSION_KNOCKBACK_RESISTANCE` | `[0,1]`        | 0             | 实体的爆炸击退抗性。这是一个百分比值，即 0 表示无抗性，0.5 表示半抗性，1 表示完全抗性。              |
+| `entity_interaction_range`       | `ENTITY_INTERACTION_RANGE`       | `[0,64]`       | 3             | 实体能与其他实体交互的交互范围，以方块为单位。                                                                                |
+| `fall_damage_multiplier`         | `FALL_DAMAGE_MULTIPLIER`         | `[0,100]`      | 1             | 实体所受摔落伤害的乘数。                                                                                                                     |
+| `flying_speed`                   | `FLYING_SPEED`                   | `[0,1024]`     | 0.4           | 飞行速度的乘数。它并非被所有飞行实体使用，例如会被恶魂忽略。                                                          |
+| `follow_range`                   | `FOLLOW_RANGE`                   | `[0,2048]`     | 32            | 实体会锁定/跟随玩家的距离，以方块为单位。                                                                                                 |
+| `gravity`                        | `GRAVITY`                        | `[1,1]`        | 0.08          | 实体所受的重力，以方块每 tick 平方为单位。                                                                                                  |
+| `jump_strength`                  | `JUMP_STRENGTH`                  | `[0,32]`       | 0.42          | 实体的跳跃力度。数值越高跳得越高。                                                                                                   |
+| `knockback_resistance`           | `KNOCKBACK_RESISTANCE`           | `[0,1]`        | 0             | 实体的击退抗性。这是一个百分比值，即 0 表示无抗性，0.5 表示半抗性，1 表示完全抗性。                        |
+| `luck`                           | `LUCK`                           | `[-1024,1024]` | 0             | 实体的幸运值。它在掷取[战利品表][loottables]时使用，用于给予额外掷取次数，或以其他方式修改所得物品的品质。               |
+| `max_absorption`                 | `MAX_ABSORPTION`                 | `[0,2048]`     | 0             | 实体的最大伤害吸收（黄心）。值为 1 表示半颗心。                                                                    |
+| `max_health`                     | `MAX_HEALTH`                     | `[1,1024]`     | 20            | 实体的最大生命值。值为 1 表示半颗心。                                                                                        |
+| `mining_efficiency`              | `MINING_EFFICIENCY`              | `[0,1024]`     | 0             | 实体挖掘方块的速度，作为加性修饰值，仅在所用工具正确时生效。更多信息见[挖掘速度][miningspeed]。                 |
+| `movement_efficiency`            | `MOVEMENT_EFFICIENCY`            | `[0,1]`        | 0             | 当实体走在有减速效果的方块（如灵魂沙）上时，对其应用的线性插值移动速度加成。                              |
+| `movement_speed`                 | `MOVEMENT_SPEED`                 | `[0,1024]`     | 0.7           | 实体的移动速度。数值越高越快。                                                                                                          |
+| `oxygen_bonus`                   | `OXYGEN_BONUS`                   | `[0,1024]`     | 0             | 实体的氧气加成。数值越高，实体开始溺水所需的时间越长。                                                             |
+| `safe_fall_distance`             | `SAFE_FALL_DISTANCE`             | `[-1024,1024]` | 3             | 实体的安全摔落距离，即在此距离内不会受到摔落伤害。                                                                    |
+| `scale`                          | `SCALE`                          | `[0.0625,16]`  | 1             | 实体渲染时的缩放比例。                                                                                                            |
+| `sneaking_speed`                 | `SNEAKING_SPEED`                 | `[0,1]`        | 0.3           | 实体潜行时对其应用的移动速度乘数。                                                                                |
+| `spawn_reinforcements`           | `SPAWN_REINFORCEMENTS_CHANCE`    | `[0,1]`        | 0             | 僵尸生成其他僵尸的几率。这仅在困难难度下相关，因为僵尸增援不会在普通及以下难度出现。         |
+| `step_height`                    | `STEP_HEIGHT`                    | `[0,10]`       | 0.6           | 实体的跨越高度，以方块为单位。如果为 1，玩家就能像走上台阶一样走上 1 格高的台沿。                                                   |
+| `submerged_mining_speed`         | `SUBMERGED_MINING_SPEED`         | `[0,20]`       | 0.2           | 实体挖掘方块的速度，作为乘性修饰值，仅在实体处于水下时生效。更多信息见[挖掘速度][miningspeed]。            |
+| `sweeping_damage_ratio`          | `SWEEPING_DAMAGE_RATIO`          | `[0,1]`        | 0             | 横扫攻击造成的伤害量，以主攻击伤害的百分比表示。这是一个百分比值，即 0 表示无伤害，0.5 表示半伤害，1 表示完全伤害。 |
+| `tempt_range`                    | `TEMPT_RANGE`                    | `[0,2048]`     | 10            | 实体能被物品吸引的范围。主要用于被动动物，例如牛或猪。                                                              |
+| `water_movement_efficiency`      | `WATER_MOVEMENT_EFFICIENCY`      | `[0,1]`        | 0             | 实体处于水下时应用的移动速度乘数。                                                                            |
+| `waypoint_transmit_range`        | `WAYPOINT_TRANSMIT_RANGE`        | `[0,60000000]` | 0             | 实体能向某个路径点追踪器发送自身位置的范围。 |
+| `waypoint_receive_range`         | `WAYPOINT_RECEIVE_RANGE`         | `[0,60000000]` | 0             | 实体能接收另一个发送器的范围。                    |
 
 :::warning
-Some attribute caps are set relatively arbitrarily by Mojang. This is especially notable for armor, which is capped at 30. NeoForge doesn't touch those caps, however there are mods to change them.
+一些属性上限是 Mojang 相对随意设定的。护甲尤其明显，它被限制在 30。NeoForge 不会改动这些上限，不过有一些 Mod 可以更改它们。
 :::
 
-### NeoForge
+### NeoForge {#neoforge}
 
-The following attributes are in the `neoforge` namespace, and their in-code values can be found in the `NeoForgeMod` class.
+以下属性位于 `neoforge` 命名空间中，它们在代码中的值可以在 `NeoForgeMod` 类中找到。
 
-| Name               | In Code            | Range      | Default Value | Usage                                                                                                                                                |
+| 名称               | 代码中             | 取值范围   | 默认值        | 用途                                                                                                                                                |
 |--------------------|--------------------|------------|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `creative_flight`  | `CREATIVE_FLIGHT`  | `[0,1]`    | 0             | Determines whether creative flight for the entity is enabled (\> 0) or disabled (\<\= 0).                                                            |
-| `nametag_distance` | `NAMETAG_DISTANCE` | `[0,32]`   | 32            | How far the nametag of the entity will be visible, in blocks.                                                                                        |
-| `swim_speed`       | `SWIM_SPEED`       | `[0,1024]` | 1             | A movement speed multiplier that is applied when the entity is underwater. This is applied independently from `minecraft:water_movement_efficiency`. |
+| `creative_flight`  | `CREATIVE_FLIGHT`  | `[0,1]`    | 0             | 决定实体的创造模式飞行是启用（\> 0）还是禁用（\<\= 0）。                                                            |
+| `nametag_distance` | `NAMETAG_DISTANCE` | `[0,32]`   | 32            | 实体名称标签的可见距离，以方块为单位。                                                                        |
+| `swim_speed`       | `SWIM_SPEED`       | `[0,1024]` | 1             | 实体处于水下时应用的移动速度乘数。它独立于 `minecraft:water_movement_efficiency` 生效。 |
 
-## Default Attributes
+## 默认属性 {#default-attributes}
 
-When creating a `LivingEntity`, it is required to register a set of default attributes for them. When an entity is [spawned][spawning] in, its default attributes are set on it. Default attributes are registered in the [`EntityAttributeCreationEvent`][event] like so:
+在创建 `LivingEntity` 时，必须为其注册一组默认属性。当实体被[生成][spawning]时，它的默认属性会被设置到它身上。默认属性在 [`EntityAttributeCreationEvent`][event] 中注册，如下所示：
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -90,10 +90,10 @@ public static void createDefaultAttributes(EntityAttributeCreationEvent event) {
 ```
 
 :::tip
-Some classes have specialized versions of `LivingEntity#createLivingAttributes`. For example, the `Monster` class has a method named `Monster#createMonsterAttributes` that can be used instead.
+一些类拥有 `LivingEntity#createLivingAttributes` 的专门版本。例如，`Monster` 类就有一个名为 `Monster#createMonsterAttributes` 的方法可供替代使用。
 :::
 
-In some situations, for example when making [your own attributes][custom], it is needed to add attributes to an existing entity's `AttributeSupplier`. This is done through the `EntityAttributeModificationEvent` like so:
+在某些情况下，例如在制作[你自己的属性][custom]时，需要向已有实体的 `AttributeSupplier` 添加属性。这通过 `EntityAttributeModificationEvent` 完成，如下所示：
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -115,13 +115,13 @@ public static void modifyDefaultAttributes(EntityAttributeModificationEvent even
 }
 ```
 
-Be aware that unlike some other registries, custom attributes existing do not block vanilla clients from connecting to a NeoForge server. If a vanilla client connects, it will only receive the attributes in the `minecraft` namespace.
+请注意，与其他一些注册表不同，存在自定义属性并不会阻止原版客户端连接到 NeoForge 服务端。如果原版客户端连接进来，它只会收到 `minecraft` 命名空间中的属性。
 
-## Querying Attributes
+## 查询属性 {#querying-attributes}
 
-Attribute values are stored on entities in an `AttributeMap`, which is basically a `Map<Attribute, AttributeInstance>`. Attribute instances are basically what item stacks are to items, i.e. whereas an attribute is a registered singleton, attribute instances are concrete attribute objects bound to a concrete entity.
+属性值以 `AttributeMap` 的形式存储在实体上，它本质上是一个 `Map<Attribute, AttributeInstance>`。属性实例（attribute instance）之于属性，就好比物品堆叠之于物品，即：属性是已注册的单例，而属性实例是绑定到某个具体实体的具体属性对象。
 
-The `AttributeMap` of an entity can be retrieved by calling `LivingEntity#getAttributes`. You can then query the map like so:
+实体的 `AttributeMap` 可以通过调用 `LivingEntity#getAttributes` 获取。随后你可以像下面这样查询该 map：
 
 ```java
 // Get the attribute map.
@@ -139,18 +139,18 @@ double value = livingEntity.getAttributeValue(Attributes.ARMOR);
 ```
 
 :::info
-When handling attributes, you will almost exclusively use `Holder<Attribute>`s instead of `Attribute`s. This is also why with custom attributes (see below), we explicitly store the `Holder<Attribute>`.
+处理属性时，你几乎总是使用 `Holder<Attribute>` 而非 `Attribute`。这也是为什么在使用自定义属性时（见下文），我们会显式存储 `Holder<Attribute>`。
 :::
 
-## Attribute Modifiers
+## 属性修饰符 {#attribute-modifiers}
 
-In contrast to querying, changing the attribute values is not as easy. This is mainly because there may be multiple changes required to an attribute at the same time.
+与查询相比，更改属性值就没那么简单了。这主要是因为同一时间可能需要对某个属性做多处更改。
 
-Consider this: You are a player, who has an attack damage attribute of 1. You wield a diamond sword, which does 6 extra attack damage, so you have 7 total attack damage. Then you drink a strength potion, adding a damage multiplier. You then also have some sort of trinket equipped that adds yet another multiplier.
+设想这样的场景：你是一名玩家，攻击伤害属性为 1。你挥舞一把额外造成 6 点攻击伤害的钻石剑，于是总攻击伤害为 7。接着你喝下一瓶力量药水，添加了一个伤害乘数。然后你又装备了某种饰品，添加了另一个乘数。
 
-To avoid miscalculations and to better communicate how the attribute values are modified, Minecraft introduces the attribute modifier system. In this system, every attribute has a **base value**, which is typically sourced from the default attributes we discussed earlier. We can then add any amount of **attribute modifiers** that can be individually removed again, without us having to worry about correctly applying operations.
+为了避免计算错误，并更好地传达属性值是如何被修改的，Minecraft 引入了属性修饰符系统。在该系统中，每个属性都有一个**基础值**，它通常来自我们前面讨论过的默认属性。随后我们可以添加任意数量的**属性修饰符**，这些修饰符又可以被单独移除，而无需担心如何正确地应用各种运算。
 
-To get started, let's create an attribute modifier:
+首先，我们来创建一个属性修饰符：
 
 ```java
 // The name of the modifier. This is later used to query the modifier from the attribute map
@@ -173,7 +173,7 @@ AttributeModifier modifier = new AttributeModifier(
 );
 ```
 
-Now, to apply the modifier, we have two options: add it as a transient modifier, or as a permanent modifier. Permanent modifiers are saved to disk, while transient modifiers are not. The use case for permanent modifiers is things like permanent stat bonuses (e.g. some sort of armor or health skill), while transient modifiers are mainly for [equipment], [mob effects][mobeffect] and other modifiers that depend on the player's current state.
+现在，要应用这个修饰符，我们有两个选择：将其作为临时修饰符添加，或作为永久修饰符添加。永久修饰符会保存到磁盘，而临时修饰符不会。永久修饰符的用例是永久性属性加成之类的东西（例如某种护甲或生命技能），而临时修饰符主要用于[装备][equipment]、[状态效果][mobeffect]以及其他依赖玩家当前状态的修饰符。
 
 ```java
 AttributeMap attributes = livingEntity.getAttributes();
@@ -187,7 +187,7 @@ attributes.getInstance(Attributes.ARMOR).addPermanentModifier(modifier);
 attributes.getInstance(Attributes.ARMOR).addOrReplacePermanentModifier(modifier);
 ```
 
-These modifiers can also be removed again:
+这些修饰符也可以再次被移除：
 
 ```java
 // Remove by modifier object.
@@ -198,7 +198,7 @@ attributes.getInstance(Attributes.ARMOR).removeModifier(id);
 attributes.getInstance(Attributes.ARMOR).removeModifiers();
 ```
 
-Finally, we can also query the attribute map for whether it has a modifier with a certain ID, as well as query base values and modifier values separately, like so:
+最后，我们还可以查询属性 map 是否含有具备某个 ID 的修饰符，也可以分别查询基础值和修饰符的值，如下所示：
 
 ```java
 // Check for the modifier being present.
@@ -209,22 +209,22 @@ double baseValue = attributes.getBaseValue(Attributes.ARMOR);
 double modifierValue = attributes.getModifierValue(Attributes.ARMOR, id);
 ```
 
-## Custom Attributes
+## 自定义属性 {#custom-attributes}
 
-If needed, you can also add your own attributes. Like many other systems, attributes are a [registry], and you can register your own objects to it. To get started, create a `DeferredRegister<Attribute>` like so:
+如有需要，你也可以添加自己的属性。与许多其他系统一样，属性是一个[注册表][registry]，你可以向其注册自己的对象。首先，像下面这样创建一个 `DeferredRegister<Attribute>`：
 
 ```java
 public static final DeferredRegister<Attribute> ATTRIBUTES = DeferredRegister.create(
     BuiltInRegistries.ATTRIBUTE, "yourmodid");
 ```
 
-For the attributes themselves, there are three classes you can choose from:
+对于属性本身，你有三个类可供选择：
 
-- `RangedAttribute`: Used by most attributes, this class defines lower and upper bounds for the attribute, along with a default value.
-- `PercentageAttribute`: Like `RangedAttribute`, but is displayed in percent instead of float values. NeoForge-added.
-- `BooleanAttribute`: An attribute that only has semantic true (\> 0) and false (\<\= 0). This still uses doubles internally. NeoForge-added.
+- `RangedAttribute`：多数属性使用的类，它为属性定义了上下界以及一个默认值。
+- `PercentageAttribute`：与 `RangedAttribute` 类似，但以百分比而非 float 值显示。NeoForge 新增。
+- `BooleanAttribute`：一个只有语义上的真（\> 0）与假（\<\= 0）的属性。它内部仍使用 double。NeoForge 新增。
 
-Using `RangedAttribute` as an example (the other two work similarly), registering an attribute would look like this:
+以 `RangedAttribute` 为例（另外两个用法类似），注册一个属性会是这样：
 
 ```java
 public static final Holder<Attribute> MY_ATTRIBUTE = ATTRIBUTES.register("my_attribute", () -> new RangedAttribute(
@@ -238,14 +238,14 @@ public static final Holder<Attribute> MY_ATTRIBUTE = ATTRIBUTES.register("my_att
 ));
 ```
 
-And that's it! Just don't forget to register your `DeferredRegister` to the mod bus, and off you go.
+就是这样！只是别忘了把你的 `DeferredRegister` 注册到 mod 总线上，然后就大功告成了。
 
 :::info
-We use `Holder<Attribute>` here instead of `Supplier<RangedAttribute>` like with many other registered objects, as it makes working with entities a lot easier (most entity methods expect `Holder<Attribute>`s).
+这里我们使用 `Holder<Attribute>`，而不像许多其他已注册对象那样使用 `Supplier<RangedAttribute>`，因为这会让与实体打交道容易得多（大多数实体方法都期望接收 `Holder<Attribute>`）。
 
-If, for some reason, you need a `Supplier<RangedAttribute>` (or a supplier of any other subclass of `Attribute`), you should use `DeferredHolder<Attribute, RangedAttribute>` as the type.
+如果出于某种原因，你需要一个 `Supplier<RangedAttribute>`（或 `Attribute` 任何其他子类的 supplier），那么应当使用 `DeferredHolder<Attribute, RangedAttribute>` 作为类型。
 
-The same rules also apply for any other `Attribute` subclass, i.e., we generally use `Holder<Attribute>` instead of `Supplier<PercentageAttribute>` or `Supplier<BooleanAttribute>`.
+同样的规则也适用于 `Attribute` 的任何其他子类，即我们通常使用 `Holder<Attribute>` 而非 `Supplier<PercentageAttribute>` 或 `Supplier<BooleanAttribute>`。
 :::
 
 [custom]: #custom-attributes

@@ -1,12 +1,12 @@
-# Particles
+# 粒子 {#particles}
 
-Particles are visual effects commonly spawned using their associated particle type. They can be spawned both client and server [side], but being mostly visual in nature, critical parts exist only on the physical (and logical) client side.
+粒子是常见的视觉效果，通常通过其关联的粒子类型来生成。它们既可以在客户端也可以在服务端生成[（端）][side]，但由于本质上主要是视觉效果，关键部分只存在于物理端（以及逻辑端）的客户端。
 
-This article covers the construction and use of particle types and particle descriptions. For more rendering-specific information, see the companion [client particles][clientparticle] article.
+本文介绍粒子类型和粒子描述的构建与使用。有关渲染方面更具体的信息，参见配套的[客户端粒子][clientparticle]一文。
 
-## Registering `ParticleType`s
+## 注册 `ParticleType` {#registering-particletypes}
 
-Particles are registered using `ParticleType`s. These work similar to `EntityType`s or `BlockEntityType`s, in that there's a `Particle` class - every spawned particle is an instance of that class -, and then there's the `ParticleType` class, holding some common information, that is used for registration. `ParticleType`s are a [registry], which means that we want to register them using a `DeferredRegister` like all other registered objects:
+粒子使用 `ParticleType` 进行注册。它的工作方式与 `EntityType` 或 `BlockEntityType` 类似：存在一个 `Particle` 类——每个生成的粒子都是该类的一个实例——然后还有一个 `ParticleType` 类，持有一些通用信息，用于注册。`ParticleType` 是一种[注册表][registry]，这意味着我们要像所有其他注册对象一样，使用 `DeferredRegister` 来注册它们：
 
 ```java
 public class MyParticleTypes {
@@ -28,12 +28,12 @@ public class MyParticleTypes {
 ```
 
 :::info
-A `ParticleType` is only necessary if you need to work with particles on the server side. The client can also use `Particle`s directly.
+只有当你需要在服务端处理粒子时，才需要 `ParticleType`。客户端也可以直接使用 `Particle`。
 :::
 
-## Custom `ParticleType`s
+## 自定义 `ParticleType` {#custom-particletypes}
 
-While for most cases `SimpleParticleType` suffices, it is sometimes necessary to attach additional data to the particle on the server side. This is where a custom `ParticleType` and an associated custom `ParticleOptions` are required. Let's start with the `ParticleOptions`, as that is where the information is actually stored:
+虽然大多数情况下 `SimpleParticleType` 就足够了，但有时需要在服务端为粒子附加额外数据。这时就需要一个自定义 `ParticleType` 以及关联的自定义 `ParticleOptions`。我们先从 `ParticleOptions` 开始，因为信息实际上是存储在它里面的：
 
 ```java
 public class MyParticleOptions implements ParticleOptions {
@@ -56,7 +56,7 @@ public class MyParticleOptions implements ParticleOptions {
 }
 ```
 
-We then use this `ParticleOptions` implementation in our custom `ParticleType`...
+然后我们在自定义 `ParticleType` 中使用这个 `ParticleOptions` 实现……
 
 ```java
 public class MyParticleType extends ParticleType<MyParticleOptions> {
@@ -79,7 +79,7 @@ public class MyParticleType extends ParticleType<MyParticleOptions> {
 }
 ```
 
-... and reference it during [registration][registry]:
+……并在[注册][registry]时引用它：
 
 ```java
 public static final Supplier<MyParticleType> MY_CUSTOM_PARTICLE = PARTICLE_TYPES.register(
@@ -88,7 +88,7 @@ public static final Supplier<MyParticleType> MY_CUSTOM_PARTICLE = PARTICLE_TYPES
 );
 ```
 
-The registered particle is then passed into `ParticleOptions#getType`:
+随后将注册的粒子传入 `ParticleOptions#getType`：
 
 ```java
 public class MyParticleOptions implements ParticleOptions {
@@ -102,11 +102,11 @@ public class MyParticleOptions implements ParticleOptions {
 }
 ```
 
-## Particle Descriptions
+## 粒子描述 {#particle-descriptions}
 
-Particle descriptions are JSON files in the `assets/<namespace>/particles` directory. A particle description has the same name as its associated [particle type][particletype], and consists of a list of textures relative to `assets/<namespace>/textures/particles`.
+粒子描述是位于 `assets/<namespace>/particles` 目录下的 JSON 文件。粒子描述与其关联的[粒子类型][particletype]同名，由一组相对于 `assets/<namespace>/textures/particles` 的纹理列表组成。
 
-A particle description looks something like this:
+一个粒子描述看起来大致如下：
 
 ```json5
 {
@@ -122,11 +122,11 @@ A particle description looks something like this:
 }
 ```
 
-During resource reload, the `ParticleResources` loads all particle descriptions and stitches the textures into the `TextureAtlas#LOCATION_PARTICLES` atlas. Then, a `SpriteSet` is created for each description, containing a list of the specified `TextureAtlasSprite`s.
+在资源重载期间，`ParticleResources` 会加载所有粒子描述，并将纹理拼接到 `TextureAtlas#LOCATION_PARTICLES` 图集中。然后，为每个描述创建一个 `SpriteSet`，其中包含指定的 `TextureAtlasSprite` 列表。
 
-### Using the Description
+### 使用描述 {#using-the-description}
 
-To allow a [particle] to make use of its description, the `ParticleType` must be associated with a [`ParticleProvider`][provider] that takes in the `SpriteSet` using the [client-side][side] [mod bus][modbus] [event] `RegisterParticleProvidersEvent`:
+要让[粒子][particle]能够使用其描述，`ParticleType` 必须借助[客户端][side]的 [mod 总线][modbus][事件][event] `RegisterParticleProvidersEvent`，与一个接收 `SpriteSet` 的 [`ParticleProvider`][provider] 关联起来：
 
 ```java
 public class MyParticleProvider implements ParticleProvider<SimpleParticleType> {
@@ -151,12 +151,12 @@ public static void registerParticleProviders(RegisterParticleProvidersEvent even
 ```
 
 :::warning
-If a particle description is created for a particle type with no associated `ParticleProvider` via `RegisterParticleProvidersEvent#registerSpriteSet`, then a 'Redundant texture list' message will be logged.
+如果为某个粒子类型创建了粒子描述，却没有通过 `RegisterParticleProvidersEvent#registerSpriteSet` 关联对应的 `ParticleProvider`，那么日志中将会记录一条 'Redundant texture list' 消息。
 :::
 
-### Datagen
+### 数据生成 {#datagen}
 
-Particle definition files can also be [datagenned][datagen] by extending `ParticleDescriptionProvider` and overriding the `#addDescriptions()` method:
+粒子定义文件也可以通过继承 `ParticleDescriptionProvider` 并重写 `#addDescriptions()` 方法来[数据生成][datagen]：
 
 ```java
 public class MyParticleDescriptionProvider extends ParticleDescriptionProvider {
@@ -190,7 +190,7 @@ public class MyParticleDescriptionProvider extends ParticleDescriptionProvider {
 }
 ```
 
-Don't forget to add the provider to the `GatherDataEvent.Client`:
+别忘了把提供器添加到 `GatherDataEvent.Client`：
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -199,13 +199,13 @@ public static void gatherData(GatherDataEvent.Client event) {
 }
 ```
 
-## Spawning Particles
+## 生成粒子 {#spawning-particles}
 
-As a reminder from before, the server only knows [`ParticleType`s][particletype] and [`ParticleOption`s][options], while the client works directly with `Particle`s provided by `ParticleProvider`s that are associated with a `ParticleType`. Consequently, the ways in which particles are spawned are vastly different depending on the side you are on.
+正如前文所述，服务端只知道 [`ParticleType`][particletype] 和 [`ParticleOption`][options]，而客户端则直接使用由 `ParticleProvider` 提供的 `Particle`，这些 `ParticleProvider` 又与某个 `ParticleType` 关联。因此，生成粒子的方式会因你所处的端而大不相同。
 
-- **Common code**: Call `Level#addParticle` or `Level#addAlwaysVisibleParticle`. This is the preferred way of creating particles that are visible to everyone.
-- **Client code**: Use the common code way. Alternatively, create a `new Particle()` with the particle class of your choice and call `Minecraft.getInstance().particleEngine#add(Particle)` with that particle. Note that particles added this way will only display for the client and thus not be visible to other players.
-- **Server code**: Call `ServerLevel#sendParticles`. Used in vanilla by the `/particle` command.
+- **通用代码**：调用 `Level#addParticle` 或 `Level#addAlwaysVisibleParticle`。这是创建对所有人可见的粒子的首选方式。
+- **客户端代码**：使用通用代码的方式。或者，用你选择的粒子类创建一个 `new Particle()`，并对该粒子调用 `Minecraft.getInstance().particleEngine#add(Particle)`。注意，以这种方式添加的粒子只会为该客户端显示，因此其他玩家看不到它。
+- **服务端代码**：调用 `ServerLevel#sendParticles`。原版中 `/particle` 命令即用此方式。
 
 [clientparticle]: ../../rendering/particles.md
 [datagen]: ../index.md#data-generation

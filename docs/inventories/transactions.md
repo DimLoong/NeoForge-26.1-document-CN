@@ -1,18 +1,18 @@
-# Transactions
+# Transactions {#transactions}
 
-Transactions are a NeoForged-added system for managing the communication between different inventories transferring their contents. Each transfer is managed through three basic concepts: the `Resource`s being transferred, the `ResourceHandler`s representing the inventories, and the `Transaction` facilitating the communication.
+事务（Transaction）是 NeoForged 新增的一套系统，用于管理不同物品栏之间转移内容物时的通信。每一次转移都通过三个基本概念来管理：被转移的 `Resource`、代表物品栏的 `ResourceHandler`，以及负责促成通信的 `Transaction`。
 
-## Resources
+## 资源（Resource） {#resources}
 
-`Resource`s represent the backing object that is transacted upon. Each `Resource` is meant to be immutable, containing what kind of object is used, not the number of objects being transferred. For example, the transaction 'five apples for an emerald', contains the `Resource`s 'apple' and 'emerald', not 'five apples' and 'one emerald'.
+`Resource` 表示被事务操作的底层对象。每个 `Resource` 都应是不可变的，它只包含所使用对象的种类，而不包含被转移对象的数量。例如，“五个苹果换一颗绿宝石”这笔交易包含的 `Resource` 是“苹果”和“绿宝石”，而不是“五个苹果”和“一颗绿宝石”。
 
-As such, every `Resource` has the following three properties:
+因此，每个 `Resource` 都具有以下三个特性：
 
-* **Immutability**: Anything stored in the `Resource` object should be non-changing.
-* **Count Agnostic**: The `Resource` does not contain any information about how much of an object there is.
-* **Equality**: No matter how the `Resource` is constructed, if they represent the same object, they must be equal.
+* **不可变性**：`Resource` 对象中存储的任何内容都应保持不变。
+* **与数量无关**：`Resource` 不包含任何关于某个对象有多少个的信息。
+* **相等性**：无论 `Resource` 如何构造，只要它们表示同一个对象，它们就必须相等。
 
-NeoForge provides resources for [items] (via `ItemResource`) and fluids (via `FluidResource`) by representing the object along with its unique [data components][datacomponent].
+NeoForge 为[物品][items]（通过 `ItemResource`）和流体（通过 `FluidResource`）提供了资源，其表示方式是把对象及其独有的[数据组件][datacomponent]一并表示出来。
 
 ```java
 // Create the resource from its backing object
@@ -25,7 +25,7 @@ ItemResource itemWithComponents = ItemResource.of(stack);
 FluidResource fluid = FluidResource.of(Fluids.WATER);
 ```
 
-We can also create our own `Resource` like so:
+我们也可以像这样创建自己的 `Resource`：
 
 ```java
 // Let's assume we are trying to represent the following object:
@@ -125,14 +125,14 @@ public final class ExampleResource implements Resource {
 ```
 
 :::note
-While `Resource`s can be used for primitives, they are not strictly necessary (e.g., energy does not have a `Resource` as it is backed by a `long`). However, it does require reimplementing some of the resource behavior yourself, as the [handler system described below][handler] requires the use of a `Resource`.
+虽然 `Resource` 可以用于基本类型，但并非严格必需（例如能量就没有 `Resource`，因为它由一个 `long` 支撑）。不过，这样做需要你自行重新实现部分资源行为，因为下文所述的[处理器系统][handler]要求使用 `Resource`。
 :::
 
-## Resource Handlers
+## 资源处理器（Resource Handler） {#resource-handlers}
 
-`ResourceHandler<T>`s represent the backing inventories within a transaction, where `T` is the type of the `Resource` backing the object. Each handler maps to its associated contents using an index (e.g., index `0` maps to the first slot, index `1` maps to the second, etc). For every index, you can check whether a `Resource` can be contained at the location (`isValid`) or what `Resource` is already stored there (`getResource`). You can also check how many `Resource`s can be stored at the location (`getCapacityAsLong` / `getCapacityAsInt`) along with how many of a `Resource` is stored there (`getAmountAsLong` / `getAmountAsInt`). The number of indices accessible to the handler represents its `size`.
+`ResourceHandler<T>` 表示事务中作为底层的物品栏，其中 `T` 是支撑该对象的 `Resource` 的类型。每个处理器都通过一个索引将其关联到相应的内容物（例如索引 `0` 映射到第一个槽位，索引 `1` 映射到第二个，以此类推）。对每个索引，你都可以检查某个 `Resource` 能否被容纳在该位置（`isValid`），或者该位置已经存储了什么 `Resource`（`getResource`）。你还可以检查该位置能存储多少个 `Resource`（`getCapacityAsLong` / `getCapacityAsInt`），以及该位置已存储了多少个某种 `Resource`（`getAmountAsLong` / `getAmountAsInt`）。处理器可访问的索引数量就是它的 `size`（大小）。
 
-To modify the contents of the backing inventory, `ResourceHandler` provides two methods: `insert` to put a `Resource` in, and `extract` to take a `Resource` out. `insert` and `extract` take in three arguments: the `Resource` being operated upon, the `int` amount to put in / take out, and a `TransactionContext` representing what [transaction] that is performing the operation, returning the amount put in / taken out. Both of these methods will find the first indices available to put in / take out the contents to / from. If the handler should only transact on one specific index, then both `insert` and `extract` provide an overload that takes in the `int` index to put in / take out `Resource`s to / from.
+为了修改底层物品栏的内容物，`ResourceHandler` 提供了两个方法：`insert` 用于放入 `Resource`，`extract` 用于取出 `Resource`。`insert` 和 `extract` 接收三个参数：被操作的 `Resource`、要放入/取出的数量（`int`），以及表示执行该操作的[事务][transaction]的 `TransactionContext`，返回实际放入/取出的数量。这两个方法都会寻找第一个可用于放入/取出内容物的索引。如果处理器只应对某个特定索引进行操作，那么 `insert` 和 `extract` 都提供了一个重载，接收要放入/取出 `Resource` 的 `int` 索引。
 
 ```java
 // For some ResourceHandler<ItemResource> handler
@@ -147,7 +147,7 @@ int indexCapacity = handler.getCapacityAsInt(0);
 boolean canAcceptApples = handler.isValid(0, ItemResource.of(Items.APPLE));
 ```
 
-There are many different types of `ResourceHandler`s depending on what the backing inventory is. Some handlers wrap around existing vanilla inventories (e.g., `VanillaContainerWrapper` for [`Container`s][container], `PlayerInventoryWrapper` for [player `Inventory`s][playerinv], `LivingEntityEquipmentWrapper` for a [living entity's][livingentity] equipment slots).
+根据底层物品栏的不同，`ResourceHandler` 有许多不同的类型。有些处理器包裹现有的原版物品栏（例如面向 [`Container`][container] 的 `VanillaContainerWrapper`、面向[玩家 `Inventory`][playerinv] 的 `PlayerInventoryWrapper`、面向[生物实体][livingentity]装备槽位的 `LivingEntityEquipmentWrapper`）。
 
 ```java
 // Wrapping around an existing container.
@@ -161,7 +161,7 @@ ResourceHandler<ItemResource> playerInv = PlayerInventoryWrapper.of(player);
 ResourceHandler<ItemResource> head = LivingEntityEquipmentWrapper.of(entity, EquipmentSlot.HEAD);
 ```
 
-Other handlers are themselves inventories, providing a convenience for those wanting to make use of the system without much implementing (e.g., `ItemStacksResourceHandler` for a list of [`ItemStack`s][itemstack], `FluidStacksResourceHandler` for a list of `FluidStack`s).
+另一些处理器本身就是物品栏，为那些想利用这套系统而又不想做太多实现工作的人提供了便利（例如面向 [`ItemStack`][itemstack] 列表的 `ItemStacksResourceHandler`、面向 `FluidStack` 列表的 `FluidStacksResourceHandler`）。
 
 ```java
 // Creating an `ItemStack` storage.
@@ -177,7 +177,7 @@ FluidStacksResourceHandler fluidStorage = new FluidStacksResourceHandler(
 ```
 
 :::note
-If you plan to use one of the `StacksResourceHandler`s as an inventory, it is highly recommended to override `onContentsChanged` to handle any disk writing or network syncing.
+如果你打算把某个 `StacksResourceHandler` 用作物品栏，强烈建议重写 `onContentsChanged`，以处理任何磁盘写入或网络同步。
 
 ```java
 // Example for block entities
@@ -197,7 +197,7 @@ public class ExampleBlockEntity extends BlockEntity {
 
 :::
 
-We can also create our own `ResourceHandler` like so:
+我们也可以像这样创建自己的 `ResourceHandler`：
 
 ```java
 public class ExampleResourceHandler implements ResourceHandler<ExampleResource> {
@@ -310,7 +310,7 @@ public class ExampleResourceHandler implements ResourceHandler<ExampleResource> 
 }
 ```
 
-Or for a `StacksResourceHandler`:
+或者为 `StacksResourceHandler`：
 
 ```java
 public class ExampleStacksResourceHandler extends StacksResourceHandler<ExampleObject, ExampleResource> {
@@ -362,25 +362,25 @@ public class ExampleStacksResourceHandler extends StacksResourceHandler<ExampleO
 ```
 
 :::tip
-NeoForge also provides a `ResourceStacksResourceHandler`, using `ResourceStack`s as the stored contents, for `Resource` implementations that are themselves the actual objects within an inventory.
+NeoForge 还提供了一个 `ResourceStacksResourceHandler`，它以 `ResourceStack` 作为存储内容，适用于那些 `Resource` 实现本身就是物品栏内实际对象的情形。
 :::
 
-### Energy Handler
+### 能量处理器 {#energy-handler}
 
-`EnergyHandler` is a trimmed down version of `ResourceHandler`, only containing one index storing a `long`. As such, it only checks how many units can be stored (`getCapacityAsLong` / `getCapacityAsInt`) along with how many units already stored (`getAmountAsLong` / `getAmountAsInt`). Additionally, `insert` and `extract` no longer take in an index since there's only one, and also no longer require a `Resource`, as the backing object is a primitive.
+`EnergyHandler` 是 `ResourceHandler` 的一个精简版本，只包含一个存储 `long` 的索引。因此，它只检查能存储多少单位（`getCapacityAsLong` / `getCapacityAsInt`）以及已存储多少单位（`getAmountAsLong` / `getAmountAsInt`）。此外，由于只有一个索引，`insert` 和 `extract` 不再接收索引参数，也不再需要 `Resource`，因为其底层对象是一个基本类型。
 
-Like `ResourceHandler`, there are different types of `EnergyHandler`s depending on your use case. The most common one is `SimpleEnergyHandler`, which provides a basic implementation along with a limit for insert / extract.
+与 `ResourceHandler` 一样，`EnergyHandler` 也有不同类型，取决于你的用例。最常见的是 `SimpleEnergyHandler`，它提供了一个基础实现，并带有对 insert / extract 的限制。
 
 ```java
 // Create an energy handler.
 EnergyHandler energy = new SimpleEnergyHandler(1000);
 ```
 
-### Item Access
+### 物品访问（Item Access） {#item-access}
 
-`ItemAccess` is also a trimmed down version of `ResourceHandler`, providing access to a single item in a specific storage location. This is typically used within [item capabilities][capabilities] to modify the item the capability is attached to. As such, it only provides the resource (`getResource`) and amount of the item currently present (`getAmount`). Additionally, `insert` and `extract` no longer take in an index since there's only one. However, as items can also store data, the `ItemAccess` provides a way to access the stored data in through [capabilities] via `getCapability`, assuming it is an `ItemCapability` with an `ItemAccess` context.
+`ItemAccess` 同样是 `ResourceHandler` 的一个精简版本，提供对某个特定存储位置中单个物品的访问。它通常用于[物品 Capability][capabilities] 中，以修改该 Capability 所依附的物品。因此，它只提供当前物品的资源（`getResource`）和数量（`getAmount`）。此外，由于只有一个索引，`insert` 和 `extract` 不再接收索引参数。不过，由于物品也可以存储数据，`ItemAccess` 提供了一种方式，可通过 `getCapability` 借助 [Capability][capabilities] 访问所存储的数据，前提是它是一个带有 `ItemAccess` 上下文的 `ItemCapability`。
 
-Like `ResourceHandler`, there are different types of `ItemAccess`es depending on usecase. The two most common are `PlayerItemAccess`, which wraps around a specific slot in the player inventory; and `HandlerItemAccess`, which wraps around a specific index in a `ResourceHandler`.
+与 `ResourceHandler` 一样，`ItemAccess` 也有不同类型，取决于用例。最常见的两种是 `PlayerItemAccess`（包裹玩家物品栏中的某个特定槽位）和 `HandlerItemAccess`（包裹某个 `ResourceHandler` 中的某个特定索引）。
 
 ```java
 // Create an item access for some location.
@@ -396,11 +396,11 @@ int count = access.getAmount();
 ResourceHandler<FluidResource> fluidContainer = access.getCapability(Capabilities.Fluid.ITEM);
 ```
 
-## Transferring Between Handlers
+## 在处理器之间转移 {#transferring-between-handlers}
 
-`Transaction`s facilitate the transfer of `Resource`s between `ResourceHandler`s. Here, resources are `insert`ed and `extract`ed from their `ResourceHandler`s. A transfer is considered valid or complete after insertion and extraction once `Transaction#commit` has been called.
+`Transaction` 促成 `Resource` 在 `ResourceHandler` 之间的转移。在这里，资源从各自的 `ResourceHandler` 中被 `insert`（放入）和 `extract`（取出）。一次转移只有在完成放入和取出、并且调用了 `Transaction#commit` 之后，才被视为有效或完整。
 
-`Transaction` is `AutoCloseable`, meaning the standard way to initiate a transaction is through a try-with-resources block using `Transaction#openRoot`:
+`Transaction` 是 `AutoCloseable` 的，这意味着发起事务的标准方式是通过 try-with-resources 块，配合 `Transaction#openRoot` 使用：
 
 ```java
 // Let's assume we have two `ResourceHandler<ItemResource>`s apples, emeralds.
@@ -429,7 +429,7 @@ try (Transaction tx = Transaction.openRoot()) {
 
 :::tip
 
-`ResourceHandlerUtil` provides a number of useful methods for checking the current state of a `ResourceHandler` or transacting between handlers in general. For example, the emerald to apples trade above could've been simplified like so:
+`ResourceHandlerUtil` 提供了许多有用的方法，用于检查某个 `ResourceHandler` 的当前状态，或在处理器之间进行转移。例如，上面绿宝石换苹果的交易本可以简化成这样：
 
 ```java
 // Let's assume we have two `ResourceHandler<ItemResource>`s apples, emeralds.
@@ -464,7 +464,7 @@ try (Transaction tx = Transaction.openRoot()) {
 
 :::
 
-`Transaction`s can also have `Transaction`s within themselves via `Transation#open` if multiple are occurring at the same time.
+如果同一时刻发生多笔事务，`Transaction` 也可以通过 `Transation#open` 在其内部嵌套 `Transaction`。
 
 ```java
 // Open the transaction.
@@ -494,13 +494,13 @@ try (Transaction tx = Transaction.openRoot()) {
 }
 ```
 
-### Taking Snapshots
+### 拍摄快照 {#taking-snapshots}
 
-On its own, `Transaction#commit` does nothing. As such, the insertions and extractions performed are permanent regardless of whether the transfer was successful or not. What we want is that for any `Transaction`, the transfer only happens if it is `commit`ted. Otherwise, the transfer should be reverted.
+单凭其自身，`Transaction#commit` 什么也不做。因此，无论转移是否成功，所执行的放入和取出都是永久性的。而我们想要的是：对于任何 `Transaction`，转移只有在被 `commit` 时才真正发生；否则，转移应被撤销。
 
-This is where the `SnapshotJournal<T>` comes in. As the name implies, it can take a `T` 'snapshot' of the current handler state right before modifying its contents. Then, it can either release the snapshot if the transaction was successful, or it can revert the handler back to its previous state. Each `SnapshotJournal` must implement at least two methods: `createSnapshot` to actually create the saved state, and `revertToSnapshot` to revert the handler back to the specified state. If any backing objects need to be notified or updated due to the changes in the handler, then the journal can also override `onRootCommit` to handle these changes.
+这正是 `SnapshotJournal<T>` 的用武之地。顾名思义，它可以在修改处理器内容之前，为处理器的当前状态拍摄一份 `T` 类型的“快照”。随后，如果事务成功，它可以释放该快照；如果失败，它可以把处理器还原到之前的状态。每个 `SnapshotJournal` 至少必须实现两个方法：`createSnapshot`（真正创建保存的状态）和 `revertToSnapshot`（把处理器还原到指定状态）。如果因处理器的变化而需要通知或更新任何底层对象，那么该 journal 还可以重写 `onRootCommit` 来处理这些变化。
 
-All NeoForge `ResourceHandler` implementations use the `SnapshotJournal` in some fashion, either directly on the handler itself or as a field within. It's only when making new `ResourceHandler`s that the `SnapshotJournal` needs to be implemented.
+所有 NeoForge 的 `ResourceHandler` 实现都以某种方式使用了 `SnapshotJournal`，要么直接在处理器本身上使用，要么作为其中的一个字段。只有在编写全新的 `ResourceHandler` 时，才需要实现 `SnapshotJournal`。
 
 ```java
 // We can use the stored object as the snapshot value since we only ever
@@ -603,7 +603,7 @@ public class ExampleResourceHandler extends SnapshotJournal<ExampleObject> imple
 }
 ```
 
-With that, our transactions will now properly handle the state of the inventories as well:
+这样一来，我们的事务现在也能正确处理物品栏的状态了：
 
 ```java
 // Let's assume we have two `ResourceHandler<ExampleResource>`s exampleA, exampleB.

@@ -2,22 +2,22 @@
 sidebar_position: 2
 ---
 
-# Data Components
+# 数据组件 {#data-components}
 
-Data components are key-value pairs within a map used to store data on the `Holder` of a registry object. Each piece of data, such as firework explosions or tools, are stored as actual objects on the holder, making the values visible and operable without having to dynamically transform a general encoded instance (e.g., `CompoundTag`, `JsonElement`).
+数据组件是映射中的键值对，用于在某个注册对象的 `Holder` 上存储数据。每一条数据，例如烟花爆炸或工具，都作为真实对象存储在 holder 上，从而使这些值可见、可操作，而无需动态地把某个通用的编码实例（例如 `CompoundTag`、`JsonElement`）转换回来。
 
-## `DataComponentType`
+## `DataComponentType` {#datacomponenttype}
 
-Each data component has an associated `DataComponentType<T>`, where `T` is the component value type. The `DataComponentType` represents a key to reference the stored component value along with some codecs to handle reading and writing to the disk and network, if desired.
+每个数据组件都有一个关联的 `DataComponentType<T>`，其中 `T` 是组件值的类型。`DataComponentType` 表示一个用于引用所存组件值的键，并在需要时附带一些用于处理磁盘和网络读写的 codec。
 
-A list of existing components can be found within `DataComponents`.
+现有组件的列表可在 `DataComponents` 中找到。
 
-### Creating Custom Data Components
+### 创建自定义数据组件 {#creating-custom-data-components}
 
-The component value associated with the `DataComponentType` must implement `hashCode` and `equals` and should be considered **immutable** when stored.
+与 `DataComponentType` 关联的组件值必须实现 `hashCode` 和 `equals`，并且在存储时应被视为**不可变的**。
 
 :::note
-Component values can very easily be implemented using a record. Record fields are immutable and implement `hashCode` and `equals`.
+使用 record 可以非常轻松地实现组件值。record 的字段是不可变的，并且会实现 `hashCode` 和 `equals`。
 :::
 
 ```java
@@ -54,19 +54,19 @@ public class ExampleClass {
 }
 ```
 
-A standard `DataComponentType` can be created via `DataComponentType#builder` and built using `DataComponentType.Builder#build`. The builder contains four settings: `persistent`, `networkSynchronized`, `cacheEncoding`, and `ignoreSwapAnimation`.
+标准的 `DataComponentType` 可通过 `DataComponentType#builder` 创建，并用 `DataComponentType.Builder#build` 构建。该构建器包含四项设置：`persistent`、`networkSynchronized`、`cacheEncoding` 和 `ignoreSwapAnimation`。
 
-`persistent` specifies the [`Codec`][codec] used to read and write the component value to disk. `networkSynchronized` specifies the `StreamCodec` used to read and write the component across the network. If `networkSynchronized` is not specified, then the `Codec` provided in `persistent` will be wrapped and used as the [`StreamCodec`][streamcodec].
+`persistent` 指定用于向磁盘读写组件值的 [`Codec`][codec]。`networkSynchronized` 指定用于跨网络读写组件的 `StreamCodec`。如果未指定 `networkSynchronized`，则 `persistent` 中提供的 `Codec` 会被包装并用作 [`StreamCodec`][streamcodec]。
 
 :::warning
-Either `persistent` or `networkSynchronized` must be provided in the builder; otherwise, a `NullPointerException` will be thrown. If no data should be sent across the network, then set `networkSynchronized` to `StreamCodec#unit`, providing the default component value.
+构建器中必须提供 `persistent` 或 `networkSynchronized` 二者之一；否则将抛出 `NullPointerException`。如果不应通过网络发送任何数据，则将 `networkSynchronized` 设为 `StreamCodec#unit`，并提供默认的组件值。
 :::
 
-`cacheEncoding` caches the encoding result of the `Codec` such that any subsequent encodes uses the cached value if the component value hasn't changed. This should only be used if the component value is expected to rarely or never change.
+`cacheEncoding` 会缓存 `Codec` 的编码结果，从而在组件值未发生变化时，后续的编码都使用缓存值。仅当预期组件值极少或永不改变时才应使用它。
 
-`ignoreSwapAnimation` will cancel the swap animation if an item has this component on it. If this is not set, the animation could still be canceled depending on the client item properties.
+`ignoreSwapAnimation` 会在物品带有此组件时取消切换动画。如果不设置此项，动画仍可能根据客户端物品属性而被取消。
 
-`DataComponentType` are registry objects and must be [registered].
+`DataComponentType` 是注册对象，必须被[注册][registered]。
 
 ```java
 // Using ExampleRecord(int, boolean)
@@ -119,11 +119,11 @@ public static final Supplier<DataComponentType<ExampleRecord>> NO_NETWORK_EXAMPL
 );
 ```
 
-## The Component Map
+## 组件映射 {#the-component-map}
 
-All data components are stored within a `DataComponentMap`, using the `DataComponentType` as the key and the object as the value. `DataComponentMap` functions similarly to a read-only `Map`. As such, there are methods to `#get` an entry given its `DataComponentType` or provide a default if not present (via `#getOrDefault`).
+所有数据组件都存储在一个 `DataComponentMap` 中，以 `DataComponentType` 作为键、以对象作为值。`DataComponentMap` 的功能类似于只读的 `Map`。因此，它提供了在给定 `DataComponentType` 时 `#get` 一个条目的方法，或在条目不存在时提供默认值（通过 `#getOrDefault`）。
 
-For a registry object, the `DataComponentMap` can be obtained through `Holder#components`.
+对于一个注册对象，可通过 `Holder#components` 获取其 `DataComponentMap`。
 
 ```java
 // For some Item item
@@ -134,11 +134,11 @@ For a registry object, the `DataComponentMap` can be obtained through `Holder#co
 DyeColor color = item.builtInRegistryHolder().components().get(DataComponents.BASE_COLOR);
 ```
 
-### `PatchedDataComponentMap`
+### `PatchedDataComponentMap` {#patcheddatacomponentmap}
 
-As the default `DataComponentMap` only provides methods for read-based operations, write-based operations are supported using the subclass `PatchedDataComponentMap`. This includes `#set`ting the value of a component or `#remove`ing it altogether.
+由于默认的 `DataComponentMap` 只提供基于读取的操作方法，基于写入的操作则由子类 `PatchedDataComponentMap` 支持。这包括 `#set` 组件的值或将其彻底 `#remove`。
 
-`PatchedDataComponentMap` stores changes using a prototype and patch map. The prototype is a `DataComponentMap` that contains the default components and their values this map should have. The patch map is a map of `DataComponentType`s to `Optional` values that contain the changes made to the default components.
+`PatchedDataComponentMap` 使用一个原型（prototype）和一个补丁映射（patch map）来存储更改。原型是一个 `DataComponentMap`，包含该映射应当拥有的默认组件及其值。补丁映射是一个从 `DataComponentType` 到 `Optional` 值的映射，其中包含对默认组件所做的更改。
 
 ```java
 // For some PatchedDataComponentMap map
@@ -153,16 +153,16 @@ map.remove(DataComponents.BASE_COLOR);
 ```
 
 :::danger
-Both the prototype and patch map are part of the hash code for the `PatchedDataComponentMap`. As such, any component values within the map should be treated as **immutable**. Always call `#set` or one of its referring methods discussed below after modifying the value of a data component.
+原型和补丁映射都属于 `PatchedDataComponentMap` 哈希码的一部分。因此，映射中的任何组件值都应被视为**不可变的**。在修改某个数据组件的值之后，务必调用 `#set` 或下文讨论的其某个引用方法。
 :::
 
-## The Component Getter
+## 组件获取器 {#the-component-getter}
 
-All instances that can provide data components usually implement `DataComponentGetter`. `DataComponentGetter` effectively gets the component values for a data type, either through a backing map or creating the value on the fly.
+所有能够提供数据组件的实例通常都会实现 `DataComponentGetter`。`DataComponentGetter` 实际上负责获取某个数据类型的组件值，可能是通过一个后备映射，也可能是即时创建该值。
 
-## The Component Holder
+## 组件持有者 {#the-component-holder}
 
-All instances that reference the backing data component map implement `DataComponentHolder`, which extends `DataComponentGetter`. `DataComponentHolder` is effectively a delegate to the read-only methods within `DataComponentMap`.
+所有引用后备数据组件映射的实例都会实现 `DataComponentHolder`，它继承自 `DataComponentGetter`。`DataComponentHolder` 实际上是 `DataComponentMap` 中只读方法的委托。
 
 ```java
 // For some DataComponentHolder holder
@@ -172,11 +172,11 @@ All instances that reference the backing data component map implement `DataCompo
 DyeColor color = holder.get(DataComponents.BASE_COLOR);
 ```
 
-### `MutableDataComponentHolder`
+### `MutableDataComponentHolder` {#mutabledatacomponentholder}
 
-`MutableDataComponentHolder` is an interface provided by NeoForge to support write-based methods to the component map. All implementations within Vanilla and NeoForge store data components using a `PatchedDataComponentMap`, so the `#set` and `#remove` methods also have delegates with the same name.
+`MutableDataComponentHolder` 是 NeoForge 提供的一个接口，用于支持对组件映射的基于写入的方法。Vanilla 和 NeoForge 中的所有实现都使用 `PatchedDataComponentMap` 来存储数据组件，因此 `#set` 和 `#remove` 方法也有同名的委托。
 
-In addition, `MutableDataComponentHolder` also provides an `#update` method which handles getting the component value or the provided default if none is set, operating on the value, and then setting it back to the map. The operator is either a `UnaryOperator`, which takes in the component value and returns the component value, or a `BiFunction`, which takes in the component value and another object and returns the component value.
+此外，`MutableDataComponentHolder` 还提供了一个 `#update` 方法，它负责获取组件值（若未设置则获取提供的默认值），对该值进行操作，然后将其重新设置回映射中。操作符可以是一个 `UnaryOperator`（接收组件值并返回组件值），也可以是一个 `BiFunction`（接收组件值和另一个对象并返回组件值）。
 
 ```java
 // For some ItemStack stack
@@ -209,9 +209,9 @@ stack.update(
 );
 ```
 
-## Adding Default Data Components to Items
+## 为物品添加默认数据组件 {#adding-default-data-components-to-items}
 
-Although the mutable data components are stored on an `ItemStack`, a map of default components can be set through `Item`, to be stored on the `Holder<Item>` and finally passed to the `ItemStack` as a prototype when constructed. A component can be added to the `Item` via `Item.Properties#component`. For components that rely on dynamically generated data, such as [datapack registry objects][datapackregistry], `Item.Properties#delayedComponent` should be used instead, constructing the value given the `HolderLookup.Provider` of registries.
+尽管可变的数据组件存储在 `ItemStack` 上，但可以通过 `Item` 设置一份默认组件映射，它会被存储在 `Holder<Item>` 上，并在构造时最终作为原型传递给 `ItemStack`。可通过 `Item.Properties#component` 向 `Item` 添加一个组件。对于依赖动态生成数据的组件，例如[数据包注册表对象][datapackregistry]，则应改用 `Item.Properties#delayedComponent`，在给定注册表的 `HolderLookup.Provider` 时构造该值。
 
 ```java
 // For some DeferredRegister.Items REGISTRAR
@@ -228,7 +228,7 @@ public static final Item COMPONENT_EXAMPLE = REGISTRAR.register("component",
 );
 ```
 
-If the data component should be added to an existing item that belongs to Vanilla or another mod, then `ModifyDefaultComponentsEvent` should be listened for on the [**mod event bus**][modbus]. The event provides the `modify` and `modifyMatching` methods which allows the `DataComponentPatch.Builder` to be modified for the associated items. The builder can `#set` existing components, including `#set`ting them to null which effectively removes them.
+如果要把数据组件添加到属于 Vanilla 或其他 Mod 的某个已有物品上，则应在[**模组事件总线**][modbus]上监听 `ModifyDefaultComponentsEvent`。该事件提供了 `modify` 和 `modifyMatching` 方法，允许针对相关物品修改 `DataComponentPatch.Builder`。该构建器可以 `#set` 已有组件，包括将其 `#set` 为 null——这实际上会移除它们。
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -246,9 +246,9 @@ public static void modifyComponents(ModifyDefaultComponentsEvent event) {
 }
 ```
 
-## Using Custom Component Holders
+## 使用自定义组件持有者 {#using-custom-component-holders}
 
-To create a custom data component holder, the holder object simply needs to implement `MutableDataComponentHolder` and implement the missing methods. The holder object must contain a field representing the `PatchedDataComponentMap` to implement the associated methods.
+要创建一个自定义数据组件持有者，该持有者对象只需实现 `MutableDataComponentHolder` 并实现其缺失的方法即可。该持有者对象必须包含一个表示 `PatchedDataComponentMap` 的字段，以实现相关方法。
 
 ```java
 public class ExampleHolder implements MutableDataComponentHolder {
@@ -293,11 +293,11 @@ public class ExampleHolder implements MutableDataComponentHolder {
 }
 ```
 
-### `DataComponentPatch` and Codecs
+### `DataComponentPatch` 与 Codec {#datacomponentpatch-and-codecs}
 
-To persist components to disk or send information across the network, the holder could send the entire `DataComponentMap`. However, this is generally a waste of information as any defaults will already be present wherever the data is sent to. So, instead, we use a `DataComponentPatch` to send the associated data. `DataComponentPatch`es only contain the patch information of the component map without any defaults. The patches are then applied to the prototype in the receiver's location.
+要把组件持久化到磁盘或跨网络发送信息，持有者可以发送整个 `DataComponentMap`。然而，这通常是一种信息浪费，因为在数据被发送到的目标位置，所有默认值都已经存在了。因此，我们改用 `DataComponentPatch` 来发送相关数据。`DataComponentPatch` 只包含组件映射的补丁信息，而不含任何默认值。随后，这些补丁会在接收方的位置被应用到原型上。
 
-A `DataComponentPatch` can be created from a `PatchedDataComponentMap` via `#patch`. Likewise, `PatchedDataComponentMap#fromPatch` can construct a `PatchedDataComponentMap` given the prototype `DataComponentMap` and a `DataComponentPatch`.
+可通过 `#patch` 从 `PatchedDataComponentMap` 创建出一个 `DataComponentPatch`。同样地，`PatchedDataComponentMap#fromPatch` 可在给定原型 `DataComponentMap` 和一个 `DataComponentPatch` 时，构造出一个 `PatchedDataComponentMap`。
 
 ```java
 public class ExampleHolder implements MutableDataComponentHolder {
@@ -331,7 +331,7 @@ public class ExampleHolder implements MutableDataComponentHolder {
 }
 ```
 
-[Syncing the holder data across the network][network] and reading/writing the data to disk must be done manually.
+[跨网络同步持有者数据][network]以及向磁盘读写数据都必须手动完成。
 
 [datapackregistry]: ../concepts/registries.md#datapack-registries
 [registered]: ../concepts/registries.md

@@ -1,22 +1,22 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Game Tests
+# 游戏测试 {#game-tests}
 
-Game Tests are a way to run in-game unit tests. The system was designed to be scalable and in parallel to run large numbers of different tests efficiently. Testing object interactions and behaviors are simply a few of the many applications of this framework. As the system can either be implemented fully in-code or via [datapacks], both will be shown below.
+游戏测试（Game Test）是一种运行游戏内单元测试的方式。该系统在设计上具有可扩展性，并能并行运行，从而高效地执行大量不同的测试。测试对象交互与行为只是这套框架众多用途中的一小部分。由于该系统既可以完全在代码中实现，也可以通过[数据包][datapacks]实现，下面两种方式都会展示。
 
-## Creating a Game Test
+## 创建游戏测试 {#creating-a-game-test}
 
-A standard Game Test follows four basic steps:
+一个标准的游戏测试遵循四个基本步骤：
 
-1. A structure, or template, is loaded holding the scene on which the interaction or behavior is tested.
-1. An environment for the test to run in.
-1. A registered function to run the logic. If a successful state is reached, then the test succeeds. Otherwise, the test fails and the result is stored within a lectern adjacent to the scene.
-1. A test instance to link the other three objects together.
+1. 加载一个结构，或称模板，其中承载着用于测试交互或行为的场景。
+1. 一个供测试运行的环境。
+1. 一个用于运行逻辑的已注册函数。如果达到成功状态，则测试通过。否则，测试失败，结果会存储在场景旁边的一个讲台（lectern）中。
+1. 一个将其他三个对象连接在一起的测试实例。
 
-## The Test Data
+## 测试数据 {#the-test-data}
 
-All test instances hold some `TestData` which defines how a game test should be run, from its initial configurations to the environment and structure template to use. As the `TestData` is serialized as a `MapCodec`, the data is stored at the root level of the file along with all the other instance-specific parameters.
+所有测试实例都持有一些 `TestData`，它定义了游戏测试应当如何运行，从其初始配置到要使用的环境和结构模板。由于 `TestData` 被序列化为一个 `MapCodec`，这些数据会与所有其他实例特定的参数一起存储在文件的根层级。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -148,19 +148,19 @@ public static void gatherData(GatherDataEvent.Client event) {
 </TabItem>
 </Tabs>
 
-## Structure Templates
+## 结构模板 {#structure-templates}
 
-Game Tests are performed within scenes loaded by structures, or templates. All templates define the dimensions of the scene and the initial data (blocks and entities) that will be loaded. The template must be stored as an `.nbt` file within `data/<namespace>/structure`. `TestData#structure` references the NBT file using a relative `Identifier` (e.g., `examplemod:example_structure` points to `data/examplemod/structure/example_structure.nbt`)
+游戏测试在由结构（或称模板）加载的场景中执行。所有模板都定义了场景的尺寸以及将被加载的初始数据（方块和实体）。模板必须以 `.nbt` 文件的形式存储在 `data/<namespace>/structure` 内。`TestData#structure` 使用一个相对的 `Identifier` 引用该 NBT 文件（例如，`examplemod:example_structure` 指向 `data/examplemod/structure/example_structure.nbt`）。
 
-## Test Environments
+## 测试环境 {#test-environments}
 
-All game tests run in some `TestEnvironmentDefinition`, determining how the current `ServerLevel` should be set up. Then, once the test has finished, the environment is tore down, letting the next instance or instances run. All environments are batched, meaning that if multiple test instances have the same environment, they will run at the same time. All test environments are located within `data/<namespace>/test_environment/<path>.json`.
+所有游戏测试都在某个 `TestEnvironmentDefinition` 中运行，它决定了当前的 `ServerLevel` 应当如何被设置。然后，一旦测试完成，环境会被拆除，以便下一个或下一批实例运行。所有环境都是分批的，这意味着如果多个测试实例拥有相同的环境，它们会同时运行。所有测试环境都位于 `data/<namespace>/test_environment/<path>.json` 内。
 
-Vanilla provides `minecraft:default`, which does not modify the `ServerLevel`. However, there are other supported definition types that can be used to construct an environment.
+原版提供了 `minecraft:default`，它不会修改 `ServerLevel`。不过，还有其他受支持的定义类型可用于构造环境。
 
-### Game Rules
+### 游戏规则 {#game-rules}
 
-This environment type sets the game rules to use for the test. During teardown, the game rules are reset to their default value.
+此环境类型设置用于测试的游戏规则。在拆除期间，游戏规则会被重置为其默认值。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -214,9 +214,9 @@ public static void gatherData(GatherDataEvent.Client event) {
 </TabItem>
 </Tabs>
 
-### Clock Time
+### 时钟时间 {#clock-time}
 
-This environment type sets the specified `WorldClock` time to some non-negative integer, like how the `/time of <clock> set <number>` command is used.
+此环境类型将指定的 `WorldClock` 时间设置为某个非负整数，类似于使用 `/time of <clock> set <number>` 命令的方式。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -272,9 +272,9 @@ public static void gatherData(GatherDataEvent.Client event) {
 </TabItem>
 </Tabs>
 
-### Timeline Attributes
+### 时间线属性 {#timeline-attributes}
 
-This environment type sets the timelines to apply to the environment attributes in a level.
+此环境类型设置要应用于世界中环境属性的时间线（timeline）。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -330,9 +330,9 @@ public static void gatherData(GatherDataEvent.Client event) {
 </TabItem>
 </Tabs>
 
-### Weather
+### 天气 {#weather}
 
-This environment type sets the weather, like to how the `/weather` command is used.
+此环境类型设置天气，类似于使用 `/weather` 命令的方式。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -386,9 +386,9 @@ public static void gatherData(GatherDataEvent.Client event) {
 </TabItem>
 </Tabs>
 
-### Minecraft Functions
+### Minecraft 函数 {#minecraft-functions}
 
-This environment type provides two Identifiers to `mcfunction`s to setup and teardown the level, respectively.
+此环境类型提供两个指向 `mcfunction` 的 Identifier，分别用于设置和拆除世界。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -450,9 +450,9 @@ public static void gatherData(GatherDataEvent.Client event) {
 </TabItem>
 </Tabs>
 
-### Composites
+### 复合 {#composites}
 
-Multiple environments can be merged using the composite environment type. The list of definitions can take in either a reference to an existing definiton, or an inlined definition.
+可以使用复合环境类型将多个环境合并起来。定义列表既可以接受对现有定义的引用，也可以接受内联定义。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -518,9 +518,9 @@ public static void gatherData(GatherDataEvent.Client event) {
 </TabItem>
 </Tabs>
 
-### Custom Definition Types
+### 自定义定义类型 {#custom-definition-types}
 
-A custom `TestEnvironmentDefinition<SavedDataType>` type provides three methods: `setup` to modify the `ServerLevel` and return the previous `SavedDataType` generic state, `teardown` to reset what was modified using the `SavedDataType`, and `codec` to provide the `MapCodec` to encode and decode the type:
+一个自定义的 `TestEnvironmentDefinition<SavedDataType>` 类型提供三个方法：`setup`，用于修改 `ServerLevel` 并返回先前的 `SavedDataType` 泛型状态；`teardown`，用于借助 `SavedDataType` 重置被修改的内容；以及 `codec`，用于提供编码和解码该类型的 `MapCodec`：
 
 ```java
 public record ExampleEnvironmentType(int value1, boolean value2) implements TestEnvironmentDefinition<Pair<Integer, Boolean>> {
@@ -551,7 +551,7 @@ public record ExampleEnvironmentType(int value1, boolean value2) implements Test
 }
 ```
 
-Then, the `MapCodec` can be [registered]:
+然后，可以将该 `MapCodec` [注册][registered]：
 
 
 ```java
@@ -566,7 +566,7 @@ public static final Supplier<MapCodec<ExampleEnvironmentType>> EXAMPLE_ENVIRONME
 );
 ```
 
-Finally, the type can then be used in your environment definition:
+最后，就可以在你的环境定义中使用该类型：
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -613,9 +613,9 @@ public static void gatherData(GatherDataEvent.Client event) {
 </TabItem>
 </Tabs>
 
-## The Test Function
+## 测试函数 {#the-test-function}
 
-The basic concept of game tests are structured around running some method that takes in a `GameTestHelper` and returning nothing. Calling the methods within the `GameTestHelper` determines whether the test succeeds or fails. Each test function is [registered], allowing it to be referenced in a test instance:
+游戏测试的基本概念围绕着运行某个接受 `GameTestHelper` 且无返回值的方法展开。调用 `GameTestHelper` 中的方法决定了测试是成功还是失败。每个测试函数都会被[注册][registered]，从而可以在测试实例中被引用：
 
 ```java
 public class ExampleFunctions {
@@ -638,58 +638,58 @@ public static final DeferredHolder<Consumer<GameTestHelper>, Consumer<GameTestHe
 );
 ```
 
-### Relative Positioning
+### 相对定位 {#relative-positioning}
 
-All test functions translate relative coordinates within the structure template scene to its absolute coordinates using the structure block's current location. To allow for easy conversion between relative and absolute positioning, `GameTestHelper#absolutePos` and `GameTestHelper#relativePos` can be used respectively.
+所有测试函数都会使用结构方块当前的位置，将结构模板场景内的相对坐标转换为绝对坐标。为了便于在相对定位和绝对定位之间转换，可以分别使用 `GameTestHelper#absolutePos` 和 `GameTestHelper#relativePos`。
 
-The relative position of a structure template can be obtained in-game by loading the structure via the [test command][test], placing the player at the wanted location, and finally running the `/test pos` command. This will grab the coordinates of the player relative to the closest structure within 200 blocks of the player. The command will export the relative position as a copyable text component in the chat to be used as a final local variable.
+在游戏中，可以通过[test 命令][test]加载结构、将玩家置于所需位置，最后运行 `/test pos` 命令来获取结构模板的相对位置。这会获取玩家相对于其 200 个方块范围内最近的结构的坐标。该命令会在聊天栏中将相对位置导出为一个可复制的文本组件，以用作最终的局部变量。
 
 :::tip
-The local variable generated by `/test pos` can specify its reference name by appending it to the end of the command:
+`/test pos` 生成的局部变量可以通过在命令末尾追加引用名称来指定该名称：
 
 ```bash
 /test pos <var> # Exports 'final BlockPos <var> = new BlockPos(...);'
 ```
 :::
 
-### Successful Completion
+### 成功完成 {#successful-completion}
 
-A test function is responsible for one thing: marking the test was successful on a valid completion. If no success state was achieved before the timeout is reached (as defined by `TestData#maxTicks`), then the test automatically fails.
+测试函数只负责一件事：在有效完成时将测试标记为成功。如果在到达超时（由 `TestData#maxTicks` 定义）之前没有达成任何成功状态，则测试自动失败。
 
-There are many abstracted methods within `GameTestHelper` which can be used to define a successful state; however, four are extremely important to be aware of.
+`GameTestHelper` 中有许多抽象方法可用于定义成功状态；不过，有四个方法极其重要，需要了解。
 
-Method               | Description
+方法               | 描述
 :---:                | :---
-`#succeed`           | The test is marked as successful.
-`#succeedIf`         | The supplied `Runnable` is tested immediately and succeeds if no `GameTestAssertException` is thrown. If the test does not succeed on the immediate tick, then it is marked as a failure.
-`#succeedWhen`       | The supplied `Runnable` is tested every tick until timeout and succeeds if the check on one of the ticks does not throw a `GameTestAssertException`.
-`#succeedOnTickWhen` | The supplied `Runnable` is tested on the specified tick and will succeed if no `GameTestAssertException` is thrown. If the `Runnable` succeeds on any other tick, then it is marked as a failure.
+`#succeed`           | 将测试标记为成功。
+`#succeedIf`         | 立即测试所提供的 `Runnable`，若未抛出 `GameTestAssertException` 则成功。如果测试没有在当前这一 tick 立即成功，则被标记为失败。
+`#succeedWhen`       | 每个 tick 都测试所提供的 `Runnable` 直到超时，若其中某个 tick 的检查未抛出 `GameTestAssertException` 则成功。
+`#succeedOnTickWhen` | 在指定 tick 测试所提供的 `Runnable`，若未抛出 `GameTestAssertException` 则成功。如果该 `Runnable` 在任何其他 tick 上成功，则被标记为失败。
 
 :::caution
-Game Tests are executed every tick until the test is marked as a success. As such, methods which schedule success on a given tick must be careful to always fail on any previous tick.
+游戏测试每个 tick 都会执行，直到测试被标记为成功。因此，那些在给定 tick 上排定成功的方法必须小心，务必在此前的任何 tick 上都保持失败。
 :::
 
-### Scheduling Actions
+### 排定动作 {#scheduling-actions}
 
-Not all actions will occur when a test begins. Actions can be scheduled to occur at specific times or intervals:
+并非所有动作都会在测试开始时发生。可以将动作排定在特定时间或间隔发生：
 
-Method           | Description
+方法           | 描述
 :---:            | :---
-`#runAtTickTime` | The action is ran on the specified tick.
-`#runAfterDelay` | The action is ran `x` ticks after the current tick.
-`#onEachTick`    | The action is ran every tick.
+`#runAtTickTime` | 该动作在指定 tick 运行。
+`#runAfterDelay` | 该动作在当前 tick 之后的第 `x` 个 tick 运行。
+`#onEachTick`    | 该动作每个 tick 都运行。
 
-### Assertions
+### 断言 {#assertions}
 
-At any time during a Game Test, an assertion can be made to check if a given condition is true. There are numerous assertion methods within `GameTestHelper`; however, it simplifies to throwing a `GameTestAssertException` whenever the appropriate state is not met.
+在游戏测试期间的任何时刻，都可以做出断言以检查某个给定条件是否为真。`GameTestHelper` 中有大量断言方法；不过，它们最终都归结为：一旦未满足相应状态，就抛出一个 `GameTestAssertException`。
 
-## Registering The Test Instance
+## 注册测试实例 {#registering-the-test-instance}
 
-With the `TestData`, `TestEnvironmentDefinition`, and test function in hand, we can now link everything together through a `GameTestInstance`. Each test instance is what represents a single game test to run. All test instances are located within `data/<namespace>/test_instance/<path>.json`.
+有了 `TestData`、`TestEnvironmentDefinition` 和测试函数，我们现在就可以通过一个 `GameTestInstance` 将它们全部连接起来。每个测试实例都代表一个要运行的游戏测试。所有测试实例都位于 `data/<namespace>/test_instance/<path>.json` 内。
 
-### Function-Based Tests
+### 基于函数的测试 {#function-based-tests}
 
-`FunctionGameTestInstance` links a `TestData` to some registered test function. The test instance will run the test function when called.
+`FunctionGameTestInstance` 将一个 `TestData` 与某个已注册的测试函数关联起来。当被调用时，该测试实例会运行该测试函数。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -770,9 +770,9 @@ public static void gatherData(GatherDataEvent.Client event) {
 </TabItem>
 </Tabs>
 
-### Block-Based Tests
+### 基于方块的测试 {#block-based-tests}
 
-`BlockBasedTestInstance` is a special kind of test instance that relies on redstone signals sent and received by `Blocks#TEST_BLOCK`s. For this test to work, the structure template must contain at least two test blocks: one and only one set to `TestBlockMode#START` and one set to `TestBlockMode#ACCEPT`. When the test starts, the starting test block is triggered, sending a fifteen signal pulse for one tick. It is expected that this signal eventually triggers other test blocks in either `LOG`, `FAIL`, or `ACCEPT` states. `LOG` test blocks also send a fifteen signal pulse when activated. `ACCEPT` and `FAIL` test blocks either cause the test instance to succeed or fail, respectively. `ACCEPT` always takes precedence over `FAIL` on a given tick.
+`BlockBasedTestInstance` 是一种特殊的测试实例，它依赖于 `Blocks#TEST_BLOCK` 收发的红石信号。为了让这种测试正常工作，结构模板必须至少包含两个测试方块：有且仅有一个设为 `TestBlockMode#START`，一个设为 `TestBlockMode#ACCEPT`。测试开始时，起始测试方块被触发，发出持续一个 tick 的 15 强度信号脉冲。预期该信号最终会触发其他处于 `LOG`、`FAIL` 或 `ACCEPT` 状态的测试方块。`LOG` 测试方块在被激活时也会发出一个 15 强度信号脉冲。`ACCEPT` 和 `FAIL` 测试方块则分别使测试实例成功或失败。在给定 tick 上，`ACCEPT` 始终优先于 `FAIL`。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -848,9 +848,9 @@ public static void gatherData(GatherDataEvent.Client event) {
 </TabItem>
 </Tabs>
 
-### Custom Test Instances
+### 自定义测试实例 {#custom-test-instances}
 
-If you need to implement your own test-based logic for whatever reason, `GameTestInstance` can be extended. Two methods must be implemented: `run`, which represents the test function; and `typeDescription`, which provides a description of the test instance. If the test instance should be used in datagen, it must have a `MapCodec` to be [registered].
+如果你出于任何原因需要实现自己的基于测试的逻辑，可以扩展 `GameTestInstance`。必须实现两个方法：`run`，它代表测试函数；以及 `typeDescription`，它提供测试实例的描述。如果该测试实例要在数据生成中使用，它必须有一个 `MapCodec` 才能被[注册][registered]。
 
 ```java
 public class ExampleTestInstance extends GameTestInstance {
@@ -898,7 +898,7 @@ public static final Supplier<MapCodec<? extends GameTestInstance>> EXAMPLE_INSTA
 );
 ```
 
-Then, the test instance can be used in a datapack:
+然后，就可以在数据包中使用该测试实例：
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -979,9 +979,9 @@ public static void gatherData(GatherDataEvent.Client event) {
 </TabItem>
 </Tabs>
 
-### Skipping the Datapack
+### 跳过数据包 {#skipping-the-datapack}
 
-If you don't want to use a datapack to construct your game tests, you can instead listen to the `RegisterGameTestsEvent` on the [mod event bus][event] and register your environments and test instances via `registerEnvironment` and `registerTest`, respectively.
+如果你不想使用数据包来构造你的游戏测试，可以改为在[Mod 事件总线][event]上监听 `RegisterGameTestsEvent`，并分别通过 `registerEnvironment` 和 `registerTest` 注册你的环境和测试实例。
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -1018,33 +1018,33 @@ public static void registerTests(RegisterGameTestsEvent event) {
 }
 ```
 
-## Running Game Tests
+## 运行游戏测试 {#running-game-tests}
 
-Game Tests can be run using the `/test` command. The `test` command is highly configurable; however, only a few are of importance to running tests:
+可以使用 `/test` 命令运行游戏测试。`test` 命令高度可配置；不过，对于运行测试而言，只有少数几个是重要的：
 
-| Subcommand  | Description                                           |
+| 子命令  | 描述                                           |
 |:-----------:|:------------------------------------------------------|
-| `run`       | Runs the specified test: `run <test_name>`.           |
-| `runall`    | Runs all available tests.                             |
-| `runclosest`| Runs the nearest test to the player within 15 blocks. |
-| `runthese`  | Runs tests within 200 blocks of the player.           |
-| `runfailed` | Runs all tests that failed in the previous run.       |
+| `run`       | 运行指定的测试：`run <test_name>`。           |
+| `runall`    | 运行所有可用的测试。                             |
+| `runclosest`| 运行距离玩家 15 个方块内最近的测试。 |
+| `runthese`  | 运行玩家 200 个方块范围内的测试。           |
+| `runfailed` | 运行上一次运行中所有失败的测试。       |
 
 :::note
-Subcommands follow the test command: `/test <subcommand>`.
+子命令跟在 test 命令之后：`/test <subcommand>`。
 :::
 
-## Buildscript Configurations
+## 构建脚本配置 {#buildscript-configurations}
 
-Game Tests provide additional configuration settings within a buildscript (the `build.gradle` file) to run and integrate into different settings.
+游戏测试在构建脚本（`build.gradle` 文件）中提供了额外的配置设置，以便在不同环境下运行和集成。
 
-### Game Test Server Run Configuration
+### 游戏测试服务端运行配置 {#game-test-server-run-configuration}
 
-The Game Test Server is a special configuration which runs a build server. The build server returns an exit code of the number of required, failed Game Tests. All failed tests, whether required or optional, are logged. This server can be run using `gradlew runGameTestServer`.
+游戏测试服务端（Game Test Server）是一个特殊配置，它运行一个构建服务器。该构建服务器返回一个退出码，其值为必需的、失败的游戏测试的数量。所有失败的测试，无论是必需的还是可选的，都会被记录下来。可以使用 `gradlew runGameTestServer` 运行该服务器。
 
-### Enabling Game Tests in Other Run Configurations
+### 在其他运行配置中启用游戏测试 {#enabling-game-tests-in-other-run-configurations}
 
-By default, only the `client` and `gameTestServer` run configurations have Game Tests enabled. If another run configuration should run Game Tests, then the `neoforge.enableGameTest` property must be set to `true`.
+默认情况下，只有 `client` 和 `gameTestServer` 运行配置启用了游戏测试。如果另一个运行配置也应运行游戏测试，则必须将 `neoforge.enableGameTest` 属性设为 `true`。
 
 ```gradle
 // Inside a run configuration

@@ -1,77 +1,77 @@
 
-# Understanding the Model System
+# 理解模型系统 {#understanding-the-model-system}
 
-Models within Minecraft are simply a list of quads with attached textures. Each part of the modeling process has their own separate implementation, with the underlying model JSON deserialized into an `UnbakedModel`. In the end, each part of the pipelines takes in some `List<BakedQuad>` and properties necessary for their own pipelines. Some [block entity renderers][ber] also make use of these models. There is no limit to how complex a model may be.
+Minecraft 中的模型本质上就是一组带有贴图纹理的四边形。建模过程的每个环节都有各自独立的实现，底层的模型 JSON 会被反序列化成一个 `UnbakedModel`。到最后，各条管线的每个环节都会接收某种 `List<BakedQuad>` 以及各自管线所需的属性。一些[方块实体渲染器][ber]也会使用这些模型。模型的复杂程度没有上限。
 
-Models are stored in the `ModelManager`, which can be accessed through `Minecraft.getInstance().getModelManager()`. For the item pipeline, you can get the associated [`ItemModel`][itemmodels] via `ModelManager#getItemModel` by passing in a [`Identifier`][rl]. For the block state pipeline, you can get the associated `BlockStateModel` via `ModelManager.getBlockStateModelSet().get()` by passing in a `BlockState`. Mods will basically always reuse a model that was previously automatically loaded and baked.
+模型存储在 `ModelManager` 中，可通过 `Minecraft.getInstance().getModelManager()` 访问。对于物品管线，你可以传入一个 [`Identifier`][rl]，通过 `ModelManager#getItemModel` 获取关联的 [`ItemModel`][itemmodels]。对于方块状态管线，你可以传入一个 `BlockState`，通过 `ModelManager.getBlockStateModelSet().get()` 获取关联的 `BlockStateModel`。Mod 基本上总是复用先前自动加载并烘焙好的模型。
 
-## Common Models and Geometry
+## 通用模型与几何体 {#common-models-and-geometry}
 
-The basic model JSON (in `assets/<namespace>/models`) are deserialized into an `UnbakedModel`. The `UnbakedModel` is generally one step short of its baked output, containing some general form of the general properties. The most important thing it contains is the `UnbakedGeometry` via `UnbakedModel#geometry`, which represents the data to become `BakedQuad`s. These quads are inlined into the item and block state model by (eventually) calling `UnbakedGeometry#bake`. This commonly constructs a `QuadCollection`, which contains that list of `BakedQuad`s which can be rendered at anytime or only if a given direction is not culled. Now, a quad compares to a triangle in a modeling program (and in most other games), however due to Minecraft's general focus on squares, the developers elected to use quads (4 vertices) instead of triangles (3 vertices) for rendering in Minecraft.
+基础的模型 JSON（位于 `assets/<namespace>/models`）会被反序列化成一个 `UnbakedModel`。`UnbakedModel` 通常距离其烘焙输出只差一步，包含了各类通用属性的某种一般形态。它包含的最重要的东西是通过 `UnbakedModel#geometry` 得到的 `UnbakedGeometry`，它表示即将变成 `BakedQuad` 的数据。这些四边形会（最终）通过调用 `UnbakedGeometry#bake` 内联到物品和方块状态模型中。这通常会构造出一个 `QuadCollection`，其中包含那份 `BakedQuad` 列表，这些四边形可以在任意时刻渲染，也可以只在某个给定方向未被剔除时才渲染。四边形对应于建模程序（以及大多数其他游戏）中的三角形，不过由于 Minecraft 总体上以方形为主，开发者选择在 Minecraft 中使用四边形（4 个顶点）而非三角形（3 个顶点）进行渲染。
 
-The `UnbakedModel` contains information that is either used by the [block state definition][bsd], [item models][itemmodelsection], or both. For example, `useAmbientOcclusion` is used exclusively by the block state definition, `guiLight` and `transforms` are used exclusively by the item model, and `textureSlots` and `parent` are used by both.
+`UnbakedModel` 所包含的信息，或供[方块状态定义][bsd]使用，或供[物品模型][itemmodelsection]使用，或两者共用。例如，`useAmbientOcclusion` 仅由方块状态定义使用，`guiLight` 和 `transforms` 仅由物品模型使用，而 `textureSlots` 和 `parent` 则由两者共用。
 
-During the baking process, every `UnbakedModel` is wrapped in a `ResolvedModel` that are obtained by the `ModelBaker` for an item or block state. As the name implies, a `ResolvedModel` is an `UnbakedModel` with all lingering references resolved. The associated data can then be obtained from the `getTop*` methods, which compute the properties and geometry from the current model and its parents. Baking the `ResolvedModel` to its `QuadCollection` is typically done here by calling `ResolvedModel#bakeTopGeometry`.
+在烘焙过程中，每个 `UnbakedModel` 都会被包装成一个 `ResolvedModel`，由 `ModelBaker` 为物品或方块状态取得。顾名思义，`ResolvedModel` 就是一个已解析所有遗留引用的 `UnbakedModel`。随后可从 `getTop*` 方法获取关联数据，这些方法会根据当前模型及其父模型计算出属性和几何体。将 `ResolvedModel` 烘焙为其 `QuadCollection` 通常就在这里通过调用 `ResolvedModel#bakeTopGeometry` 完成。
 
-## Block State Definitions
+## 方块状态定义 {#block-state-definitions}
 
-The block state definition JSON (in `assets/<namespace>/blockstates`) is compiled and baked into a `BlockStateModel` for every `BlockState`. The process of creating the `BlockStateModel` goes like so:
+方块状态定义 JSON（位于 `assets/<namespace>/blockstates`）会为每个 `BlockState` 编译并烘焙成一个 `BlockStateModel`。创建 `BlockStateModel` 的过程如下：
 
-- During the loading process:
-    - The block state definition JSON is loaded into a `BlockStateModel.UnbakedRoot`. The root is a general shared cache system used to link a `BlockState` to some set of `BlockStateModel`s.
-    - The `BlockStateModel.UnbakedRoot` loads in the `BlockStateModel.Unbaked` and gets ready to link them to their appropriate `BlockState`.
-    - The `BlockStateModel.Unbaked` loads in its `BlockStateModelPart.Unbaked`, which is used to get the common `UnbakedModel` (or more specifically the `ResolvedModel`).
-- During the baking process:
-    - `BlockStateModel.UnbakedRoot#bake` is called for every `BlockState`.
-    - `BlockStateModel.Unbaked#bake` is called for a given `BlockState`, creating a `BlockStateModel`.
-    - `BlockStateModelPart.Unbaked#bake` is called for the model parts within a `BlockStateModel`, inlining the `ResolvedModel` to a `QuadCollection`, along with getting the ambient occlusion settings, the particle icon, and the render type by default.
+- 在加载过程中：
+    - 方块状态定义 JSON 被加载成一个 `BlockStateModel.UnbakedRoot`。这个根是一套通用的共享缓存系统，用于将某个 `BlockState` 关联到某组 `BlockStateModel`。
+    - `BlockStateModel.UnbakedRoot` 加载各个 `BlockStateModel.Unbaked`，并准备将它们关联到相应的 `BlockState`。
+    - `BlockStateModel.Unbaked` 加载它的 `BlockStateModelPart.Unbaked`，后者用于获取通用的 `UnbakedModel`（更确切地说是 `ResolvedModel`）。
+- 在烘焙过程中：
+    - `BlockStateModel.UnbakedRoot#bake` 会为每个 `BlockState` 调用。
+    - `BlockStateModel.Unbaked#bake` 会为给定的 `BlockState` 调用，创建出一个 `BlockStateModel`。
+    - `BlockStateModelPart.Unbaked#bake` 会为 `BlockStateModel` 内的各个模型部件调用，将 `ResolvedModel` 内联为一个 `QuadCollection`，同时默认还会获取环境光遮蔽设置、粒子图标和渲染类型。
 
-The most important method within `BlockStateModel` is `collectParts`, which is responsible for appending to the list of `BlockStateModelPart`s to render. Remember that every `BlockStateModelPart` contains its list of `BakedQuad`s, via `BlockStateModelPart#getQuads`, which is then uploaded to the vertex consumer and rendered. `collectParts` has five parameters:
+`BlockStateModel` 中最重要的方法是 `collectParts`，它负责向要渲染的 `BlockStateModelPart` 列表追加内容。记住，每个 `BlockStateModelPart` 都通过 `BlockStateModelPart#getQuads` 持有各自的 `BakedQuad` 列表，随后这些四边形会被上传到顶点消费者并渲染。`collectParts` 有五个参数：
 
-- A `BlockAndTintGetter`: A representation of the level the `BlockState` is rendered within.
-- A `BlockPos`: The position that the block is rendered at.
-- A `BlockState`: The [blockstate] being rendered. May be null, indicating that an item is being rendered.
-- A `RandomSource`: A client-bound random source you can use for randomization.
-- A `List<BlockStateModelPart>`: The list that should receive the parts to render.
+- 一个 `BlockAndTintGetter`：`BlockState` 所渲染于其中的世界的一种表示。
+- 一个 `BlockPos`：方块渲染所在的位置。
+- 一个 `BlockState`：正在渲染的[方块状态][blockstate]。可能为 null，表示正在渲染的是一个物品。
+- 一个 `RandomSource`：一个客户端绑定的随机源，可用于随机化。
+- 一个 `List<BlockStateModelPart>`：应接收要渲染部件的列表。
 
-### Model Data
+### 模型数据 {#model-data}
 
-Sometimes, a `BlockStateModel` may rely on the `BlockEntity` to determine what `BlockStateModelPart`s to choose in `collectParts`. NeoForge provides the `ModelData` system to sync and pass data from the `BlockEntity`. To do so, a `BlockEntity` must implement `getModelData` and return the data it wants to sync. The data can then be sent to the client by calling `BlockEntity#requestModelDataUpdate`. Then, within `collectParts`, `getModelData` can be called on the `BlockAndTintGetter` with the `BlockPos` to get the data.
+有时，`BlockStateModel` 可能依赖 `BlockEntity` 来决定在 `collectParts` 中选择哪些 `BlockStateModelPart`。NeoForge 提供了 `ModelData` 系统来从 `BlockEntity` 同步并传递数据。为此，`BlockEntity` 必须实现 `getModelData` 并返回它想要同步的数据。随后可通过调用 `BlockEntity#requestModelDataUpdate` 将数据发送到客户端。然后，在 `collectParts` 内，可在 `BlockAndTintGetter` 上以 `BlockPos` 调用 `getModelData` 来获取数据。
 
-## Item Models
+## 物品模型 {#item-models}
 
-The [client item][clientitem] JSON (in `assets/<namespace>/items`) is compiled and baked into an `ItemModel` for a given `Item` to be used by the `ItemStack`. The process of creating the `ItemModel` goes like so:
+[客户端物品][clientitem] JSON（位于 `assets/<namespace>/items`）会为给定的 `Item` 编译并烘焙成一个 `ItemModel`，供 `ItemStack` 使用。创建 `ItemModel` 的过程如下：
 
-- During the loading process:
-    - The client item JSON is loaded into a `ClientItem`. This holds the item model and some general properties for how it should be rendered.
-    - The `ClientItem` loads in the `ItemModel.Unbaked`.
-- During the baking process:
-    - `ItemModel.Unbaked#bake` is called for every `Item`, inlining the `ResolvedModel` to a `List<BakedQuad>`, along with some general `ModelRenderProperties` and the render type if the `Item` is a `BlockItem`.
+- 在加载过程中：
+    - 客户端物品 JSON 被加载成一个 `ClientItem`。它持有物品模型以及关于其应如何渲染的一些通用属性。
+    - `ClientItem` 加载其中的 `ItemModel.Unbaked`。
+- 在烘焙过程中：
+    - `ItemModel.Unbaked#bake` 会为每个 `Item` 调用，将 `ResolvedModel` 内联为一个 `List<BakedQuad>`，同时还会带上一些通用的 `ModelRenderProperties`，若该 `Item` 是 `BlockItem` 则还带上渲染类型。
 
-Information about item rendering can be found in the [Manually Rendering an Item][itemmodels] section.
+关于物品渲染的信息可在[手动渲染物品][itemmodels]一节中找到。
 
-### Perspectives
+### 视角 {#perspectives}
 
-Minecraft's render engine recognizes a total of 8 perspective types (9 if you include the in-code fallback) for item rendering. These are used in a model JSON's `display` block, and represented in code through the `ItemDisplayContext` enum. These are normally passed from the `UnbakedModel` to a `ModelRenderProperties` in the `ItemModel`, which is then applied to the `ItemStackRenderState` via `ModelRenderProperties#applyToLayer`.
+Minecraft 的渲染引擎为物品渲染共识别 8 种视角类型（若算上代码中的兜底项则为 9 种）。它们在模型 JSON 的 `display` 块中使用，并在代码中通过 `ItemDisplayContext` 枚举来表示。它们通常从 `UnbakedModel` 传递到 `ItemModel` 中的 `ModelRenderProperties`，再通过 `ModelRenderProperties#applyToLayer` 应用到 `ItemStackRenderState`。
 
-| Enum value                | JSON key                  | Usage                                                                                                            |
+| 枚举值                     | JSON 键                    | 用途                                                                                                            |
 |---------------------------|---------------------------|------------------------------------------------------------------------------------------------------------------|
-| `THIRD_PERSON_RIGHT_HAND` | `"thirdperson_righthand"` | Right hand in third person (F5 view, or on other players)                                                        |
-| `THIRD_PERSON_LEFT_HAND`  | `"thirdperson_lefthand"`  | Left hand in third person (F5 view, or on other players)                                                         |
-| `FIRST_PERSON_RIGHT_HAND` | `"firstperson_righthand"` | Right hand in first person                                                                                       |
-| `FIRST_PERSON_LEFT_HAND`  | `"firstperson_lefthand"`  | Left hand in first person                                                                                        |
-| `HEAD`                    | `"head"`                  | When in a player's head armor slot (often only achievable via commands)                                          |
-| `GUI`                     | `"gui"`                   | Inventories, player hotbar                                                                                       |
-| `GROUND`                  | `"ground"`                | Dropped items; note that the rotation of the dropped item is handled by the dropped item renderer, not the model |
-| `FIXED`                   | `"fixed"`                 | Item frames                                                                                                      |
-| `ON_SHELF`                | `"on_shelf"`              | On shelf blocks                                                                                                      |
-| `NONE`                    | `"none"`                  | Fallback purposes in code, should not be used in JSON                                                            |
+| `THIRD_PERSON_RIGHT_HAND` | `"thirdperson_righthand"` | 第三人称下的右手（F5 视角，或其他玩家身上）                                                                        |
+| `THIRD_PERSON_LEFT_HAND`  | `"thirdperson_lefthand"`  | 第三人称下的左手（F5 视角，或其他玩家身上）                                                                        |
+| `FIRST_PERSON_RIGHT_HAND` | `"firstperson_righthand"` | 第一人称下的右手                                                                                                  |
+| `FIRST_PERSON_LEFT_HAND`  | `"firstperson_lefthand"`  | 第一人称下的左手                                                                                                  |
+| `HEAD`                    | `"head"`                  | 位于玩家头部盔甲槽时（通常只能通过命令实现）                                                                        |
+| `GUI`                     | `"gui"`                   | 物品栏、玩家快捷栏                                                                                                |
+| `GROUND`                  | `"ground"`                | 掉落物；注意掉落物的旋转由掉落物渲染器处理，而非模型                                                                |
+| `FIXED`                   | `"fixed"`                 | 物品展示框                                                                                                        |
+| `ON_SHELF`                | `"on_shelf"`              | 位于置物架方块上                                                                                                  |
+| `NONE`                    | `"none"`                  | 用于代码中的兜底目的，不应在 JSON 中使用                                                                            |
 
-NeoForge allows the `ItemDisplayContext` to be [extended] for use in custom render calls. Modded `ItemDisplayContext`s may specify a fallback transform to use if none is specified in the model. Otherwise, behavior will be the same as vanilla.
+NeoForge 允许对 `ItemDisplayContext` 进行[扩展][extended]，以用于自定义渲染调用。带 Mod 的 `ItemDisplayContext` 可以指定一个兜底变换，在模型中未指定时使用。否则，其行为与原版相同。
 
-## Modifying a Baking Result
+## 修改烘焙结果 {#modifying-a-baking-result}
 
-Modifying an existing block state model or item stack model in-code can typically be done by wrapping the model in some sort of delegate. Block state models have `DelegateBlockStateModel`, while item stack models do not have an existing implementation. Your implementation can then override only select methods, like so:
+在代码中修改已有的方块状态模型或物品堆叠模型，通常可以通过将模型包装进某种委托来完成。方块状态模型有 `DelegateBlockStateModel`，而物品堆叠模型则没有现成的实现。你的实现随后可以只重写选定的方法，如下所示：
 
 ```java
 // For block states
@@ -102,7 +102,7 @@ public class MyDelegateItemModel implements ItemModel {
 }
 ```
 
-After writing your model wrapper class, you must apply the wrappers to the models it should affect. Do so in a [client-side][sides] [event handler][event] for `ModelEvent.ModifyBakingResult` on the [**mod event bus**][modbus]:
+编写好模型包装类后，你必须把这些包装应用到它应影响的模型上。在[**Mod 事件总线**][modbus]上针对 `ModelEvent.ModifyBakingResult` 的[客户端][sides][事件处理器][event]中执行此操作：
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client
@@ -127,7 +127,7 @@ public static void modifyBakingResult(ModelEvent.ModifyBakingResult event) {
 ```
 
 :::warning
-It is generally encouraged to use a [custom model loader][modelloader] over wrapping baked models in `ModelEvent.ModifyBakingResult` when possible. Custom model loaders can also use delegate models if needed.
+一般而言，在可能的情况下，推荐使用[自定义模型加载器][modelloader]，而非在 `ModelEvent.ModifyBakingResult` 中包装烘焙后的模型。自定义模型加载器在需要时同样可以使用委托模型。
 :::
 
 [ao]: https://en.wikipedia.org/wiki/Ambient_occlusion

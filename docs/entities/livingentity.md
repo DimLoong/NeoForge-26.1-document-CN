@@ -1,21 +1,21 @@
 ---
 sidebar_position: 3
 ---
-# Living Entities, Mobs & Players
+# 生物实体、生物与玩家 {#living-entities-mobs--players}
 
-Living entities are a big subgroup of [entities] that all inherit from the common `LivingEntity` superclass. These include mobs (through the `Mob` subclass), players (through the `Player` subclass) and armor stands (through the `ArmorStand` subclass).
+生物实体是[实体][entities]的一大子群，它们都继承自共同的 `LivingEntity` 超类。这包括生物（通过 `Mob` 子类）、玩家（通过 `Player` 子类）和盔甲架（通过 `ArmorStand` 子类）。
 
-Living entities have a number of additional properties that regular entities do not have. These include [attributes], [mob effects][mobeffects], damage tracking and more.
+生物实体拥有许多普通实体所没有的额外属性。这些包括[属性][attributes]、[状态效果][mobeffects]、伤害追踪等。
 
-## Health, Damage and Healing
+## 生命值、伤害与治疗 {#health-damage-and-healing}
 
-_See also: [Attributes][attributes]._
+_另见：[属性][attributes]。_
 
-One of the most notable features that sets living entities apart from others is the fully-fleshed health system. Living entities generally have a max health, a current health and sometimes things such as armor or natural regeneration.
+生物实体区别于其他实体的最显著特性之一，就是完备的生命值系统。生物实体通常拥有最大生命值、当前生命值，有时还有护甲或自然回复之类的东西。
 
-By default, max health is determined by the `minecraft:max_health` [attribute][attributes], and the current health is set to the same value when [spawning]. When the entity is damaged by calling [`Entity#hurtServer`][hurt] on it, the current health is decreased according to the damage calculations. Many entities, such as zombies, will by default then remain at that reduced health value, while some, such as players, can heal these lost hit points again.
+默认情况下，最大生命值由 `minecraft:max_health` [属性][attributes]决定，当前生命值在[生成][spawning]时被设为相同的值。当通过对实体调用 [`Entity#hurtServer`][hurt] 使其受到伤害时，当前生命值会根据伤害计算相应减少。许多实体（例如僵尸）默认会保持在这个降低后的生命值上，而某些实体（例如玩家）则可以再次回复这些损失的生命值。
 
-To get or set the max health value, the attribute is read or written directly, like so:
+要获取或设置最大生命值，需直接读取或写入该属性，如下所示：
 
 ```java
 // Get the attribute map of our entity.
@@ -31,27 +31,27 @@ maxHealth = entity.getMaxHealth();
 attributes.getInstance(Attributes.MAX_HEALTH).setBaseValue(50);
 ```
 
-When [taking damage][damage], living entities will apply some additional calculations, such as considering the `minecraft:armor` attribute (except for [damage types][damagetypes] that are in the `minecraft:bypasses_armor` [tag][tags]) as well as the `minecraft:absorption` attribute. Living entities can also override `#onDamageTaken` to perform post-attack behavior; it is only called if the final damage value is greater than zero.
+在[受到伤害][damage]时，生物实体会应用一些额外的计算，例如考虑 `minecraft:armor` 属性（处于 `minecraft:bypasses_armor` [标签][tags]中的[伤害类型][damagetypes]除外）以及 `minecraft:absorption` 属性。生物实体还可以重写 `#onDamageTaken` 来执行攻击后的行为；它只在最终伤害值大于零时才会被调用。
 
-### Damage Events
+### 伤害事件 {#damage-events}
 
-Due to the complexity of the damage pipeline, there are multiple events for you to hook into, which are fired in the order they are listed in. This is generally intended for damage modifications you want to do to entities that are not (or not necessarily) your own, i.e. if you want to modify damage done to entities from Minecraft or other mods, or if you want to modify damage done to any entity, which may or may not be your own.
+由于伤害流程的复杂性，有多个事件供你挂钩，它们按此处列出的顺序触发。这一般适用于你想对不（或不一定）属于自己的实体做的伤害修改，即：如果你想修改对 Minecraft 或其他 Mod 的实体造成的伤害，或者想修改对任意实体（无论是否属于你自己）造成的伤害。
 
-Common to all these events is the `DamageContainer`. A new `DamageContainer` is instantiated at the start of the attack, and discarded after the attack has finished. It contains the original [`DamageSource`][damagesources], the original damage amount, and a list of all individual modifications - armor, absorption, [enchantments], [mob effects][mobeffects], etc. The `DamageContainer` is passed to all events listed below, and you can check what modifications have already been done to make your own changes as necessary.
+所有这些事件的共同点是 `DamageContainer`。每次攻击开始时会实例化一个新的 `DamageContainer`，攻击结束后将其丢弃。它包含原始的 [`DamageSource`][damagesources]、原始伤害量，以及所有单项修改（护甲、伤害吸收、[附魔][enchantments]、[状态效果][mobeffects]等）的列表。`DamageContainer` 会传递给下面列出的所有事件，你可以检查已经做了哪些修改，以便按需做出自己的改动。
 
-#### `EntityInvulnerabilityCheckEvent`
+#### `EntityInvulnerabilityCheckEvent` {#entityinvulnerabilitycheckevent}
 
-This event allows mods to both bypass and add invulnerabilities for an entity. This event is also fired for non-living entities. You would use this event to make an entity immune to an attack, or strip away an existing immunity it may have.
+该事件允许 Mod 为实体绕过、也能添加无敌状态。该事件对非生物实体也会触发。你会用这个事件让实体对某次攻击免疫，或剥离它可能已有的某种免疫。
 
-For technical reasons, hooks to this event should be deterministic and only depend on the damage type. This means that random chances for invulnerabilities, or invulnerabilities that only apply up to a certain damage amount, should instead be added in `LivingIncomingDamageEvent` (see below).
+出于技术原因，该事件的挂钩应当是确定性的，且只依赖于伤害类型。这意味着随机几率的无敌状态、或仅在伤害量达到某阈值前才生效的无敌状态，应当改为在 `LivingIncomingDamageEvent`（见下文）中添加。
 
-#### `LivingIncomingDamageEvent`
+#### `LivingIncomingDamageEvent` {#livingincomingdamageevent}
 
-This event is called only on the server side and should be used for two main use cases: dynamically cancelling the attack, and adding reduction modifier callbacks.
+该事件只在服务端调用，应当用于两个主要用例：动态取消攻击，以及添加减免修饰回调。
 
-Dynamically cancelling attacks is basically adding a non-deterministic invulnerability, for example a random chance to cancel damage, an invulnerability depending on the time of day or the amount of damage taken, etc. Consistent invulnerabilities should be performed via `EntityInvulnerabilityCheckEvent` (see above).
+动态取消攻击基本上就是添加一种非确定性的无敌，例如随机取消伤害的几率、依赖当日时间或已受伤害量的无敌等。一致性的无敌应当通过 `EntityInvulnerabilityCheckEvent`（见上文）来实现。
 
-Reduction modifier callbacks allow you to modify a part of the performed damage reduction. For example, it would allow you to reduce the effect of armor damage reduction by 50%. This would then also propagate correctly to mob effects, which then have a different damage amount to work with, etc. A reduction modifier callback can be added like so:
+减免修饰回调允许你修改所执行的伤害减免的某个部分。例如，它能让你将护甲伤害减免的效果降低 50%。这随后也会正确地传播到状态效果，使其得到一个不同的伤害量来处理，如此等等。减免修饰回调可以像下面这样添加：
 
 ```java
 @SubscribeEvent // on the game event bus
@@ -70,41 +70,41 @@ public static void decreaseArmor(LivingIncomingDamageEvent event) {
 }
 ```
 
-Callbacks are applied in the order they are added. This means that callbacks added in an event handler with higher [priority] will be run first.
+回调按其添加顺序应用。这意味着在具有更高[优先级][priority]的事件处理器中添加的回调会先运行。
 
-#### `LivingShieldBlockEvent`
+#### `LivingShieldBlockEvent` {#livingshieldblockevent}
 
-This event can be used to fully customize shield blocking. This includes introducing additional shield blocking, preventing shield blocks, modifying the vanilla shield block check, changing the damage done to the shield or the attacking item, changing the view arc of the shield, allowing projectiles but blocking melee attacks (or vice versa), block attacks passively (i.e. without using the shield), block only a percentage of damage, etc.
+该事件可用于完全自定义盾牌格挡。这包括引入额外的盾牌格挡、阻止盾牌格挡、修改原版盾牌格挡检查、更改对盾牌或攻击物品造成的伤害、更改盾牌的视角弧度、允许抛射物但格挡近战攻击（或反之）、被动格挡攻击（即不使用盾牌）、只格挡一定百分比的伤害等。
 
-Note that this event is not designed for immunities or attack cancellations that are outside the scope of "shield-like" items.
+请注意，该事件的设计目的不是处理超出“盾牌类”物品范畴的免疫或攻击取消。
 
-#### `ArmorHurtEvent`
+#### `ArmorHurtEvent` {#armorhurtevent}
 
-This event should be pretty self-explanatory. It is fired when armor damage from an attack is calculated, and can be used to modify how much durability damage (if any at all) is done to which armor piece.
+该事件应当相当不言自明。它在计算攻击造成的护甲损伤时触发，可用于修改对哪件护甲造成多少耐久损伤（乃至是否造成损伤）。
 
-#### `LivingDamageEvent.Pre`
+#### `LivingDamageEvent.Pre` {#livingdamageeventpre}
 
-This event is called immediately before the damage is done. The `DamageContainer` is fully populated, the final damage amount is available, and the event can no longer be canceled as the attack is considered successful by this point.
+该事件在伤害造成之前的一刻调用。此时 `DamageContainer` 已完全填充，最终伤害量已可用，并且由于此刻攻击已被视为成功，事件不能再被取消。
 
-At this point, all kinds of modifiers are available, allowing you to finely modify the damage amount. Be aware that things like armor damage are already done by this point.
+在此刻，各类修饰符均可用，允许你精细地修改伤害量。请注意，护甲损伤之类的处理在此刻已经完成。
 
-#### `LivingDamageEvent.Post`
+#### `LivingDamageEvent.Post` {#livingdamageeventpost}
 
-This event is called after the damage has been done, absorption has been reduced, the combat tracker has been updated, and stats and game events have been handled. It is not cancellable, as the attack has already happened. This event would commonly be used for post-attack effects. Note that the event is fired even if the damage amount is zero, so check that value accordingly if needed.
+该事件在伤害已造成、伤害吸收已减少、战斗追踪器已更新、统计与游戏事件已处理之后调用。它不可取消，因为攻击已经发生。该事件通常用于攻击后效果。请注意，即便伤害量为零该事件也会触发，因此如有需要请相应地检查该值。
 
-If you are calling this on your own entity, you should consider overriding `ILivingEntityExtension#onDamageTaken()` instead. Unlike `LivingDamageEvent.Post`, this is only called if the damage is greater than zero.
+如果你是对自己的实体调用它，应当考虑改为重写 `ILivingEntityExtension#onDamageTaken()`。与 `LivingDamageEvent.Post` 不同，它只在伤害大于零时才被调用。
 
-## Mob Effects
+## 状态效果 {#mob-effects}
 
-_See [Mob Effects & Potions][mobeffects]._
+_见[状态效果与药水][mobeffects]。_
 
-## Equipment
+## 装备 {#equipment}
 
-_See [Containers on Entities][containers]._
+_见[实体上的容器][containers]。_
 
-## Hierarchy
+## 层级结构 {#hierarchy}
 
-Living entities have a complex class hierarchy. As mentioned before, there are three direct subclasses (red classes are `abstract`, blue classes are not):
+生物实体拥有复杂的类层级结构。如前所述，它有三个直接子类（红色的类是 `abstract`，蓝色的类不是）：
 
 ```mermaid
 graph LR;
@@ -116,11 +116,11 @@ graph LR;
     class ArmorStand blue;
 ```
 
-Of these, `ArmorStand` has no subclasses (and is also the only non-abstract class), so we will focus on the class hierarchy of `Mob` and `Avatar`.
+其中，`ArmorStand` 没有子类（也是唯一的非抽象类），因此我们将聚焦于 `Mob` 和 `Avatar` 的类层级结构。
 
-### Hierarchy of `Mob`
+### `Mob` 的层级结构 {#hierarchy-of-mob}
 
-The class hierarchy of `Mob` looks as follows (red classes are `abstract`, blue classes are not):
+`Mob` 的类层级结构如下所示（红色的类是 `abstract`，蓝色的类不是）：
 
 ```mermaid
 graph LR;
@@ -161,21 +161,21 @@ graph LR;
     class Bat,CopperGolem,EnderDragon,Ghast,Phantom,IronGolem,Shulker,SnowGolem,Villager,WanderingTrader,Dolphin,Squid,GlowSquid,Allay,Cod,Salmon,TropicalFish,Pufferfish,Tadpole,Slime,MagmaCube blue;
 ```
 
-All other living entities missing from the diagram are subclasses of either `Animal` or `Monster`.
+图中未列出的所有其他生物实体，都是 `Animal` 或 `Monster` 的子类。
 
-As you may have noticed, this is very messy. For example, why aren't bees, parrots etc. also flying mobs? This problem becomes even worse when looking into the subclass hierarchy of `Animal` and `Monster`, which will not be discussed here in detail (look them up using your IDE's Show Hierarchy feature if you're interested). It is best to acknowledge it, but not worry about it.
+你可能已经注意到，这非常混乱。例如，为什么蜜蜂、鹦鹉等不也是飞行生物？当深入查看 `Animal` 和 `Monster` 的子类层级时，这个问题会变得更加糟糕，这里就不详细讨论了（如果你感兴趣，可以用 IDE 的 Show Hierarchy 功能去查看它们）。最好是承认它的存在，但不必为之烦恼。
 
-Let's go over the most important classes:
+我们来过一遍最重要的几个类：
 
-- `PathfinderMob`: Contains (surprise!) logic for pathfinding.
-- `AgeableMob`: Contains the logic for aging and baby entities. Zombies and other monsters with baby variants do not extend this class, they instead are children of `Monster`.
-- `Animal`: What most animals extend. Has further abstract subclasses, such as `AbstractHorse` or `TamableAnimal`.
-- `Monster`: The abstract class for most entities the game considers monsters. Like `Animal`, this has further abstract subclasses, such as `AbstractPiglin`, `AbstractSkeleton`, `Raider`, and `Zombie`.
-- `WaterAnimal`: The abstract class for water-based animals, such as fish, squids and dolphins. These are kept separate from the other animals due to significantly different pathfinding.
+- `PathfinderMob`：包含（意料之中！）寻路逻辑。
+- `AgeableMob`：包含衰老与幼年实体的逻辑。带有幼年变体的僵尸和其他怪物不继承这个类，它们反而是 `Monster` 的子类。
+- `Animal`：大多数动物所继承的类。有进一步的抽象子类，例如 `AbstractHorse` 或 `TamableAnimal`。
+- `Monster`：游戏视为怪物的大多数实体的抽象类。与 `Animal` 一样，它也有进一步的抽象子类，例如 `AbstractPiglin`、`AbstractSkeleton`、`Raider` 和 `Zombie`。
+- `WaterAnimal`：水生动物（如鱼、鱿鱼和海豚）的抽象类。由于寻路方式明显不同，它们与其他动物区分开来。
 
-### Hierarchy of `Avatar`
+### `Avatar` 的层级结构 {#hierarchy-of-avatar}
 
-Avatars define not only the player, but also a player-like mannequin. Depending on which side the avatar is on, a different class is used. You should never need to construct avatars, except for `FakePlayer`s and `Mannequin`s.
+Avatar 不仅定义玩家，还定义一种类玩家的人偶（mannequin）。根据 avatar 所在的端，会使用不同的类。除了 `FakePlayer` 和 `Mannequin` 之外，你应该永远不需要自己构造 avatar。
 
 ```mermaid
 graph LR;
@@ -192,21 +192,21 @@ graph LR;
     class ClientMannequin,LocalPlayer,RemotePlayer,ServerPlayer,FakePlayer blue;
 ```
 
-- `AbstractClientPlayer`: This class is used as a base for the two client players, both used to represent players on the [logical client][logicalsides].
-- `LocalPlayer`: This class is used to represent the player currently running the game.
-- `RemotePlayer`: This class is used to represent other players that the `LocalPlayer` may encounter during multiplayer. As such, `RemotePlayer`s do not exist in singleplayer contexts.
-- `ServerPlayer`: This class is used to represent players on the [logical server][logicalsides].
-- `FakePlayer`: This is a special subclass of `ServerPlayer` designed to be used as a mock for a player, for non-player mechanisms that need a player context.
-- `Mannequin`: This class designed to be used as a posable player, usually without any AI.
-- `ClientMannequin`: The class is used to represent the mannequin on the [logical client][logicalsides].
+- `AbstractClientPlayer`：该类用作两个客户端玩家的基类，二者都用于在[逻辑客户端][logicalsides]上表示玩家。
+- `LocalPlayer`：该类用于表示当前正在运行游戏的玩家。
+- `RemotePlayer`：该类用于表示 `LocalPlayer` 在多人游戏中可能遇到的其他玩家。因此，`RemotePlayer` 在单人游戏场景中不存在。
+- `ServerPlayer`：该类用于在[逻辑服务端][logicalsides]上表示玩家。
+- `FakePlayer`：这是 `ServerPlayer` 的一个特殊子类，设计用作玩家的模拟对象，供需要玩家上下文的非玩家机制使用。
+- `Mannequin`：该类设计用作可摆姿势的玩家，通常不带任何 AI。
+- `ClientMannequin`：该类用于在[逻辑客户端][logicalsides]上表示人偶。
 
-## Spawning
+## 生成 {#spawning}
 
-In addition to the [regular ways of spawning][spawning] - that is, the `/summon` command and the in-code way via `EntityType#spawn` or `Level#addFreshEntity` -, `Mob`s can also be spawned through some other means. `ArmorStand`s can be spawned through regular means, and `Player`s should not be instantiated yourself, except for `FakePlayer`s.
+除了[常规的生成方式][spawning]——即 `/summon` 命令以及通过 `EntityType#spawn` 或 `Level#addFreshEntity` 的代码方式——之外，`Mob` 还可以通过其他一些方式生成。`ArmorStand` 可以通过常规方式生成，而 `Player` 不应由你自己实例化，`FakePlayer` 除外。
 
-### Spawn Eggs
+### 刷怪蛋 {#spawn-eggs}
 
-It is common (though not required) to [register] a spawn egg for mobs. This is done through the `SpawnEggItem` class and the `DataComponents#ENTITY_DATA` [data component][datacomponent]:
+为生物[注册][register]一个刷怪蛋是常见做法（尽管并非必需）。这通过 `SpawnEggItem` 类和 `DataComponents#ENTITY_DATA` [数据组件][datacomponent]完成：
 
 ```java
 // Assume we have a DeferredRegister.Items called ITEMS
@@ -219,25 +219,25 @@ DeferredItem<SpawnEggItem> MY_ENTITY_SPAWN_EGG = ITEMS.registerItem("my_entity_s
     ));
 ```
 
-As an item like any other, the item should be added to a [creative tab][creative], and a [client item][clientitem], [model] and [translation] should be added.
+作为与其他物品别无二致的物品，该物品应被添加到[创造模式物品栏][creative]，并应为其添加[客户端物品][clientitem]、[模型][model]和[翻译][translation]。
 
-### Natural Spawning
+### 自然生成 {#natural-spawning}
 
-_See also [Entities/`MobCategory`][mobcategory], [Worldgen/Biome Modifers/Add Spawns][addspawns], [Worldgen/Biome Modifers/Add Spawn Costs][addspawncosts]; and [Spawn Cycle][spawncycle] on the [Minecraft Wiki][mcwiki]._
+_另见[实体/`MobCategory`][mobcategory]、[世界生成/生物群系修改器/添加生成][addspawns]、[世界生成/生物群系修改器/添加生成消耗][addspawncosts]；以及 [Minecraft Wiki][mcwiki] 上的[生成周期][spawncycle]。_
 
-Natural spawning is performed every tick for entities where `MobCategory#isFriendly()` is true (all non-monster entities by default), and every 400 ticks (\= 20 seconds) for entities where `MobCategory#isFriendly()` is false (all monsters). If `MobCategory#isPersistent()` returns true (mainly animals), this process additionally also happens on chunk generation.
+自然生成对 `MobCategory#isFriendly()` 为 true 的实体（默认为所有非怪物实体）每 tick 执行一次，对 `MobCategory#isFriendly()` 为 false 的实体（所有怪物）每 400 tick（\= 20 秒）执行一次。如果 `MobCategory#isPersistent()` 返回 true（主要是动物），这一过程还会额外在区块生成时发生。
 
-For each chunk and mob category, it is checked whether the spawn cap is hit. More technically, this is a check for whether there are less than `MobCategory#getMaxInstancesPerChunk() * loadedChunks / 289` entities of that `MobCategory` in the surrounding `loadedChunks` area, where `loadedChunks` is at most the 17x17 chunk area centered on the current chunk, or fewer chunks if less chunks are loaded (due to render distance or similar reasons).
+对于每个区块和每个生物类别，会检查是否已达到生成上限。更技术地说，这是检查在周围 `loadedChunks` 区域内该 `MobCategory` 的实体是否少于 `MobCategory#getMaxInstancesPerChunk() * loadedChunks / 289`，其中 `loadedChunks` 至多为以当前区块为中心的 17x17 区块区域，若加载的区块更少（由于渲染距离或类似原因），则为更少的区块。
 
-Next, for each chunk, it is required that there are less than `MobCategory#getMaxInstancesPerChunk()` entities of that `MobCategory` near at least one player (near means that the distance between mob and player \<\= 128) for spawning of that `MobCategory` to occur.
+接下来，对于每个区块，要求在至少一名玩家附近该 `MobCategory` 的实体少于 `MobCategory#getMaxInstancesPerChunk()` 个（“附近”指生物与玩家之间的距离 \<\= 128），该 `MobCategory` 的生成才会发生。
 
-If the conditions are met, an entry is randomly chosen from the relevant biome's spawn data, and spawning occurs if a suitable position can be found. There are at most three attempts to find a random position; if no position can be found, no spawning will occur.
+如果满足这些条件，就会从相关生物群系的生成数据中随机选取一个条目，并在能找到合适位置时进行生成。至多有三次寻找随机位置的尝试；如果找不到位置，则不会发生生成。
 
-#### Example
+#### 示例 {#example}
 
-Sound complex? Let's go through this with an example for animals in plains biomes.
+听起来很复杂？我们通过一个平原生物群系中动物的示例来梳理一遍。
 
-In the plains biome, every tick, the game tries to spawn entities from the `CREATURE` mob category, which contains the following entries:
+在平原生物群系中，游戏每 tick 都会尝试从 `CREATURE` 生物类别生成实体，该类别包含以下条目：
 
 ```json5
 [
@@ -250,9 +250,9 @@ In the plains biome, every tick, the game tries to spawn entities from the `CREA
 ]
 ```
 
-Since the spawn cap for `CREATURE` is 10, the up to 17x17 chunks centered around each player's current chunk are scanned for other `CREATURE`-type entities. If \<\= 10 * chunkCount / 289 entities are found (which basically just means that near the unloaded chunks, the chance for spawns becomes higher), each found entity is distance-checked to the nearest player. If the distance is greater than 128 for at least one of them, spawning can occur.
+由于 `CREATURE` 的生成上限是 10，会扫描以每名玩家当前区块为中心的至多 17x17 区块，查找其他 `CREATURE` 类型的实体。如果找到的实体 \<\= 10 * chunkCount / 289 个（这基本上意味着在未加载区块附近，生成几率会变高），则会对每个找到的实体做与最近玩家的距离检查。如果其中至少有一个的距离大于 128，就可以发生生成。
 
-If all those checks pass, a spawn entry is chosen from the above list based on the weights. Let's assume pigs were chosen. The game then checks a random position in the chunk for whether it would be suitable for spawning the entity. If the position is suitable, the entities are spawned according to the min and max counts specified in the spawn data (so exactly 4 pigs in our case). If the position is not suitable, the game tries again twice with different positions. If no position is found still, spawning is canceled.
+如果所有这些检查都通过，就会根据权重从上述列表中选取一个生成条目。假设选中了猪。游戏随后会检查区块中的一个随机位置是否适合生成该实体。如果位置合适，就会按照生成数据中指定的最小和最大数量生成实体（因此在我们的例子中恰好是 4 头猪）。如果位置不合适，游戏会用不同的位置再尝试两次。如果仍找不到位置，则取消生成。
 
 [addspawncosts]: ../worldgen/biomemodifier.md#add-spawn-costs
 [addspawns]: ../worldgen/biomemodifier.md#add-spawns

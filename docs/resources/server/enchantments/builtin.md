@@ -1,25 +1,25 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Built-In Enchantment Effect Components
+# 内置附魔效果组件 {#built-in-enchantment-effect-components}
 
-Vanilla Minecraft provides numerous different types of enchantment effect components for use in [enchantment] definitions. This article will explain each, including their usage and in-code definition.
+原版 Minecraft 提供了众多不同类型的附魔效果组件，供[附魔][enchantment]定义使用。本文将逐一讲解，包括它们的用法和代码内定义。
 
-## Value Effect Components
+## 数值效果组件 {#value-effect-components}
 
-_See also [Value Effect Components] on the Minecraft Wiki_
+_另请参阅 Minecraft Wiki 上的 [Value Effect Components]_
 
-Value effect components are used for enchantments that alter a numerical value somewhere in the game, and are implemented by the class `EnchantmentValueEffect`. If a value is altered by more than one value effect component (for example, by multiple enchantments), all of their effects will apply.
+数值效果组件（value effect component）用于会改变游戏中某处数值的附魔，由 `EnchantmentValueEffect` 类实现。如果一个值被多个数值效果组件改变（例如被多个附魔改变），它们的效果都会应用。
 
-Value effect components can be set to use any of these operations on their given values:
-- `minecraft:set`: Overwrites the given level-based value.
-- `minecraft:add`: Adds the specified level-based value to the old one.
-- `minecraft:all_of`: Accepts a list of other value effects and applies them in the stated sequence.
-- `minecraft:multiply`: Multiplies the specified level-based factor by the old one.
-- `minecraft:remove_binomial`: Polls a given (level-based) chance using a binomial distibution. If it works, subtracts 1 from the value. Note that many values are effectively flags, being fully on at 1 and fully off at 0.
-- `minecraft:exponential`: Polls a given (level-based) base and (level-based) exponent and then raises the base to that exponent. Multiplies the result with the old value.
+数值效果组件可以设置为对给定值使用以下任一运算：
+- `minecraft:set`：覆盖给定的基于等级的值。
+- `minecraft:add`：将指定的基于等级的值加到旧值上。
+- `minecraft:all_of`：接受一个由其他数值效果组成的列表，并按所述顺序应用它们。
+- `minecraft:multiply`：将指定的基于等级的因子与旧值相乘。
+- `minecraft:remove_binomial`：使用二项分布对给定的（基于等级的）几率进行一次投掷。若成功，则从值中减去 1。注意许多值实际上是标志位，在 1 时完全开启，在 0 时完全关闭。
+- `minecraft:exponential`：投掷一个给定的（基于等级的）底数和（基于等级的）指数，然后将底数升到该指数次幂。将结果与旧值相乘。
 
-The Sharpness enchantment uses `minecraft:damage`, a value effect component, as follows to achieve its effect:
+锋利（Sharpness）附魔使用了数值效果组件 `minecraft:damage`，如下所示，以达成其效果：
 
 <Tabs>
 <TabItem value="sharpness.json" label="JSON">
@@ -70,9 +70,9 @@ DataComponentMap.builder().set(
 </TabItem>
 </Tabs>
 
-The object within the `value` block is a [LevelBasedValue], which can be used to have a value effect component that changes the intensity of its effect by level.
+`value` 块内的对象是一个 [LevelBasedValue]，它可以让数值效果组件按等级改变其效果的强度。
 
-The `EnchantmentValueEffect#process` method can be used to adjust values based on the provided numerical operations, like so:
+`EnchantmentValueEffect#process` 方法可用于根据所提供的数值运算来调整值，如下所示：
 
 ```java
 // `valueEffect` is an EnchantmentValueEffect instance.
@@ -81,52 +81,52 @@ float baseValue = 1.0;
 float modifiedValue = valueEffect.process(enchantLevel, server.random, baseValue);
 ```
 
-### Vanilla Enchantment Value Effect Component Types
+### 原版附魔数值效果组件类型 {#vanilla-enchantment-value-effect-component-types}
 
-#### Defined as `DataComponentType<EnchantmentValueEffect>`
+#### 定义为 `DataComponentType<EnchantmentValueEffect>` {#defined-as-datacomponenttypeenchantmentvalueeffect}
 
-- `minecraft:crossbow_charge_time`: Modifies the charge-up time of this crossbow in seconds. Used by Quick Charge.
-- `minecraft:trident_spin_attack_strength`: Modifies the 'strength' of the spin attack of a trident (see `TridentItem#releaseUsing`). Used by Riptide.
+- `minecraft:crossbow_charge_time`：以秒为单位修改此弩的蓄力时间。由快速装填（Quick Charge）使用。
+- `minecraft:trident_spin_attack_strength`：修改三叉戟旋转攻击的"强度"（见 `TridentItem#releaseUsing`）。由激流（Riptide）使用。
 
-#### Defined as `DataComponentType<List<ConditionalEffect<EnchantmentValueEffect>>>`
+#### 定义为 `DataComponentType<List<ConditionalEffect<EnchantmentValueEffect>>>` {#defined-as-datacomponenttypelistconditionaleffectenchantmentvalueeffect}
 
-Armor related:
-- `minecraft:armor_effectiveness`: Determines effectiveness of armor against this weapon on a scale of 0 (no protection) to 1 (normal protection). Used by Breach.
-- `minecraft:damage_protection`: Each "point" of damage reduction reduces damage taken while wielding this item by 4%, to a maximum reduction of 80%. Used by Blast Protection, Feather Falling, Fire Protection, Protection, and Projectile Protection.
+护甲相关：
+- `minecraft:armor_effectiveness`：决定护甲对此武器的有效程度，取值范围为 0（无防护）到 1（正常防护）。由破甲（Breach）使用。
+- `minecraft:damage_protection`：每"点"减伤会将持有此物品时受到的伤害减少 4%，最多减少 80%。由爆炸保护、摔落缓冲、火焰保护、保护和弹射物保护使用。
 
-Attack related:
-- `minecraft:damage`: Modifies attack damage with this weapon. Used by Sharpness, Impaling, Bane of Arthropods, Power, and Smite. 
-- `minecraft:smash_damage_per_fallen_block`: Adds damage per block fallen to a mace. Used by Density.
-- `minecraft:knockback`: Modifies the amount of knockback caused while wielding this weapon, measured in game units. Used by Knockback and Punch.
-- `minecraft:mob_experience`: Modifies the amount of experience for killing a mob. Unused.
+攻击相关：
+- `minecraft:damage`：修改此武器的攻击伤害。由锋利、穿刺、节肢杀手、力量和亡灵杀手使用。
+- `minecraft:smash_damage_per_fallen_block`：为重锤按下落方块数添加伤害。由致密（Density）使用。
+- `minecraft:knockback`：修改持有此武器时造成的击退量，以游戏单位衡量。由击退和冲击使用。
+- `minecraft:mob_experience`：修改击杀生物所获得的经验量。未使用。
 
-Durability related:
-- `minecraft:item_damage`: Modifies the durability damage taken by the item. Values below 1 act as a chance that the item takes damage. Used by Unbreaking.
-- `minecraft:repair_with_xp`: Causes the item to repair itself using XP gain, and determines how effective this is. Used by Mending.
+耐久相关：
+- `minecraft:item_damage`：修改物品受到的耐久损伤。低于 1 的值表示物品受损的几率。由耐久使用。
+- `minecraft:repair_with_xp`：使物品利用经验获取来修复自身，并决定其效果如何。由经验修补使用。
 
-Projectile related:
-- `minecraft:ammo_use`: Modifies the amount of ammo used when firing a bow or crossbow. The value is clamped to an integer, so values below 1 will result in 0 ammo use. Used by Infinity.
-- `minecraft:projectile_piercing`: Modifies the number of entities pierced by a projectile from this weapon. Used by Piercing.
-- `minecraft:projectile_count`: Modifies the number of projectiles spawned when shooting this bow. Used by Multishot.
-- `minecraft:projectile_spread`: Modifies the maximum spread of projectiles in degrees from the direction they were fired. Used by Multishot.
-- `minecraft:trident_return_acceleration`: Causes the trident to return to its owner, and modifies the acceleration applied to this trident while doing so. Used by Loyalty.
+弹射物相关：
+- `minecraft:ammo_use`：修改发射弓或弩时消耗的弹药量。该值被钳制为整数，因此低于 1 的值将导致消耗 0 弹药。由无限使用。
+- `minecraft:projectile_piercing`：修改此武器发射的弹射物所穿透的实体数量。由穿透（Piercing）使用。
+- `minecraft:projectile_count`：修改射出此弓时生成的弹射物数量。由多重射击使用。
+- `minecraft:projectile_spread`：修改弹射物相对于发射方向的最大散布度数。由多重射击使用。
+- `minecraft:trident_return_acceleration`：使三叉戟返回其拥有者，并修改返回过程中施加于该三叉戟的加速度。由忠诚（Loyalty）使用。
 
-Other:
-- `minecraft:block_experience`: Modifies the amount of XP from breaking a block. Used by Silk Touch.
-- `minecraft:fishing_time_reduction`: Reduces the time it takes for the bobber to sink while fishing with this rod by the given number of seconds. Used by Lure.
-- `minecraft:fishing_luck_bonus`: Modifies the amount of [luck] used in the fishing loot table. Used by Luck of the Sea.
+其他：
+- `minecraft:block_experience`：修改破坏方块所获得的经验量。由精准采集使用。
+- `minecraft:fishing_time_reduction`：将使用此钓竿时浮标下沉所需的时间减少给定的秒数。由饵钓（Lure）使用。
+- `minecraft:fishing_luck_bonus`：修改钓鱼战利品表中所用的[幸运][luck]量。由海之眷顾使用。
 
-#### Defined as `DataComponentType<List<TargetedConditionalEffect<EnchantmentValueEffect>>>`
+#### 定义为 `DataComponentType<List<TargetedConditionalEffect<EnchantmentValueEffect>>>` {#defined-as-datacomponenttypelisttargetedconditionaleffectenchantmentvalueeffect}
 
-- `minecraft:equipment_drops`: Modifies the chance of equipment dropping from an entity killed by this weapon. Used by Looting.
+- `minecraft:equipment_drops`：修改被此武器击杀的实体掉落装备的几率。由抢夺（Looting）使用。
 
-## Location Based Effect Components
+## 基于位置的效果组件 {#location-based-effect-components}
 
-_See also: [Location Based Effect Components] on the Minecraft Wiki_
+_另请参阅 Minecraft Wiki 上的 [Location Based Effect Components]_
 
-Location based effect components are components that implement `EnchantmentLocationBasedEffect`. These components define actions to take that need to know where in the level the wielder of the enchantment is. They operate using two major methods: `EnchantmentEntityEffect#onChangedBlock`, which is called when the enchanted item is equipped and when the wielder changes their `BlockPos`, and `onDeactivate`, which is called when the enchanted item is removed.
+基于位置的效果组件（location based effect component）是实现 `EnchantmentLocationBasedEffect` 的组件。这些组件定义了需要知道附魔持有者在世界中所处位置才能执行的动作。它们主要通过两个方法运作：`EnchantmentEntityEffect#onChangedBlock`，在附魔物品被装备时以及持有者改变其 `BlockPos` 时调用；以及 `onDeactivate`，在附魔物品被移除时调用。
 
-Here is an example which uses the `minecraft:attributes` location based effect component type to change the wielder's entity scale:
+下面是一个使用 `minecraft:attributes` 基于位置的效果组件类型来改变持有者实体缩放比例的示例：
 
 <Tabs>
 <TabItem value="attribute.json" label="JSON">
@@ -176,44 +176,44 @@ DataComponentMap.builder().set(
 </TabItem>
 </Tabs>
 
-Vanilla adds the following location based events:
+原版添加了以下基于位置的事件：
 
-- `minecraft:all_of`: Runs a list of entity effects in sequence.
-- `minecraft:apply_mob_effect`: Applies a [mob effect] to the affected mob.
-- `minecraft:attribute`: Applies an [attribute modifier] to the wielder of the enchantment.
-- `minecraft:change_item_damage`: Damages this item's durability.
-- `minecraft:damage_entity`: Does damage to the affected entity. This stacks with attack damage if in an attacking context.
-- `minecraft:explode`: Summons an explosion. 
-- `minecraft:ignite`: Sets the entity on fire.
-- `minecraft:apply_impulse`: Applies the specified velocity (broken into direction, coordinate, and magnitude) to the entity.
-- `minecraft:apply_exhaustion`: Adds the specified amount of food exhaustion to the player.
-- `minecraft:play_sound`: Plays a specified sound.
-- `minecraft:replace_block`: Replaces a block at a given offset.
-- `minecraft:replace_disk`: Replaces a disk of blocks.
-- `minecraft:run_function`: Runs a specified [datapack function].
-- `minecraft:set_block_properies`: Modifies the block state properties of the specified block.
-- `minecraft:spawn_particles`: Spawns a particle.
-- `minecraft:summon_entity`: Summons an entity.
+- `minecraft:all_of`：按顺序运行一系列实体效果。
+- `minecraft:apply_mob_effect`：对受影响的生物施加一个[状态效果][mob effect]。
+- `minecraft:attribute`：对附魔持有者施加一个[属性修饰符][attribute modifier]。
+- `minecraft:change_item_damage`：损耗此物品的耐久。
+- `minecraft:damage_entity`：对受影响的实体造成伤害。若处于攻击上下文中，这会与攻击伤害叠加。
+- `minecraft:explode`：召唤一次爆炸。
+- `minecraft:ignite`：使实体着火。
+- `minecraft:apply_impulse`：对实体施加指定的速度（分解为方向、坐标和量级）。
+- `minecraft:apply_exhaustion`：为玩家增加指定量的饥饿消耗。
+- `minecraft:play_sound`：播放指定的声音。
+- `minecraft:replace_block`：替换给定偏移处的一个方块。
+- `minecraft:replace_disk`：替换一个圆盘状区域的方块。
+- `minecraft:run_function`：运行指定的[数据包函数][datapack function]。
+- `minecraft:set_block_properies`：修改指定方块的方块状态属性。
+- `minecraft:spawn_particles`：生成一个粒子。
+- `minecraft:summon_entity`：召唤一个实体。
 
-### Vanilla Location Based Effect Component Types
+### 原版基于位置的效果组件类型 {#vanilla-location-based-effect-component-types}
 
-#### Defined as `DataComponentType<List<ConditionalEffect<EnchantmentLocationBasedEffect>>>`
+#### 定义为 `DataComponentType<List<ConditionalEffect<EnchantmentLocationBasedEffect>>>` {#defined-as-datacomponenttypelistconditionaleffectenchantmentlocationbasedeffect}
 
-- `minecraft:location_changed`: Runs a location based effect when the wielder's Block Position changes and when this item is equipped. Used by Frost Walker and Soul Speed.
+- `minecraft:location_changed`：在持有者的方块位置改变时以及此物品被装备时，运行一个基于位置的效果。由冰霜行者和灵魂疾行使用。
 
-#### Defined as `DataComponentType<List<EnchantmentAttributeEffect>>`
+#### 定义为 `DataComponentType<List<EnchantmentAttributeEffect>>` {#defined-as-datacomponenttypelistenchantmentattributeeffect}
 
-- `minecraft:attributes`: Applies an attribute modifier to the wielder, and removes it when the enchanted item is no longer equipped.
+- `minecraft:attributes`：对持有者施加一个属性修饰符，并在附魔物品不再被装备时移除它。
 
-## Entity Effect Components
+## 实体效果组件 {#entity-effect-components}
 
-_See also [Entity Effect Components] on the Minecraft Wiki._
+_另请参阅 Minecraft Wiki 上的 [Entity Effect Components]。_
 
-Entity effect components are components that implement `EnchantmentEntityEffect`, an subtype of `EnchantmentLocationBasedEffect`. These override `EnchantmentLocationBasedEffect#onChangedBlock` to run `EnchantmentEntityEffect#apply` instead; this `apply` method is also directly invoked somewhere else in the codebase depending on the specific type of the component. This allows effects to occur without waiting for the wielder's block position to change.
+实体效果组件（entity effect component）是实现 `EnchantmentEntityEffect` 的组件，它是 `EnchantmentLocationBasedEffect` 的一个子类型。这些组件重写 `EnchantmentLocationBasedEffect#onChangedBlock` 以改为运行 `EnchantmentEntityEffect#apply`；这个 `apply` 方法也会视组件的具体类型而定，在代码库中的其他某处被直接调用。这使得效果无需等待持有者的方块位置改变即可发生。
 
-All types of location based effect component are also valid types of entity effect component, except for `minecraft:attribute`, which is registered only as a location based effect component.
+所有基于位置的效果组件类型也都是合法的实体效果组件类型，`minecraft:attribute` 除外——它只被注册为基于位置的效果组件。
 
-Here is an example of the JSON definition of one such component from the Fire Aspect enchantment:
+下面是取自火焰附加（Fire Aspect）附魔的一个此类组件的 JSON 定义示例：
 
 <Tabs>
 <TabItem value="fire.json" label="JSON">
@@ -295,41 +295,41 @@ DataComponentMap.builder().set(
 </TabItem>
 </Tabs>
 
-Here, the entity effect component is `minecraft:post_attack`. Its effect is `minecraft:ignite`, which is implemented by the `Ignite` record. This record's implementation of `EnchantmentEntityEffect#apply` sets the target entity on fire.
+这里，实体效果组件是 `minecraft:post_attack`。其效果是 `minecraft:ignite`，由 `Ignite` record 实现。该 record 对 `EnchantmentEntityEffect#apply` 的实现会使目标实体着火。
 
-### Vanilla Enchantment Entity Effect Component Types
+### 原版附魔实体效果组件类型 {#vanilla-enchantment-entity-effect-component-types}
 
-#### Defined as `DataComponentType<List<ConditionalEffect<EnchantmentEntityEffect>>>`
+#### 定义为 `DataComponentType<List<ConditionalEffect<EnchantmentEntityEffect>>>` {#defined-as-datacomponenttypelistconditionaleffectenchantmententityeffect}
 
-- `minecraft:post_piercing_attack`: Runs an entity effect when a living entity lunges forward. Used by Lunge.
-- `minecraft:hit_block`: Runs an entity effect when an entity (for example, a projectile) hits a block. Used by Channeling.
-- `minecraft:tick`: Runs an entity effect each tick. Used by Soul Speed.
-- `minecraft:projectile_spawned`: Runs an entity effect after a projectile entity has been spawned from a bow or crossbow. Used by Flame.
+- `minecraft:post_piercing_attack`：在生物实体向前突刺时运行一个实体效果。由突刺（Lunge）使用。
+- `minecraft:hit_block`：在一个实体（例如弹射物）击中方块时运行一个实体效果。由引雷（Channeling）使用。
+- `minecraft:tick`：每刻运行一个实体效果。由灵魂疾行使用。
+- `minecraft:projectile_spawned`：在一个弹射物实体从弓或弩生成之后运行一个实体效果。由火矢（Flame）使用。
 
-#### Defined as `DataComponentType<List<TargetedConditionalEffect<EnchantmentEntityEffect>>>`
+#### 定义为 `DataComponentType<List<TargetedConditionalEffect<EnchantmentEntityEffect>>>` {#defined-as-datacomponenttypelisttargetedconditionaleffectenchantmententityeffect}
 
-- `minecraft:post_attack`: Runs an entity effect after an attack damages an entity. Used by Bane of Arthropods, Channeling, Fire Aspect, Thorns, and Wind Burst.
+- `minecraft:post_attack`：在一次攻击对实体造成伤害之后运行一个实体效果。由节肢杀手、引雷、火焰附加、荆棘和风爆使用。
 
-For more detail on each of these, please look at the [relevant minecraft wiki page].
+关于这些的更多细节，请查看[相关的 Minecraft Wiki 页面][relevant minecraft wiki page]。
 
-## Other Vanilla Enchantment Component Types
+## 其他原版附魔组件类型 {#other-vanilla-enchantment-component-types}
 
-#### Defined as `DataComponentType<List<ConditionalEffect<DamageImmunity>>>`
+#### 定义为 `DataComponentType<List<ConditionalEffect<DamageImmunity>>>` {#defined-as-datacomponenttypelistconditionaleffectdamageimmunity}
 
-- `minecraft:damage_immunity`: Applies immunity to a specified damage type. Used by Frost Walker.
+- `minecraft:damage_immunity`：对指定伤害类型施加免疫。由冰霜行者使用。
 
-#### Defined as `DataComponentType<Unit>`
+#### 定义为 `DataComponentType<Unit>` {#defined-as-datacomponenttypeunit}
 
-- `minecraft:prevent_equipment_drop`: Prevents this item from being dropped by a player when dying. Used by Curse of Vanishing.
-- `minecraft:prevent_armor_change`: Prevents this item from being unequipped from an armor slot. Used by Curse of Binding.
+- `minecraft:prevent_equipment_drop`：防止此物品在玩家死亡时被掉落。由消失诅咒使用。
+- `minecraft:prevent_armor_change`：防止此物品从护甲槽位被卸下。由绑定诅咒使用。
 
-#### Defined as `DataComponentType<List<CrossbowItem.ChargingSounds>>`
+#### 定义为 `DataComponentType<List<CrossbowItem.ChargingSounds>>` {#defined-as-datacomponenttypelistcrossbowitemchargingsounds}
 
-- `minecraft:crossbow_charge_sounds`: Determines the sound events that occur when charging a crossbow. Each entry represents one level of the enchantment.
+- `minecraft:crossbow_charge_sounds`：决定为弩蓄力时发生的声音事件。每个条目代表附魔的一个等级。
 
-#### Defined as `DataComponentType<List<Holder<SoundEvent>>>`
+#### 定义为 `DataComponentType<List<Holder<SoundEvent>>>` {#defined-as-datacomponenttypelistholdersoundevent}
 
-- `minecraft:trident_sound`: Determines the sound events that occur when using a trident. Each entry represents one level of the enchantment.
+- `minecraft:trident_sound`：决定使用三叉戟时发生的声音事件。每个条目代表附魔的一个等级。
 
 [enchantment]: index.md
 [Value Effect Components]: https://minecraft.wiki/w/Enchantment_definition#Components_with_value_effects

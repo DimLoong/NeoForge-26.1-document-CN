@@ -1,28 +1,28 @@
-# Global Loot Modifiers
+# 全局战利品修改器 {#global-loot-modifiers}
 
-Global Loot Modifiers, or GLMs for short, are a data-driven way to modify drops without the need to overwrite dozens or hundreds of vanilla loot tables, or to handle effects that would require interactions with another mod's loot tables without knowing what mods are loaded.
+全局战利品修改器（Global Loot Modifiers，简称 GLM）是一种数据驱动的掉落物修改方式，无需覆盖数十乃至数百张原版战利品表，也可用于在不知道加载了哪些 Mod 的情况下处理需要与其他 Mod 战利品表交互的效果。
 
-GLMs work by first rolling the associated [loot table][loottable] and then applying the GLM to the result of rolling the table. GLMs are also stacking, rather than last-load-wins, to allow for multiple mods to modify the same loot table, this is similar to [tags].
+GLM 的工作方式是：先掷取关联的[战利品表][loottable]，然后把 GLM 应用到掷取表所得的结果上。GLM 还是叠加式的，而非“后加载者覆盖”，以允许多个 Mod 修改同一张战利品表，这一点与[标签][tags]类似。
 
-To register a GLM, you will need three things:
+要注册一个 GLM，你需要三样东西：
 
-- A JSON file representing your loot modifier. This file contains all the data for your modification, allowing data packs to tweak your effect. It is located at `data/<namespace>/loot_modifiers/<path>.json`.
-- A class that implements `IGlobalLootModifier` or extends `LootModifier` (which in turn implements `IGlobalLootModifier`). This class contains the code that makes the modifier work.
-- A map [codec] to encode and decode your loot modifier class. Usually, this is implemented as a `public static final` field in the loot modifier class.
+- 一个表示你的战利品修改器的 JSON 文件。该文件包含你修改的所有数据，允许数据包对你的效果进行调整。它位于 `data/<namespace>/loot_modifiers/<path>.json`。
+- 一个实现 `IGlobalLootModifier` 或继承 `LootModifier`（后者进而实现 `IGlobalLootModifier`）的类。该类包含使修改器工作的代码。
+- 一个用于编码和解码你的战利品修改器类的映射 [Codec][codec]。通常，它作为战利品修改器类中的一个 `public static final` 字段实现。
 
-## The Loot Modifier JSON
+## 战利品修改器 JSON {#the-loot-modifier-json}
 
-This file contains all values related to your modifier, for example chances to apply, what items to add, etc. The JSON can be found at `data/<namespace>/loot_modifiers/<path>.json`, where `<namespace>` and `<path>` are parts of the unique [`Identifier`][identifier]. It is recommended to avoid hard-coded values wherever possible so that data pack makers can adjust balance if they wish to. A loot modifier must contain at least two fields and may contain more, depending on the circumstances:
+该文件包含与你的修改器相关的所有值，例如应用的概率、要添加的物品等。JSON 位于 `data/<namespace>/loot_modifiers/<path>.json`，其中 `<namespace>` 和 `<path>` 是唯一 [`Identifier`][identifier] 的组成部分。建议尽可能避免硬编码值，以便数据包制作者在需要时调整平衡性。一个战利品修改器必须至少包含两个字段，并且可以根据情况包含更多：
 
-- The `type` field contains the registry name of the loot modifier.
-- The `conditions` field is a list of loot table conditions for this modifier to activate.
-- Additional properties may be required or optional, depending on the used codec.
+- `type` 字段包含战利品修改器的注册名。
+- `conditions` 字段是激活该修改器所需的一列战利品表条件。
+- 其他属性可能是必需的或可选的，取决于所使用的 Codec。
 
 :::tip
-A common use case for GLMs is to add extra loot to one specific loot table. To achieve this, the [`neoforge:loot_table_id` condition][loottableid] can be used.
+GLM 的一个常见用途是向某个特定的战利品表添加额外战利品。为此，可以使用 [`neoforge:loot_table_id` 条件][loottableid]。
 :::
 
-An example usage may look something like this:
+一个示例用法可能看起来像这样：
 
 ```json5
 {
@@ -43,9 +43,9 @@ An example usage may look something like this:
 }
 ```
 
-## `IGlobalLootModifier` and `LootModifier`
+## `IGlobalLootModifier` 与 `LootModifier` {#igloballootmodifier-and-lootmodifier}
 
-To actually apply the loot modifier to the loot table, a `IGlobalLootModifier` implementation must be specified. In most cases, you will want to use the `LootModifier` subclass, which handles things like conditions and priorities for you. To get started, we extend `LootModifier` in our loot modifier class:
+要真正把战利品修改器应用到战利品表上，必须指定一个 `IGlobalLootModifier` 实现。在大多数情况下，你会想使用 `LootModifier` 子类，它会为你处理条件和优先级等事项。要开始，我们在战利品修改器类中继承 `LootModifier`：
 
 ```java
 // We cannot use a record because records cannot extend other classes.
@@ -82,12 +82,12 @@ public class MyLootModifier extends LootModifier {
 ```
 
 :::info
-The returned list of drops from a modifier is fed into other modifiers in `priority` order, from highest to lowest. As such, modified loot can and should be expected to be modified by another loot modifier.
+一个修改器返回的掉落物列表会按 `priority` 从高到低的顺序传入其他修改器。因此，被修改过的战利品可以且应当被预期还会被另一个战利品修改器进一步修改。
 :::
 
-## The Loot Modifier Codec
+## 战利品修改器 Codec {#the-loot-modifier-codec}
 
-To tell the game about the existence of our loot modifier, we must define and [register] a [codec] for it. Reiterating on our previous example with the three fields, this would look something like this:
+为了让游戏知道我们的战利品修改器的存在，我们必须为它定义并[注册][register]一个 [Codec][codec]。沿用前面带有三个字段的示例，代码大致如下：
 
 ```java
 public static final MapCodec<MyLootModifier> CODEC = RecordCodecBuilder.mapCodec(inst -> 
@@ -100,7 +100,7 @@ public static final MapCodec<MyLootModifier> CODEC = RecordCodecBuilder.mapCodec
 );
 ```
 
-Then, we [register] the codec to the registry:
+然后，我们把该 Codec [注册][register]到注册表：
 
 ```java
 public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> GLOBAL_LOOT_MODIFIER_SERIALIZERS =
@@ -110,13 +110,13 @@ public static final Supplier<MapCodec<MyLootModifier>> MY_LOOT_MODIFIER =
         GLOBAL_LOOT_MODIFIER_SERIALIZERS.register("my_loot_modifier", () -> MyLootModifier.CODEC);
 ```
 
-## Builtin Loot Modifiers
+## 内置战利品修改器 {#builtin-loot-modifiers}
 
-NeoForge provides a loot modifier out of the box for you to use:
+NeoForge 开箱即用地提供了一个战利品修改器供你使用：
 
-### `neoforge:add_table`
+### `neoforge:add_table` {#neoforgeadd_table}
 
-This loot modifier rolls a second loot table and adds the results to the loot table the modifier is applied to.
+该战利品修改器会掷取第二张战利品表，并把结果添加到该修改器所应用的战利品表上。
 
 ```json5
 {
@@ -127,9 +127,9 @@ This loot modifier rolls a second loot table and adds the results to the loot ta
 }
 ```
 
-## Datagen
+## 数据生成 {#datagen}
 
-GLMs can be [datagenned][datagen]. This is done by subclassing `GlobalLootModifierProvider`:
+GLM 可以[数据生成][datagen]。这通过继承 `GlobalLootModifierProvider` 完成：
 
 ```java
 public class MyGlobalLootModifierProvider extends GlobalLootModifierProvider {
@@ -157,7 +157,7 @@ public class MyGlobalLootModifierProvider extends GlobalLootModifierProvider {
 }
 ```
 
-And like all data providers, you must register the provider to the `GatherDataEvent`s:
+和所有数据提供器一样，你必须把该提供器注册到 `GatherDataEvent`：
 
 ```java
 @SubscribeEvent // on the mod event bus
