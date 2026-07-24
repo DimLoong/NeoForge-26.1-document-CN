@@ -90,9 +90,18 @@ neoforge-reader:v1:documents       # 各页面进度集合(DocumentProgress)
 
 点击顶栏“继续阅读”按钮 → 弹出面板 → “清除记录” → 二次确认“确认清除”。仅删除上述 3 个 `neoforge-reader:v1:*` 键，**不调用 `localStorage.clear()`**，不影响主题选择等其他数据。
 
+## 搜索
+
+已将原项目的线上 Algolia 替换为**本地离线全文搜索** [`@easyops-cn/docusaurus-search-local`](https://github.com/easyops-cn/docusaurus-search-local)（配置见 `docusaurus.config.js` 的 `themes`）：支持中英文分词，索引在**构建时生成**（`build/search-index.json` 等），无需外部服务、可离线使用，搜索结果优先显示中文标题与正文片段。
+
+> 注意：该插件的搜索索引在 `npm run build` 阶段生成，因此**搜索功能需通过 `npm run build` + `npm run serve` 使用**；`npm run start` 开发模式下搜索框可能不返回结果，属正常现象。
+
+## 版本切换
+
+版本切换控件已从顶部导航栏**移至左侧边栏顶部**（`src/theme/DocSidebar/` 包裹 + `src/components/SidebarVersionSelector/`），显示当前版本 label（如 `26.1`）并可下拉切换到其他版本。切换后跳转到目标版本的主文档。
+
 ## 已知限制
 
-- **搜索**：仍使用原项目的线上 Algolia（`docusaurus.config.js` 的 `algolia`）。其索引为英文官方站，本地中文内容不会被该索引覆盖；离线时搜索不可用。未引入本地全文搜索以避免增加复杂度与构建风险（详见 `translation/qa-report.md`）。
 - **动态分节需联网**：见上文 `initialize.js` 说明。
 - **历史遗留破损锚点**：原英文文档本身存在少量 broken anchors（如 `#TODO`、大小写不匹配的锚点），构建时为警告（`onBrokenAnchors` 默认 `warn`），不影响构建成功；本次未擅自改动这些原文事实。详见 `translation/qa-report.md`。
 - 无独立 `tsc` 类型检查步骤（原项目即如此，TS 由 Babel 转译）。

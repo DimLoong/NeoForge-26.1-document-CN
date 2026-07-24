@@ -1,0 +1,110 @@
+.wrapper {
+  position: relative;
+  padding: 0.85rem 0.9rem 0.75rem;
+  border-bottom: 1px solid var(--nf-border-color, rgba(128, 128, 128, 0.2));
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+/* 触发按钮 */
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.42rem 0.7rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+  background: var(--nf-surface-2, rgba(128, 128, 128, 0.08));
+  border: 1px solid var(--nf-border-strong, rgba(128, 128, 128, 0.3));
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.trigger:hover {
+  border-color: var(--ifm-color-primary);
+  background: color-mix(in srgb, var(--ifm-color-primary) 8%, var(--nf-surface-2));
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 1px;
+}
+
+.current {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex: 0 0 auto;
+  margin-left: 0.5rem;
+  opacity: 0.6;
+  transition: transform 160ms ease;
+}
+.chevron[data-open='true'] {
+  transform: rotate(180deg);
+}
+
+/* 下拉菜单 */
+.menu {
+  position: absolute;
+  top: calc(100% - 0.35rem);
+  left: 0.9rem;
+  right: 0.9rem;
+  z-index: 20;
+  margin: 0;
+  padding: 0.3rem;
+  list-style: none;
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--nf-border-strong, rgba(128, 128, 128, 0.3));
+  border-radius: 0.6rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-align: left;
+  color: var(--ifm-font-color-base);
+  background: transparent;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.option:hover {
+  background: color-mix(in srgb, var(--ifm-color-primary) 12%, transparent);
+}
+
+.option[data-active='true'] {
+  color: var(--ifm-color-primary);
+  font-weight: 700;
+  background: color-mix(in srgb, var(--ifm-color-primary) 10%, transparent);
+}
+
+.check {
+  flex: 0 0 auto;
+  color: var(--ifm-color-primary);
+}

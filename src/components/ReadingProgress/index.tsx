@@ -182,6 +182,11 @@ export default function ReadingProgress(): JSX.Element {
         const docs = readDocuments();
         const links = document.querySelectorAll<HTMLAnchorElement>('.menu__link[href]');
         links.forEach((link) => {
+          // 跳过分类项：其展开箭头用 ::after 渲染，标记会与之冲突。
+          if (link.classList.contains('menu__link--sublist')) {
+            link.removeAttribute('data-reading-status');
+            return;
+          }
           const href = link.getAttribute('href') || '';
           const path = href.split('#')[0].replace(/\/$/, '');
           const entry =
