@@ -1,12 +1,12 @@
-# Jar-in-Jar
+# Jar-in-Jar {#jar-in-jar}
 
-Jar-in-Jar is a way to load dependencies for mods from within the jars of the mods. To accomplish this, Jar-in-Jar generates a metadata json within `META-INF/jarjar/metadata.json` on build containing the artifacts to load from within the jar.
+jar-in-jar 是一种从 Mod 的 jar 内部为其加载依赖的方式。为此，jar-in-jar 会在构建时于 `META-INF/jarjar/metadata.json` 中生成一份元数据 json，其中记录了需要从该 jar 内部加载的构件。
 
-Jar-in-Jar is a completely optional system. This will include all dependencies from the `jarJar` configuration into the `jarJar` task.
+jar-in-jar 是一套完全可选的系统。它会把 `jarJar` 配置中的所有依赖纳入 `jarJar` 任务。
 
-## Adding Dependencies
+## 添加依赖 {#adding-dependencies}
 
-You can add dependencies to be included inside your jar using the `jarJar` configuration. Jar-in-Jar is a negotiation system, and by default, will create and include the highest version from the `prefer` version.
+你可以使用 `jarJar` 配置来添加需要打包进你 jar 中的依赖。jar-in-jar 是一套协商系统，默认情况下会从 `prefer` 版本出发，创建并纳入其中的最高版本。
 
 ```gradle
 // In build.gradle
@@ -22,7 +22,7 @@ dependencies {
 }
 ```
 
-If your library should only work between an exact version range rather than the preferred version to whatever the highest version there is, you can configure `strictly` to a range your mod is compatible with:
+如果你的库只应在某个确切的版本范围内工作，而不是从首选版本一直取到现有的最高版本，你可以将 `strictly` 配置为你的 Mod 所兼容的范围：
 
 ```gradle
 // In build.gradle

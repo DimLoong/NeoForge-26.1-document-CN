@@ -1,13 +1,13 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Parchment
+# Parchment {#parchment}
 
-[Parchment] is a community-sourced set of mappings of **parameter names** and **javadocs** that augment the official names released by Mojang. By using parchment, you can get parameter names for most Minecraft methods, instead of the non-descriptive `p_` names.
+[Parchment] 是一套由社区维护的映射，包含**参数名**和 **javadoc**，用以补充 Mojang 发布的官方名称。使用 Parchment 后，你可以为大多数 Minecraft 方法获得有意义的参数名，而不是那些没有描述性的 `p_` 名称。
 
-## Configuring parchment
+## 配置 Parchment {#configuring-parchment}
 
-The most basic configuration is using the following properties in `gradle.properties`:
+最基本的配置方式是在 `gradle.properties` 中使用以下属性：
 
 <Tabs defaultValue="mdg">
 <TabItem value="mdg" label="ModDevGradle">
@@ -32,7 +32,7 @@ neogradle.subsystems.parchment.mappingsVersion=2023.12.10
 </TabItem>
 </Tabs>
 
-The subsystem also has a Gradle DSL and supports more parameters, explained in the following Gradle snippet:
+该子系统还提供了 Gradle DSL，并支持更多参数，下面的 Gradle 代码片段对此作了说明：
 
 <Tabs defaultValue="mdg">
 <TabItem value="mdg" label="ModDevGradle">
@@ -116,7 +116,7 @@ subsystems {
 </Tabs>
 
 :::tip
-You can find the latest Parchment versions on their [documentation](https://parchmentmc.org/docs/getting-started).
+你可以在 Parchment 的[文档](https://parchmentmc.org/docs/getting-started)中找到最新的版本。
 :::
 
 [Parchment]: https://parchmentmc.org/

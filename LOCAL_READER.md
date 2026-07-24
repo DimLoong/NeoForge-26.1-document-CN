@@ -37,20 +37,24 @@ npm run clear
 npm run write-heading-ids
 ```
 
-> 注意：`npm run start` / `npm run build` 会先执行 `node scripts/initialize.js`，从远程仓库克隆并生成 `primer/docs`、`toolchain/docs/plugins` 两个**动态分节**（NeoGradle / ModDevGradle / 版本导读等）。**首次**运行需要联网，且 NeoGradle 仓库较大，克隆可能耗时数分钟；生成后目录存在即不再重复克隆。这些动态分节是外部内容、每次构建可被覆盖，**不在本次翻译范围内**。
+> 注意：`npm run start` / `npm run build` 会先执行 `node scripts/initialize.js`，从远程仓库克隆并生成 `primer/docs`（版本导读）与 `toolchain/docs/plugins`（ModDevGradle / NeoGradle）。**首次**运行需要联网，NeoGradle 仓库较大，克隆可能耗时数分钟；生成后目录存在即不再重复克隆。
 
 ## 翻译范围
 
 **已翻译（简体中文）**
 - `docs/` 下全部 **77 篇 `.md`** 正文（NeoForge 26.1）。
 - 16 个 `docs/**/_category_.json` 的侧边栏分类 `label`。
+- **工具链特性** `toolchain/docs/`（5 篇）+ **插件文档** `toolchain/docs/plugins/`（ModDevGradle、NeoGradle 各 1 篇）。
+- **用户指南** `user/docs/`（5 篇）、**整合包开发** `modpack/docs/`（1 篇）。
 - 首页 `src/pages/index.md` 的可见文本与卡片文案。
 - 导航栏、页脚、站点标题/标语（`docusaurus.config.js`）。
 - 界面 UI 文本（上一页/下一页、提示框标签、搜索等）由 Docusaurus 内置 `zh-Hans` 翻译自动提供（`i18n.defaultLocale = 'zh-Hans'`）。
 
+> **关于 `toolchain/docs/plugins`（插件文档）的持久化**：这两篇原为构建时从上游仓库拉取的英文内容。为保留中文译文，已做两处改动：① `.gitignore` 取消忽略该目录（纳入 Git 跟踪）；② `scripts/clean.js` 不再在 `clear` 时删除它。因 `initialize.js` 检测到目录存在即跳过重新生成，中文译文得以长期保留。若日后想恢复从上游同步英文原文，删除 `toolchain/docs/plugins/` 后重新 `build` 即可。
+
 **未翻译（保持英文）**
 - 所有历史版本 `versioned_docs/*`。
-- 动态生成的 `primer/`、`toolchain/`（外部仓库内容，构建时覆盖）。
+- **版本导读 `primer/`**：构建时从上游生成、内容为 1.14→26.2 各版本迁移说明（约 21.8 万词、体量大且时效性低），未翻译；`clear` 时仍会清理、`build` 时重新拉取英文。
 - `user/`、`modpack/` 独立文档集与 `src/pages/contributing.md`（贡献者向，非 26.1 正文）。
 - 所有代码块内容（含注释）、代码标识符、路径、命令、URL —— 按技术翻译规范逐字保留。
 

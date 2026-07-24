@@ -2,52 +2,52 @@
 sidebar_position: 1
 ---
 
-# Installing a NeoForge Client
+# 安装 NeoForge 客户端 {#installing-a-neoforge-client}
 
-_This article assumes that you [have the correct version of Java installed][java], and that you use the (vanilla) Minecraft launcher. If you are using a [third-party launcher][launchers], please consult their documentation instead._
+_本文假设你[已安装正确版本的 Java][java]，并且使用（原版）Minecraft 启动器。如果你使用的是[第三方启动器][launchers]，请改为查阅其相应文档。_
 
-## Installing
+## 安装 {#installing}
 
-To install NeoForge:
+安装 NeoForge 的步骤：
 
-- Close your Minecraft Launcher.
-- Download the installer `.jar` from [the NeoForged website][neoforged].
-- Make sure that `Install client` is selected and click `Proceed`.
-- Open the Minecraft Launcher. A NeoForged run option should have appeared.
+- 关闭你的 Minecraft 启动器。
+- 从 [NeoForged 官网][neoforged] 下载 `.jar` 安装程序。
+- 确保已选择 `Install client`，然后点击 `Proceed`。
+- 打开 Minecraft 启动器，此时应当出现一个 NeoForged 的运行选项。
 
-Now, while you can use that run option, it is recommended to instead use custom launch profiles when dealing with modded instances, as to keep the mods isolated from the vanilla game. To that end, the Minecraft Launcher offers you the ability to create custom profiles in the Installations tab:
+尽管你可以直接使用该运行选项，但在处理带 Mod 的实例时，我们建议改用自定义启动配置，以便将 Mod 与原版游戏隔离开。为此，Minecraft 启动器允许你在 Installations 标签页中创建自定义配置：
 
-- Go to the Installations tab.
-- Click "New Installation".
-- Name your new installation.
-- Select the desired NeoForge version.
-- Select the game directory. This should be a separate folder outside the standard [`.minecraft`][dotminecraft] directory.
-- Press "Install" and boot up the profile.
+- 前往 Installations 标签页。
+- 点击 "New Installation"。
+- 为新的安装配置命名。
+- 选择所需的 NeoForge 版本。
+- 选择游戏目录。该目录应当是标准 [`.minecraft`][dotminecraft] 目录之外的一个单独文件夹。
+- 点击 "Install" 并启动该配置。
 
-## Adding Mods
+## 添加 Mod {#adding-mods}
 
-After starting the game once, a `mods` folder will have appeared in the specified game directory. This is where you want to put your mod files.
+首次启动游戏后，指定的游戏目录中会出现一个 `mods` 文件夹。你需要把 Mod 文件放到这里。
 
-Mod files should only be downloaded from trustworthy sources. We generally recommend you get your mods on [CurseForge][curseforge] or [Modrinth][modrinth].
+Mod 文件只应从可信来源下载。我们通常建议你从 [CurseForge][curseforge] 或 [Modrinth][modrinth] 获取 Mod。
 
-## Updating
+## 更新 {#updating}
 
-To update your NeoForge version, simply download and run the installer for the new NeoForge version, as described above. Then, go to the Installations tab in the launcher and change the version in your NeoForge profile to the new version.
+要更新你的 NeoForge 版本，只需按上文所述下载并运行新版 NeoForge 的安装程序即可。然后，前往启动器的 Installations 标签页，将你 NeoForge 配置中的版本改为新版本。
 
 :::danger
-Always backup your world before updating NeoForge or mods!
+更新 NeoForge 或 Mod 前，请务必备份你的世界！
 
-To backup your world, open the game directory and select the `saves` subfolder. Then, copy the folder with your world's name (e.g. `New World`) to a safe location.
+要备份世界，打开游戏目录并选中 `saves` 子文件夹。然后，把以你世界名称命名的文件夹（例如 `New World`）复制到一个安全的位置。
 
-If anything goes wrong during updating, delete the updated world folder, downgrade NeoForge and/or mods to what versions were used before, then copy your world backup back into the `saves` folder.
+如果更新过程中出现任何问题，删除更新后的世界文件夹，将 NeoForge 和/或 Mod 降回之前使用的版本，然后把你的世界备份复制回 `saves` 文件夹。
 :::
 
-## Installing Modpacks
+## 安装整合包 {#installing-modpacks}
 
-The Minecraft Launcher does not offer functionality to automatically install collections of mods and associated configuration files, so-called modpacks. This generally falls into the territory of [third-party launchers][launchers].
+Minecraft 启动器不提供自动安装整合包（即成套 Mod 及其关联配置文件的集合）的功能。这通常属于[第三方启动器][launchers]的范畴。
 
 :::tip
-If you are building a modpack yourself, we recommend you have a look at the [modpack documentation][modpack] for some tips and tricks.
+如果你要自己制作整合包，我们建议你看看[整合包文档][modpack]，其中有一些实用技巧。
 :::
 
 [curseforge]: https://www.curseforge.com/minecraft/search?class=mc-mods

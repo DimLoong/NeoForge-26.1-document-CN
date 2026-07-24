@@ -9,7 +9,8 @@
 .cache-loader
 
 # Generated sections
-/toolchain/docs/plugins
+# 注：toolchain 插件文档已翻译为中文并纳入 Git 跟踪，故不再忽略（配合 scripts/clean.js）。
+# /toolchain/docs/plugins
 
 # IDE
 /.idea

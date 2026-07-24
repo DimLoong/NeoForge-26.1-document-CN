@@ -1,16 +1,16 @@
-# Dependencies
+# 依赖 {#dependencies}
 
-Dependencies are not only used to develop interoperability between mods or add additional libraries to the game, but it also determines what version of Minecraft to develop for. This will provide a quick overview on how to modify the `repositories` and `dependencies` block to add dependencies to your development environment.
+依赖不仅用于开发 Mod 之间的互操作性或向游戏中添加额外的库，还决定了你要为哪个版本的 Minecraft 进行开发。本文将快速介绍如何修改 `repositories` 与 `dependencies` 代码块，从而为你的开发环境添加依赖。
 
 :::note
 
-This will not explain Gradle concepts in depth. It is highly recommended to read the [Gradle Dependency Management guide][guide] before continuing.
+本文不会深入讲解 Gradle 的相关概念。强烈建议你在继续之前先阅读 [Gradle 依赖管理指南][guide]。
 
 :::
 
-## Mod Dependencies
+## Mod 依赖 {#mod-dependencies}
 
-All mod dependencies are added the same way as any other artifacts.
+所有 Mod 依赖的添加方式与其他任何构件（artifact）相同。
 
 ```gradle
 dependencies {
@@ -19,9 +19,9 @@ dependencies {
 }
 ```
 
-### Local Mod Dependencies
+### 本地 Mod 依赖 {#local-mod-dependencies}
 
-If the mod you are trying to depend on is not available on a maven repository (e.g., [Maven Central][central], [CurseMaven], [Modrinth]), you can add a mod dependency using a [flat directory][flat] instead:
+如果你想依赖的 Mod 无法从某个 maven 仓库获取（例如 [Maven Central][central]、[CurseMaven]、[Modrinth]），你可以改用[扁平目录（flat directory）][flat]来添加 Mod 依赖：
 
 ```gradle
 repositories {
@@ -53,7 +53,7 @@ dependencies {
 ```
 
 :::note
-The group name can be anything but must not be empty for flat directory entries as they are not checked when resolving the artifact file.
+对于扁平目录中的条目，group 名称可以任意取值，但禁止为空，因为在解析构件文件时并不会对其进行校验。
 :::
 
 [guide]: https://docs.gradle.org/8.14.3/userguide/dependency_management.html

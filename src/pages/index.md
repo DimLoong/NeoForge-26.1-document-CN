@@ -36,7 +36,7 @@ import cardillu5 from "../../static/img/index illu 5.png"
         <div class="col category">
             <Card
                 title="NeoForge 文档"
-                body="学习如何使用 NeoForge 创建你的第一个 Mod，并探索它提供的丰富 API。"
+                body="学习如何使用 NeoForge 创建你的第一个 Mod，并探索它提供的丰富 API"
                 link="/docs/gettingstarted/"
                 linkTitle="开始阅读"
                 main
@@ -48,7 +48,7 @@ import cardillu5 from "../../static/img/index illu 5.png"
         <div class="col category">
             <Card
                 title="工具链特性"
-                body="了解 NeoForged 通过其 Gradle 插件提供的各项特性。"
+                body="了解 NeoForged 通过其 Gradle 插件提供的各项特性"
                 link="/toolchain/docs/"
                 linkTitle="了解更多"
                 img={cardillu2}
@@ -57,7 +57,7 @@ import cardillu5 from "../../static/img/index illu 5.png"
         <div class="col category">
             <Card
                 title="版本导读"
-                body="了解 Minecraft 各版本之间的变化，以及如何相应地更新你的 Mod。"
+                body="了解 Minecraft 各版本之间的变化，以及如何相应地更新你的 Mod"
                 link="/primer/docs/"
                 linkTitle="阅读更多"
                 img={cardillu3}
@@ -68,7 +68,7 @@ import cardillu5 from "../../static/img/index illu 5.png"
         <div class="col category">
             <Card
                 title="用户指南"
-                body="了解如何在客户端或服务端环境中安装和使用 NeoForge。"
+                body="了解如何在客户端或服务端环境中安装和使用 NeoForge"
                 link="/user/docs/"
                 linkTitle="开始阅读"
                 img={cardillu4}
@@ -77,7 +77,7 @@ import cardillu5 from "../../static/img/index illu 5.png"
         <div class="col category">
             <Card
                 title="整合包开发"
-                body="了解如何使用 NeoForge Mod 创建和调试整合包。"
+                body="了解如何使用 NeoForge Mod 创建和调试整合包"
                 link="/modpack/docs/"
                 linkTitle="开始阅读"
                 img={cardillu5}

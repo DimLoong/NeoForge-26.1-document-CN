@@ -1,7 +1,18 @@
 import Link from "@docusaurus/Link";
-import { useDoc, useDocsVersion } from "@docusaurus/plugin-content-docs/client";
+import {
+    useActivePluginAndVersion,
+    useDoc
+} from "@docusaurus/plugin-content-docs/client";
 import Breadcrumbs from "@theme-original/DocBreadcrumbs";
 import Admonition from "@theme/Admonition";
+
+const NOTICE_TARGETS: Record<string, { docId: string; versionLabel?: string }> =
+    {
+        default: { docId: "gettingstarted/index", versionLabel: "26.1" },
+        toolchain: { docId: "docs/index" },
+        user: { docId: "docs/index" },
+        modpack: { docId: "docs/index" }
+    };
 
 function TranslationNotice() {
     return (
@@ -20,10 +31,15 @@ function TranslationNotice() {
 
 export default function DocBreadcrumbsWrapper(props) {
     const { metadata } = useDoc();
-    const version = useDocsVersion();
+    const active = useActivePluginAndVersion({ failfast: false });
+    const pluginId = active?.activePlugin?.pluginId;
+    const versionLabel = active?.activeVersion?.label;
 
+    const target = pluginId ? NOTICE_TARGETS[pluginId] : undefined;
     const shouldShowNotice =
-        version?.label === "26.1" && metadata.id === "gettingstarted/index";
+        !!target &&
+        metadata.id === target.docId &&
+        (!target.versionLabel || versionLabel === target.versionLabel);
 
     return (
         <>

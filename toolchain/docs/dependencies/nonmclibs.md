@@ -4,13 +4,13 @@ sidebar_position: 1
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Non-Minecraft Dependencies
+# 非 Minecraft 依赖 {#non-minecraft-dependencies}
 
-Non-Minecraft dependencies are artifacts that are neither a mod nor a dependency Minecraft or NeoForge itself relies on. By default, NeoForge does not load non-Minecraft dependencies when loading a mod. For development environments, they must be added as a runtime dependencies, while production environments should make use of the [jar-in-jar system][jij].
+非 Minecraft 依赖是指既不是 Mod、也不是 Minecraft 或 NeoForge 本身所依赖的那些构件。默认情况下，NeoForge 在加载 Mod 时不会加载非 Minecraft 依赖。在开发环境中，它们必须作为运行时依赖添加；而在生产环境中，则应当利用 [jar-in-jar 系统][jij]。
 
-## 1.21.9 and Above
+## 1.21.9 及以上 {#1219-and-above}
 
-Running NeoForge on 1.21.9 and above will load anything available on the classpath in development, including non-minecraft dependencies. This means adding the library is as simple as adding any other gradle dependency:
+在 1.21.9 及以上版本运行 NeoForge 时，开发环境中会加载类路径上的任何内容，包括非 Minecraft 依赖。这意味着添加该库与添加任何其他 gradle 依赖一样简单：
 
 ```gradle
 // This adds the library at compile and runtime
@@ -19,9 +19,9 @@ Running NeoForge on 1.21.9 and above will load anything available on the classpa
 implementation 'com.example:example:1.0'
 ```
 
-## 1.21.8 and Below
+## 1.21.8 及以下 {#1218-and-below}
 
-Running NeoForge on 1.21.8 and below additionally require the library to be added to the runtime classpath:
+在 1.21.8 及以下版本运行 NeoForge 时，还需要额外将该库添加到运行时类路径中：
 
 <Tabs defaultValue="mdg">
 <TabItem value="mdg" label="ModDevGradle">
@@ -53,7 +53,7 @@ runs {
 }
 ```
 
-Or, you can use a configuration:
+或者，你也可以使用一个 configuration：
 
 ```gradle
 configurations {
