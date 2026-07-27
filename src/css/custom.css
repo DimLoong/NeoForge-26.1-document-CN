@@ -101,6 +101,7 @@ html[data-theme="dark"] {
     --ifm-color-primary-lightest: #b3ccff;
 
     --ifm-background-color: #0f1115;
+    --ifm-backgroun-image: url("../../static/img/index-bg.webp");
     --ifm-background-surface-color: #16181d;
     --ifm-navbar-background-color: rgba(15, 17, 21, 0.78);
     --ifm-footer-background-color: #101216;
@@ -547,6 +548,11 @@ details {
 .footer--dark {
     --ifm-footer-background-color: var(--ifm-footer-background-color);
 }
+html[data-theme="light"] .footer--dark {
+    --ifm-footer-color: var(--ifm-font-color-base);
+    --ifm-footer-link-color: var(--ifm-color-emphasis-700);
+    --ifm-footer-title-color: var(--ifm-heading-color);
+}
 .footer__copyright > p {
     margin: 0;
     font-size: 0.8rem;
@@ -558,8 +564,9 @@ details {
    ============================================================ */
 .link-card {
     position: relative;
+    top: 0;
     transition:
-        transform 250ms ease,
+        top 250ms ease,
         border-color 250ms ease,
         box-shadow 250ms ease;
     border: 1px solid var(--nf-border-color);
@@ -604,7 +611,7 @@ details {
 }
 
 .link-card:hover {
-    transform: translateY(-3px);
+    top: -3px;
     border-color: var(--ifm-color-primary-light);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
@@ -645,6 +652,27 @@ details {
     background: var(--ifm-background-surface-color);
 }
 
+.main-wrapper:has(.index-container) {
+    background-image: url("/img/index-bg.webp");
+    background-size: contain;
+    background-position: top;
+    background-repeat: no-repeat;
+}
+
+.landing-api-intro {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.landing-inline-logo,
+.markdown .landing-inline-logo {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    border-radius: 0;
+}
+
 .index-container {
     width: 100%;
     position: relative;
@@ -652,6 +680,7 @@ details {
 
 .index-wrapper {
     width: 68%;
+    margin: 100px 0;
 }
 
 .index-wrapper-img {
@@ -660,4 +689,18 @@ details {
     top: 30px;
     width: 320px;
     mix-blend-mode: screen;
+}
+
+/* 浅色 landing page：使用纯色页面与无插画卡片布局。 */
+html[data-theme="light"] .main-wrapper:has(.index-container) {
+    background-image: none;
+}
+
+html[data-theme="light"] .main-wrapper:has(.index-container) .link-card-img {
+    display: none !important;
+}
+
+html[data-theme="light"] .main-wrapper:has(.index-container) .link-card-body,
+html[data-theme="light"] .main-wrapper:has(.index-container) .link-card-footer {
+    width: 100%;
 }

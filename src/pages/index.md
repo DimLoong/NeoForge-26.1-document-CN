@@ -1,24 +1,23 @@
 import Card from "../theme/Card.tsx";
-import indexillu from "../../static/img/index illu 0.png"
-import cardillu1 from "../../static/img/index illu 1.png"
-import cardillu2 from "../../static/img/index illu 2.png"
-import cardillu3 from "../../static/img/index illu 3.png"
-import cardillu4 from "../../static/img/index illu 4.png"
-import cardillu5 from "../../static/img/index illu 5.png"
+import indexillu from "../../static/img/index illu 0.webp"
+import cardillu1 from "../../static/img/index illu 1.webp"
+import cardillu2 from "../../static/img/index illu 2.webp"
+import cardillu3 from "../../static/img/index illu 3.webp"
+import cardillu4 from "../../static/img/index illu 4.webp"
+import cardillu5 from "../../static/img/index illu 5.webp"
 
 <div class="index-container">
 <div class="index-wrapper">
 # NeoForged 文档 [非官方翻译版本]
 
-:::info[非官方翻译]
+这是 [NeoForged] 的官方文档的**非官方翻译**，可能存在翻译错误或版本滞后。请以[官方英文文档]为准。
 
-本文档为社区维护的非官方中文翻译，可能存在翻译错误或版本滞后。请以[官方英文文档](https://docs.neoforged.net/docs/gettingstarted/)为准。
+<p className="landing-api-intro">
+    <img className="landing-inline-logo" src="/img/logo.svg" alt="" />
+    <span>NeoForge 是 Minecraft 的 Mod 开发 API。</span>
+</p>
 
-:::
-
-这是 [NeoForged] 的官方文档的**非官方翻译**，NeoForged 是 Minecraft 的 Mod 开发 API。
-
-本文档仅面向 NeoForged，**并非 Java 教程**。
+本文档仅面向 NeoForge，**并非 Java 教程**。
 
 如果你想为文档做贡献，请阅读[参与文档贡献][contributing]。
 
@@ -87,4 +86,5 @@ import cardillu5 from "../../static/img/index illu 5.png"
 </div>
 
 [NeoForged]: https://neoforged.net
+[官方英文文档]: https://docs.neoforged.net/docs/gettingstarted/
 [contributing]: ./contributing
