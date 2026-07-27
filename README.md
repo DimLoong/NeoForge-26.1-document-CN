@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="static/img/index%20illu%200.webp" alt="NeoForge 文档插图" width="50%" height="auto" />
+  <img src="static/img/index%20illu%200.webp" alt="NeoForge 文档插图" width="33%" height="auto" />
 </p>
 
 <h1 align="center">NeoForge 非官方中文文档</h1>
