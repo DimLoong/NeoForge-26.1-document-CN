@@ -47,15 +47,15 @@ const config = {
     favicon: "img/favicon.ico",
 
     // Set the production url of your site here
-    url: "https://docs.neoforged.net",
+    url: "https://neoforge-docs-cn.pages.dev",
     // Set the /<baseUrl>/ pathname under which your site is served
     // For GitHub pages deployment, it is often '/<projectName>/'
     baseUrl: "/",
 
     // GitHub pages deployment config.
     // If you aren't using GitHub pages, you don't need these.
-    organizationName: "neoforged", // Usually your GitHub org/user name.
-    projectName: "documentation", // Usually your repo name.
+    organizationName: "DimLoong",
+    projectName: "NeoForge-26.1-document-CN", // Usually your repo name.
 
     onBrokenLinks: "throw", // Yay multi versioned-docs sites
 
