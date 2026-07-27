@@ -1,0 +1,34 @@
+.comments {
+  max-width: var(--nf-content-max-width, 56rem);
+  margin: 3rem auto 0;
+  padding-top: 2rem;
+  border-top: 1px solid var(--nf-border-color, rgba(128, 128, 128, 0.2));
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  font-size: 1.15rem;
+  font-weight: 650;
+  color: var(--ifm-heading-color);
+}
+
+.header svg {
+  opacity: 0.75;
+}
+
+.notice {
+  padding: 0.9rem 1.1rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--ifm-color-emphasis-700);
+  background: var(--nf-surface-2, rgba(128, 128, 128, 0.08));
+  border: 1px dashed var(--nf-border-strong, rgba(128, 128, 128, 0.3));
+  border-radius: 0.6rem;
+}
+
+.notice code {
+  font-size: 0.82em;
+}
