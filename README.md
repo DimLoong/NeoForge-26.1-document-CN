@@ -9,7 +9,6 @@
 </p>
 
 <p align="center">
-
 <a href="https://neoforge-docs-cn.dimloong.workers.dev/">在线阅读此文档</a>
 ·
 <a href="https://docs.neoforged.net/">官方英文文档</a>
@@ -17,7 +16,6 @@
 <a href="https://github.com/neoforged/Documentation">上游仓库</a>
 ·
 <a href="https://github.com/DimLoong/NeoForge-26.1-document-CN/issues">反馈问题</a>
-
 </p>
 
 ## 关于本项目
