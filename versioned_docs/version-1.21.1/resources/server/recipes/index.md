@@ -1,25 +1,25 @@
-# Recipes
+# 配方 {#recipes}
 
-Recipes are a way to transform a set of objects into other objects within a Minecraft world. Although Minecraft uses this system purely for item transformations, the system is built in a way that allows any kind of objects - blocks, entities, etc. - to be transformed. Almost all recipes use recipe data files; a "recipe" is assumed to be a data-driven recipe in this article unless explicitly stated otherwise.
+配方是一种将 Minecraft 世界中的一组对象转换为其他对象的方法。尽管 Minecraft 使用该系统纯粹是为了进行物品转换，但该系统的构建方式允许任何类型的对象（块、实体等）进行转换。几乎所有的配方都使用配方数据文件；除非另有明确说明，否则本文中的“配方”假定为数据驱动的配方。
 
-Recipe data files are located at `data/<namespace>/recipe/<path>.json`. For example, the recipe `minecraft:diamond_block` is located at `data/minecraft/recipe/diamond_block.json`.
+配方数据文件位于 `data/<namespace>/recipe/<path>.json`。例如，配方 `minecraft:diamond_block` 位于 `data/minecraft/recipe/diamond_block.json`。
 
-## Terminology
+## 术语 {#terminology}
 
-- A **recipe JSON**, or **recipe file**, is a JSON file that is loaded and stored by the `RecipeManager`. It contains info such as the recipe type, the inputs and outputs, as well as additional information (e.g. processing time).
-- A **`Recipe`** holds in-code representations of all JSON fields, alongside the matching logic ("Does this input match the recipe?") and some other properties.
-- A **`RecipeInput`** is a type that provides inputs to a recipe. Comes in several subclasses, e.g. `CraftingInput` or `SingleRecipeInput` (for furnaces and similar).
-- A **recipe ingredient**, or just **ingredient**, is a single input for a recipe (whereas the `RecipeInput` generally represents a collection of inputs to check against a recipe's ingredients). Ingredients are a very powerful system and as such outlined [in their own article][ingredients].
-- The **`RecipeManager`** is a singleton field on the server that holds all loaded recipes.
-- A **`RecipeSerializer`** is basically a wrapper around a [`MapCodec`][codec] and a [`StreamCodec`][streamcodec], both used for serialization.
-- A **`RecipeType`** is the registered type equivalent of a `Recipe`. It is mainly used when looking up recipes by type. As a rule of thumb, different crafting containers should use different `RecipeType`s. For example, the `minecraft:crafting` recipe type covers the `minecraft:crafting_shaped` and `minecraft:crafting_shapeless` recipe serializers, as well as the special crafting serializers.
-- A **recipe [advancement]** is an advancement responsible for unlocking a recipe in the recipe book. They are not required, and generally neglected by players in favor of recipe viewer mods, however the [recipe data provider][datagen] generates them for you, so it's recommended to just roll with it.
-- A **`RecipeBuilder`** is used during datagen to create JSON recipes.
-- A **recipe factory** is a method reference used to create a `Recipe` from a `RecipeBuilder`. It can either be a reference to a constructor, or a static builder method, or a functional interface (often named `Factory`) created specifically for this purpose.
+- **配方 JSON**，或**配方文件**，是由 `RecipeManager` 加载和存储的 JSON 文件。它包含配方类型、输入和输出等信息，以及附加信息（例如处理时间）。
+- **`Recipe`** 保存所有 JSON 字段的代码内表示，以及匹配逻辑（“此输入与配方匹配吗？”）和一些其他属性。
+- **`RecipeInput`** 是一种为配方提供输入的类型。有几个子类，例如 `CraftingInput` 或 `SingleRecipeInput`（用于熔炉和类似设备）。
+- **配方成分**，或只是**成分**，是配方的单个输入（而 `RecipeInput` 通常表示用于检查配方成分的输入集合）。成分是一个非常强大的系统，因此[在他们自己的文章中][ingredients]中进行了概述。
+- **`RecipeManager`** 是服务器上的一个单例字段，用于保存所有加载的配方。
+- **`RecipeSerializer`** 基本上是 [`MapCodec`][codec] 和 [`StreamCodec`][streamcodec] 的包装，两者都用于序列化。
+- **`RecipeType`** 是与 `Recipe` 等效的注册类型。它主要用于按类型查找配方时。根据经验，不同的制作容器应使用不同的 `RecipeType`。例如，`minecraft:crafting` 配方类型涵盖 `minecraft:crafting_shaped` 和 `minecraft:crafting_shapeless` 配方序列化器以及特殊工艺序列化器。
+- **配方[进度]**是负责解锁配方书中配方的进度。它们不是必需的，而且通常会被喜欢配方查看器 Mod 的玩家忽略，但是[配方数据提供者][datagen] 会为你生成它们，所以建议直接使用它。
+- **`RecipeBuilder`** 在数据生成过程中使用来创建 JSON 配方。
+- **配方工厂**是用于从 `RecipeBuilder` 创建 `Recipe` 的方法引用。它可以是对构造函数的引用，也可以是静态构建器方法，也可以是专门为此目的创建的功能接口（通常名为 `Factory`）。
 
-## JSON Specification
+## JSON 规范 {#json-specification}
 
-The contents of recipe files vary greatly depending on the selected type. Common to all recipe files are the `type` and [`neoforge:conditions`][conditions] properties:
+配方文件的内容根据所选类型的不同而有很大差异。所有配方文件的共同点是 `type` 和 [`neoforge:conditions`][conditions] 属性：
 
 ```json5
 {
@@ -30,13 +30,13 @@ The contents of recipe files vary greatly depending on the selected type. Common
 }
 ```
 
-A full list of types provided by Minecraft can be found in the [Built-In Recipe Types article][builtin]. Mods can also [define their own recipe types][customrecipes].
+Minecraft 提供的类型的完整列表可以在 [内置配方类型文章][builtin] 中找到。 Mod 还可以[定义自己的配方类型][customrecipes]。
 
-## Using Recipes
+## 使用配方 {#using-recipes}
 
-Recipes are loaded, stored and obtained via the `RecipeManager` class, which is in turn obtained via `ServerLevel#getRecipeManager` or - if you don't have a `ServerLevel` available - `ServerLifecycleHooks.getCurrentServer()#getRecipeManager`. Be aware that while the client has a full copy of the `RecipeManager` for display purposes, recipe logic should always run on the server to avoid sync issues.
+配方通过 `RecipeManager` 类加载、存储和获取，而该类又通过 `ServerLevel#getRecipeManager` 获取，或者 - 如果你没有可用的 `ServerLevel`-`ServerLifecycleHooks.getCurrentServer()#getRecipeManager`。请注意，虽然客户端拥有 `RecipeManager` 的完整副本用于显示目的，但配方逻辑应始终在服务器上运行以避免同步问题。
 
-The easiest way to get a recipe is by ID:
+获取配方的最简单方法是通过 ID：
 
 ```java
 RecipeManager recipes = serverLevel.getRecipeManager();
@@ -47,7 +47,7 @@ optional.map(RecipeHolder::value).ifPresent(recipe -> {
 });
 ```
 
-A more practically applicable method is constructing a `RecipeInput` and trying to get a matching recipe. In this example, we will be creating a `CraftingInput` containing one diamond block using `CraftingInput#of`. This will create a shapeless input, a shaped input would instead use `CraftingInput#ofPositioned`, and other inputs would use other `RecipeInput`s (for example, furnace recipes will generally use `new SingleRecipeInput`).
+更实际适用的方法是构造 `RecipeInput` 并尝试获得匹配的配方。在此示例中，我们将使用 `CraftingInput#of` 创建一个包含一个钻石块的 `CraftingInput`。这将创建一个无形状输入，成形输入将使用 `CraftingInput#ofPositioned`，其他输入将使用其他 `RecipeInput`（例如，熔炉配方通常会使用 `new SingleRecipeInput`）。
 
 ```java
 RecipeManager recipes = serverLevel.getRecipeManager();
@@ -70,7 +70,7 @@ optional.map(RecipeHolder::value).ifPresent(recipe -> {
 });
 ```
 
-Alternatively, you can also get yourself a potentially empty list of recipes that match your input, this is especially useful for cases where it can be reasonably assumed that multiple recipes match:
+或者，你还可以获取与你的输入匹配的可能为空的配方列表，这对于可以合理假设多个配方匹配的情况特别有用：
 
 ```java
 RecipeManager recipes = serverLevel.getRecipeManager();
@@ -82,7 +82,7 @@ List<RecipeHolder<? extends Recipe<CraftingInput>>> list = recipes.getRecipesFor
 );
 ```
 
-Once we have our correct recipe inputs, we also want to get the recipe outputs. This is done by calling `Recipe#assemble`:
+一旦我们有了正确的配方输入，我们还希望获得配方输出。这是通过调用 `Recipe#assemble` 来完成的：
 
 ```java
 RecipeManager recipes = serverLevel.getRecipeManager();
@@ -95,7 +95,7 @@ ItemStack result = optional
         .orElse(ItemStack.EMPTY);
 ```
 
-If necessary, it is also possible to iterate over all recipes of a type. This is done like so:
+如有必要，还可以迭代某个类型的所有配方。这样做是这样的：
 
 ```java
 RecipeManager recipes = serverLevel.getRecipeManager();
@@ -103,17 +103,17 @@ RecipeManager recipes = serverLevel.getRecipeManager();
 List<RecipeHolder<?>> list = recipes.getAllRecipesFor(RecipeTypes.CRAFTING);
 ```
 
-## Other Recipe Mechanisms
+## 其他配方机制 {#other-recipe-mechanisms}
 
-Some mechanisms in vanilla are generally considered recipes, but are implemented differently in code. This is generally either due to legacy reasons, or because the "recipes" are constructed from other data (e.g. [tags]).
+原版 中的一些机制通常被认为是配方，但在代码中的实现方式有所不同。这通常是由于遗留原因，或者是因为“配方”是根据其他数据（例如[标签]）构建的。
 
 :::warning
-Recipe viewer mods will generally not pick up these recipes. Support for these mods must be added manually, please see the corresponding mod's documentation for more information.
+配方查看器 Mod 通常不会选择这些配方。必须手动添加对这些 mod 的支持，请参阅相应 mod 的文档以获取更多信息。
 :::
 
-### Anvil Recipes
+### 砧配方 {#anvil-recipes}
 
-Anvils have two input slots and one output slot. The only vanilla use cases are tool repairing, combining and renaming, and since each of these use cases needs special handling, no recipe files are provided. However, the system can be built upon using `AnvilUpdateEvent`. This [event] allows getting the input (left input slot) and material (right input slot) and allows setting an output item stack, as well as the experience cost and the number of materials to consume. The process can also be prevented as a whole by [canceling][cancel] the event.
+砧座有两个输入槽和一个输出槽。唯一的普通用例是工具修复、组合和重命名，并且由于每个用例都需要特殊处理，因此不提供配方文件。但是，可以使用 `AnvilUpdateEvent` 构建该系统。此[事件]允许获取输入（左输入槽）和材料（右输入槽），并允许设置输出物品堆栈，以及经验成本和消耗的材料数量。还可以通过[取消][cancel]事件来整体阻止该过程。
 
 ```java
 // This example allows repairing a stone pickaxe with a full stack of dirt, consuming half the stack, for 3 levels.
@@ -129,19 +129,19 @@ public static void onAnvilUpdate(AnvilUpdateEvent event) {
 }
 ```
 
-### Brewing
+### 酿造 {#brewing}
 
-See [the Brewing chapter in the Mob Effects & Potions article][brewing].
+请参阅[生物效果和药水文章中的酿造章节][brewing]。
 
-## Custom Recipes
+## 定制配方 {#custom-recipes}
 
-To add custom recipes, we need at least three things: a `Recipe`, a `RecipeType`, and a `RecipeSerializer`. Depending on what you are implementing, you may also need a custom `RecipeInput` if reusing an existing subclass is not feasible.
+要添加自定义配方，我们至少需要三样东西：`Recipe`、 `RecipeType` 和 `RecipeSerializer`。根据你要实现的内容，如果重用现有子类不可行，你可能还需要自定义 `RecipeInput`。
 
-For the sake of example, and to highlight many different features, we are going to implement a recipe-driven mechanic that requires you to right-click a `BlockState` in-world with a certain item, breaking the `BlockState` and dropping the result item.
+为了举例，并突出许多不同的功能，我们将实现一个配方驱动的机制，要求你右键单击世界中的 `BlockState` 中的某个物品，破坏 `BlockState` 并删除结果物品。
 
-### The Recipe Input
+### 配方输入 {#the-recipe-input}
 
-Let's begin by defining what we want to put into the recipe. It's important to understand that the recipe input represents the actual inputs that the player is using right now. As such, we don't use tags or ingredients here, instead we use the actual item stacks and blockstates we have available.
+让我们首先定义我们想要放入配方中的内容。重要的是要理解配方输入代表玩家现在正在使用的实际输入。因此，我们在这里不使用标签或成分，而是使用我们可用的实际物品堆栈和方块状态。
 
 ```java
 // Our inputs are a BlockState and an ItemStack.
@@ -163,13 +163,13 @@ public record RightClickBlockInput(BlockState state, ItemStack stack) implements
 }
 ```
 
-Recipe inputs don't need to be registered or serialized in any way because they are created on demand. It is not always necessary to create your own, the vanilla ones (`CraftingInput`, `SingleRecipeInput` and `SmithingRecipeInput`) are fine for many use cases.
+配方输入不需要以任何方式注册或序列化，因为它们是根据需要创建的。并不总是需要创建自己的，普通的（`CraftingInput`、 `SingleRecipeInput` 和 `SmithingRecipeInput`）适用于许多用例。
 
-Additionally, NeoForge provides the `RecipeWrapper` input, which wraps the `#getItem` and `#size` calls with respect to an `IItemHandler` passed in the constructor. Basically, this means that any grid-based inventory, such as a chest, can be used as a recipe input by wrapping it in a `RecipeWrapper`.
+此外，NeoForge 提供了 `RecipeWrapper` 输入，它包装了与构造函数中传递的 `IItemHandler` 相关的 `#getItem` 和 `#size` 调用。基本上，这意味着任何基于网格的库存（例如箱子）都可以通过将其包装在 `RecipeWrapper` 中来用作配方输入。
 
-### The Recipe Class
+### 配方类 {#the-recipe-class}
 
-Now that we have our inputs, let's get to the recipe itself. This is what holds our recipe data, and also handles matching and returning the recipe result. As such, it is usually the longest class for your custom recipe.
+现在我们已经有了输入，让我们开始讨论配方本身。这是保存我们的配方数据的地方，并且还处理匹配和返回配方结果。因此，它通常是你的自定义配方中最长的课程。
 
 ```java
 // The generic parameter for Recipe<T> is our RightClickBlockInput from above.
@@ -231,9 +231,9 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 }
 ```
 
-### The Recipe Type
+### 配方类型 {#the-recipe-type}
 
-Next up, our recipe type. This is fairly straightforward because there's no data other than a name associated with a recipe type. They are one of two [registered][registry] parts of the recipe system, so like with all other registries, we create a `DeferredRegister` and register to it:
+接下来是我们的配方类型。这相当简单，因为除了与配方类型关联的名称之外没有任何数据。它们是配方系统的两个[注册][registry]部分之一，因此与所有其他注册表一样，我们创建一个 `DeferredRegister` 并注册到它：
 
 ```java
 public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES =
@@ -247,7 +247,7 @@ public static final Supplier<RecipeType<RightClickBlockRecipe>> RIGHT_CLICK_BLOC
         );
 ```
 
-After we have registered our recipe type, we must override `#getType` in our recipe, like so:
+注册配方类型后，我们必须覆盖配方中的 `#getType`，如下所示：
 
 ```java
 public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
@@ -260,11 +260,11 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 }
 ```
 
-### The Recipe Serializer
+### 配方序列化器 {#the-recipe-serializer}
 
-A recipe serializer provides two codecs, one map codec and one stream codec, for serialization from/to JSON and from/to network, respectively. This section will not go in depth about how the codecs work, please see [Map Codecs][codec] and [Stream Codecs][streamcodec] for more information.
+配方序列化器提供两种 Codec，一种映射 Codec 和一种流式编解码器，分别用于从/到 JSON 和从/到网络的序列化。本节不会深入讨论 Codec 的工作原理，请参阅[MapCodec][codec]和[流式编解码器][streamcodec]以获取更多信息。
 
-Since recipe serializers can get fairly large, vanilla moves them to separate classes. It is recommended, but not required to follow the practice - smaller serializers are often defined in anonymous classes within fields of the recipe class. To follow good practice, we will create a separate class that holds our codecs:
+由于配方序列化器可能变得相当大，因此原版将它们移动到单独的类中。建议但不要求遵循实践 - 较小的序列化器通常在配方类字段内的匿名类中定义。为了遵循良好的实践，我们将创建一个单独的类来保存我们的 Codec：
 
 ```java
 // The generic parameter is our recipe class.
@@ -298,7 +298,7 @@ public class RightClickBlockRecipeSerializer implements RecipeSerializer<RightCl
 }
 ```
 
-Like with the type, we register our serializer:
+与类型一样，我们注册序列化器：
 
 ```java
 public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
@@ -308,7 +308,7 @@ public static final Supplier<RecipeSerializer<RightClickBlockRecipe>> RIGHT_CLIC
         RECIPE_SERIALIZERS.register("right_click_block", RightClickBlockRecipeSerializer::new);
 ```
 
-And similarly, we must also override `#getSerializer` in our recipe, like so:
+同样，我们还必须在配方中覆盖 `#getSerializer`，如下所示：
 
 ```java
 public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
@@ -321,11 +321,11 @@ public class RightClickBlockRecipe implements Recipe<RightClickBlockInput> {
 }
 ```
 
-### The Crafting Mechanic
+### 制作机械师 {#the-crafting-mechanic}
 
-Now that all parts of your recipe are complete, you can make yourself some recipe JSONs (see the [datagen] section for that) and then query the recipe manager for your recipes, like above. What you then do with the recipe is up to you. A common use case would be a machine that can process your recipes, storing the active recipe as a field.
+现在配方的所有部分都已完成，你可以自己制作一些配方 JSON（请参阅 [datagen] 部分），然后向配方管理器查询你的配方，如上所示。然后你如何处理这个配方就取决于你了。一个常见的用例是一台可以处理你的配方的机器，将活动配方存储为字段。
 
-In our case, however, we want to apply the recipe when an item is right-clicked on a block. We will do so using an [event handler][event]. Keep in mind that this is an example implementation, and you can alter this in any way you like (so long as you run it on the server).
+然而，在我们的例子中，我们希望在右键单击块上的物品时应用配方。我们将使用[事件处理器][event]来执行此操作。请记住，这是一个示例实现，你可以按照你喜欢的任何方式更改它（只要你在服务器上运行它）。
 
 ```java
 @SubscribeEvent // on the game event bus
@@ -368,17 +368,17 @@ public static void useItemOnBlock(UseItemOnBlockEvent event) {
 }
 ```
 
-### Extending the Crafting Grid Size
+### 扩展制作网格尺寸 {#extending-the-crafting-grid-size}
 
-The `ShapedRecipePattern` class, responsible for holding the in-memory representation of shaped crafting recipes, has a hardcoded limit of 3x3 slots, hindering mods that want to add larger crafting tables while reusing the vanilla shaped crafting recipe type. To solve this problem, NeoForge patches in a static method called `ShapedRecipePattern#setCraftingSize(int width, int height)` that allows increasing the limit. It should be called during `FMLCommonSetupEvent`. The biggest value wins here, so for example if one mod added a 4x6 crafting table and another added a 6x5 crafting table, the resulting values would be 6x6.
+`ShapedRecipePattern` 类负责保存形状工艺配方的内存表示，具有 3x3 插槽的硬编码限制，阻碍了想要在重用原版形状工艺配方类型时添加更大工艺台的 mod。为了解决这个问题，NeoForge 修补了一个名为 `ShapedRecipePattern#setCraftingSize(int width, int height)` 的静态方法，该方法允许增加限制。应在 `FMLCommonSetupEvent` 期间调用。此处最大的值获胜，因此，例如，如果一个 Mod 添加了 4x6 工作台，另一个 Mod 添加了 6x5 工作台，则结果值为 6x6。
 
 :::danger
-`ShapedRecipePattern#setCraftingSize` is not thread-safe. It must be wrapped in an `event#enqueueWork` call.
+`ShapedRecipePattern#setCraftingSize` 不是线程安全的。它必须包含在 `event#enqueueWork` 调用中。
 :::
 
-## Data Generation
+## 数据生成 {#data-generation}
 
-Like most other JSON files, recipes can be datagenned. For recipes, we want to extend the `RecipeProvider` class and override `#buildRecipes`:
+与大多数其他 JSON 文件一样，配方可以进行数据生成。对于配方，我们要扩展 `RecipeProvider` 类并覆盖 `#buildRecipes`：
 
 ```java
 public class MyRecipeProvider extends RecipeProvider {
@@ -394,11 +394,11 @@ public class MyRecipeProvider extends RecipeProvider {
 }
 ```
 
-Of note is the `RecipeOutput` parameter of `#buildRecipes`. Minecraft uses this object to automatically generate a recipe advancement for you. On top of that, NeoForge injects [conditions] support into `RecipeOutput`, which can be called on via `#withConditions`.
+值得注意的是 `#buildRecipes` 的 `RecipeOutput` 参数。 Minecraft 使用此对象自动为你生成配方进度。最重要的是，NeoForge 向 `RecipeOutput` 注入[条件]支持，可以通过 `#withConditions` 调用。
 
-Recipes themselves are commonly added through subclasses of `RecipeBuilder`. Listing all vanilla recipe builders is beyond the scope of this article (they are explained in the [Built-In Recipe Types article][builtin]), however creating your own builder is explained [below][customdatagen].
+配方本身通常是通过 `RecipeBuilder` 的子类添加的。列出所有原始配方构建器超出了本文的范围（它们在[内置配方类型文章][builtin]中进行了解释），但是[下面][customdatagen]解释了创建你自己的构建器。
 
-Like all other data providers, recipe providers must be registered to `GatherDataEvent` like so:
+与所有其他数据提供者一样，配方提供者必须注册到 `GatherDataEvent`，如下所示：
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -415,15 +415,15 @@ public static void gatherData(GatherDataEvent event) {
 }
 ```
 
-The recipe provider also adds helpers for common scenarios, such as `twoByTwoPacker` (for 2x2 block recipes), `threeByThreePacker` (for 3x3 block recipes) or `nineBlockStorageRecipes` (for 3x3 block recipes and 1 block to 9 items recipes).
+配方提供程序还为常见场景添加了帮助程序，例如 `twoByTwoPacker`（用于 2x2 块配方）、 `threeByThreePacker`（用于 3x3 块配方）或 `nineBlockStorageRecipes`（用于 3x3 块配方和 1 块到 9 项配方）。
 
-### Data Generation for Custom Recipes
+### 自定义配方的数据生成 {#data-generation-for-custom-recipes}
 
-To create a recipe builder for your own recipe serializer(s), you need to implement `RecipeBuilder` and its methods. A common implementation, partially copied from vanilla, would look like this:
+要为你自己的配方序列化器创建配方构建器，你需要实现 `RecipeBuilder` 及其方法。一个常见的实现，部分复制自普通版本，如下所示：
 
 ```java
 // This class is abstract because there is a lot of per-recipe-serializer logic.
-// It serves the purpose of showing the common part of all (vanilla) recipe builders.
+// It serves the purpose of showing the common part of all (原版) recipe builders.
 public abstract class SimpleRecipeBuilder implements RecipeBuilder {
     // Make the fields protected so our subclasses can use them.
     protected final ItemStack result;
@@ -452,7 +452,7 @@ public abstract class SimpleRecipeBuilder implements RecipeBuilder {
         return this;
     }
 
-    // Vanilla wants an Item here, not an ItemStack. You still can and should use the ItemStack
+    // 原版 wants an Item here, not an ItemStack. You still can and should use the ItemStack
     // for serializing the recipes.
     @Override
     public Item getResult() {
@@ -461,9 +461,9 @@ public abstract class SimpleRecipeBuilder implements RecipeBuilder {
 }
 ```
 
-So we have a base for our recipe builder. Now, before we continue with the recipe serializer-dependent part, we should first consider what to make our recipe factory. In our case, it makes sense to use the constructor directly. In other situations, using a static helper or a small functional interface is the way to go. This is especially relevant if you use one builder for multiple recipe classes.
+这样我们就有了配方构建器的基础。现在，在我们继续依赖于配方序列化器的部分之前，我们应该首先考虑如何创建我们的配方工厂。在我们的例子中，直接使用构造函数是有意义的。在其他情况下，使用静态助手或小型功能接口是正确的方法。如果你将一个构建器用于多个配方类，这一点尤其重要。
 
-Utilizing `RightClickBlockRecipe::new` as our recipe factory, and reusing the `SimpleRecipeBuilder` class above, we can create the following recipe builder for `RightClickBlockRecipe`s:
+利用 `RightClickBlockRecipe::new` 作为我们的配方工厂，并重用上面的 `SimpleRecipeBuilder` 类，我们可以为 `RightClickBlockRecipe` 创建以下配方构建器：
 
 ```java
 public class RightClickBlockRecipeBuilder extends SimpleRecipeBuilder {
@@ -496,7 +496,7 @@ public class RightClickBlockRecipeBuilder extends SimpleRecipeBuilder {
 }
 ```
 
-And now, during datagen, you can call on your recipe builder like any other:
+现在，在数据生成期间，你可以像其他任何人一样调用你的配方构建器：
 
 ```java
 @Override
@@ -514,7 +514,7 @@ protected void buildRecipes(RecipeOutput output) {
 ```
 
 :::note
-It is also possible to have `SimpleRecipeBuilder` be merged into `RightClickBlockRecipeBuilder` (or your own recipe builder), especially if you only have one or two recipe builders. The abstraction here serves to show which parts of the builder are recipe-dependent and which are not.
+也可以将 `SimpleRecipeBuilder` 合并到 `RightClickBlockRecipeBuilder`（或你自己的配方构建器）中，特别是如果你只有一两个配方构建器。这里的抽象用于显示构建器的哪些部分依赖于配方，哪些部分不依赖于配方。
 :::
 
 [advancement]: ../advancements.md

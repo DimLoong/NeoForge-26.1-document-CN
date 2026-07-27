@@ -1,10 +1,10 @@
-# Key Mappings
+# 按键映射 {#key-mappings}
 
-A key mapping, or key binding, defines a particular action that should be tied to an input: mouse click, key press, etc. Each action defined by a key mapping can be checked whenever the client can take an input. Furthermore, each key mapping can be assigned to any input through the [Controls option menu][controls].
+键映射或键绑定定义了应与输入绑定的特定操作：鼠标单击、按键等。只要客户端可以接受输入，就可以检查键映射定义的每个操作。此外，每个键映射可以通过[控制选项菜单][controls]分配给任何输入。
 
-## Registering a `KeyMapping`
+## 注册 `KeyMapping` {#registering-a-keymapping}
 
-A `KeyMapping` can be registered by listening to the `RegisterKeyMappingsEvent` on the [mod event bus][eventbus] only on the physical client and calling `#register`.
+可以通过仅在物理客户端上监听[mod 事件总线][eventbus]上的 `RegisterKeyMappingsEvent` 并调用 `#register` 来注册 `KeyMapping`。
 
 ```java
 // In some physical client only class
@@ -18,25 +18,25 @@ public static void registerBindings(RegisterKeyMappingsEvent event) {
 }
 ```
 
-## Creating a `KeyMapping`
+## 创建 `KeyMapping` {#creating-a-keymapping}
 
-A `KeyMapping` can be created using it's constructor. The `KeyMapping` takes in a [translation key][tk] defining the name of the mapping, the default input of the mapping, and the [translation key][tk] defining the category the mapping will be put within in the [Controls option menu][controls].
+可以使用它的构造函数创建 `KeyMapping`。 `KeyMapping` 接受定义映射名称、映射默认输入的 [翻译键][tk]，以及定义映射将放入 [控件选项菜单][controls] 中的类别的 [翻译键][tk]。
 
 :::tip
-A `KeyMapping` can be added to a custom category by providing a category [translation key][tk] not provided by vanilla. Custom category translation keys should contain the mod id (e.g. `key.categories.examplemod.examplecategory`).
+通过提供原版未提供的类别[翻译关键字][tk]，可以将 `KeyMapping` 添加到自定义类别中。自定义类别翻译键应包含 mod id（例如 `key.categories.examplemod.examplecategory`）。
 :::
 
-### Default Inputs
+### 默认输入 {#default-inputs}
 
-Each key mapping has a default input associated with it. This is provided through `InputConstants.Key`. Each input consists of an `InputConstants.Type`, which defines what device is providing the input, and an integer, which defines the associated identifier of the input on the device.
+每个键映射都有一个与其关联的默认输入。这是通过 `InputConstants.Key` 提供的。每个输入都包含一个 `InputConstants.Type`（定义提供输入的设备）和一个整数（定义设备上输入的关联标识符）。
 
-Vanilla provides three types of inputs: `KEYSYM`, which defines a keyboard through the provided `GLFW` key tokens, `SCANCODE`, which defines a keyboard through the platform-specific scancode, and `MOUSE`, which defines a mouse.
+原版 提供三种类型的输入：`KEYSYM`（通过提供的 `GLFW` 密钥标记定义键盘）、 `SCANCODE`（通过特定于平台的扫描码定义键盘）和 `MOUSE`（定义鼠标）。
 
 :::note
-It is highly recommended to use `KEYSYM` over `SCANCODE` for keyboards as `GLFW` key tokens are not tied to any particular system. You can read more on the [GLFW docs][keyinput].
+强烈建议对键盘使用 `KEYSYM` 而不是 `SCANCODE`，因为 `GLFW` 密钥令牌不绑定到任何特定系统。你可以在 [GLFW 文档][keyinput] 上阅读更多内容。
 :::
 
-The integer is dependent on the type provided. All input codes are defined in `GLFW`: `KEYSYM` tokens are prefixed with `GLFW_KEY_*` while `MOUSE` codes are prefixed with `GLFW_MOUSE_*`.
+整数取决于提供的类型。所有输入代码均在 `GLFW` 中定义：`KEYSYM` 令牌以 `GLFW_KEY_*` 为前缀，而 `MOUSE` 代码以 `GLFW_MOUSE_*` 为前缀。
 
 ```java
 new KeyMapping(
@@ -48,16 +48,16 @@ new KeyMapping(
 ```
 
 :::note
-If the key mapping should not be mapped to a default, the input should be set to `InputConstants#UNKNOWN`. The vanilla constructor will require you to extract the input code via `InputConstants$Key#getValue` while the NeoForge constructor can be supplied the raw input field.
+如果键映射不应映射到默认值，则输入应设置为 `InputConstants#UNKNOWN`。普通构造函数将要求你通过 `InputConstants$Key#getValue` 提取输入代码，而 NeoForge 构造函数可以提供原始输入字段。
 :::
 
-### `IKeyConflictContext`
+### `IKeyConflictContext` {#ikeyconflictcontext}
 
-Not all mappings are used in every context. Some mappings are only used in a GUI, while others are only used purely in game. To avoid mappings of the same key used in different contexts conflicting with each other, an `IKeyConflictContext` can be assigned.
+并非所有映射都在每个上下文中使用。有些映射仅在 GUI 中使用，而其他映射仅在游戏中使用。为了避免在不同上下文中使用的相同密钥的映射相互冲突，可以分配 `IKeyConflictContext`。
 
-Each conflict context contains two methods: `#isActive`, which defines if the mapping can be used in the current game state, and `#conflicts`, which defines whether the mapping conflicts with a key in the same or different conflict context.
+每个冲突上下文包含两个方法：`#isActive`，它定义映射是否可以在当前游戏状态中使用；`#conflicts`，它定义映射是否与相同或不同冲突上下文中的键冲突。
 
-Currently, NeoForge defines three basic contexts through `KeyConflictContext`: `UNIVERSAL`, which is the default meaning the key can be used in every context, `GUI`, which means the mapping can only be used when a `Screen` is open, and `IN_GAME`, which means the mapping can only be used if a `Screen` is not open. New conflict contexts can be created by implementing `IKeyConflictContext`.
+目前，NeoForge 通过 `KeyConflictContext` 定义了三个基本上下文：`UNIVERSAL`，这是默认的，意味着密钥可以在每个上下文中使用；`GUI`，这意味着映射只能在 `Screen` 打开时使用；`IN_GAME`，这意味着映射只能在 `Screen` 打开时使用。 `Screen` 未开放。可以通过实施 `IKeyConflictContext` 创建新的冲突上下文。
 
 ```java
 new KeyMapping(
@@ -69,11 +69,11 @@ new KeyMapping(
 )
 ```
 
-### `KeyModifier`
+### `KeyModifier` {#keymodifier}
 
-Modders may not want mappings to have the same behavior if a modifier key is held at the same (e.g. `G` vs `CTRL + G`). To remedy this, NeoForge adds an additional parameter to the constructor to take in a `KeyModifier` which can apply control (`KeyModifier#CONTROL`), shift (`KeyModifier#SHIFT`), or alt (`KeyModifier#ALT`) to any input. `KeyModifier#NONE` is the default and will apply no modifier.
+如果修饰键保持相同（例如 `G` 与 `CTRL + G`），Mod 开发者可能不希望映射具有相同的行为。为了解决这个问题，NeoForge 在构造函数中添加了一个额外的参数来接收 `KeyModifier`，它可以将控制 (`KeyModifier#CONTROL`)、移位 (`KeyModifier#SHIFT`) 或 alt (`KeyModifier#ALT`) 应用于任何输入。 `KeyModifier#NONE` 是默认值，不会应用任何修饰符。
 
-A modifier can be added in the [controls option menu][controls] by holding down the modifier key and the associated input.
+通过按住修改键和关联的输入，可以在[控件选项菜单][controls]中添加修改器。
 
 ```java
 new KeyMapping(
@@ -86,13 +86,13 @@ new KeyMapping(
 )
 ```
 
-## Checking a `KeyMapping`
+## 检查 `KeyMapping` {#checking-a-keymapping}
 
-A `KeyMapping` can be checked to see whether it has been clicked. Depending on when, the mapping can be used in a conditional to apply the associated logic.
+可以检查 `KeyMapping` 是否被点击。根据何时，可以在条件中使用映射来应用关联的逻辑。
 
-### Within the Game
+### 游戏内 {#within-the-game}
 
-Within the game, a mapping should be checked by listening to `ClientTickEvent.Post` on the [event bus][eventbus] and checking `KeyMapping#consumeClick` within a while loop. `#consumeClick` will return `true` only the number of times the input was performed and not already previously handled, so it won't infinitely stall the game.
+在游戏中，应通过在 [事件总线][eventbus] 上监听 `ClientTickEvent.Post` 并在 while 循环内检查 `KeyMapping#consumeClick` 来检查映射。 `#consumeClick` 将仅返回 `true` 执行输入且之前尚未处理的次数，因此它不会无限地停止游戏。
 
 ```java
 @SubscribeEvent // on the game event bus only on the physical client
@@ -104,14 +104,14 @@ public static void onClientTick(ClientTickEvent.Post event) {
 ```
 
 :::caution
-Do not use the `InputEvent`s as an alternative to `ClientTickEvent.Post`. There are separate events for keyboard and mouse inputs only, so they wouldn't handle any additional inputs.
+请勿使用 `InputEvent` 作为 `ClientTickEvent.Post` 的替代品。仅针对键盘和鼠标输入有单独的事件，因此它们不会处理任何其他输入。
 :::
 
-### Inside a GUI
+### GUI 内部 {#inside-a-gui}
 
-Within a GUI, a mapping can be checked within one of the `GuiEventListener` methods using `IKeyMappingExtension#isActiveAndMatches`. The most common methods which can be checked are `#keyPressed` and `#mouseClicked`. 
+在 GUI 中，可以使用 `IKeyMappingExtension#isActiveAndMatches` 在 `GuiEventListener` 方法之一中检查映射。最常见的检查方法是 `#keyPressed` 和 `#mouseClicked`。
 
-`#keyPressed` takes in the `GLFW` key token, the platform-specific scan code, and a bitfield of the held down modifiers. A key can be checked against a mapping by creating the input using `InputConstants#getKey`. The modifiers are already checked within the mapping methods itself.
+`#keyPressed` 接收 `GLFW` 密钥令牌、特定于平台的扫描代码以及按下的修饰符的位字段。可以通过使用 `InputConstants#getKey` 创建输入来检查映射的键。修饰符已经在映射方法本身中进行了检查。
 
 ```java
 // In some Screen subclass
@@ -126,10 +126,10 @@ public boolean keyPressed(int key, int scancode, int mods) {
 ```
 
 :::note
-If you do not own the screen which you are trying to check a **key** for, you can listen to the `Pre` or `Post` events of `ScreenEvent.KeyPressed` on the [event bus][eventbus] instead.
+如果你不拥有要检查**键**的屏幕，则可以改为在[事件总线][eventbus]上监听 `ScreenEvent.KeyPressed` 的 `Pre` 或 `Post` 事件。
 :::
 
-`#mouseClicked` takes in the mouse's x position, y position, and the button clicked. A mouse button can be checked against a mapping by creating the input using `InputConstants.Type#getOrCreate` with the `MOUSE` input.
+`#mouseClicked` 获取鼠标的 x 位置、 y 位置和单击的按钮。通过使用 `InputConstants.Type#getOrCreate` 和 `MOUSE` 输入创建输入，可以根据映射检查鼠标按钮。
 
 ```java
 // In some Screen subclass
@@ -144,7 +144,7 @@ public boolean mouseClicked(double x, double y, int button) {
 ```
 
 :::note
-If you do not own the screen which you are trying to check a **mouse** for, you can listen to the `Pre` or `Post` events of `ScreenEvent.MouseButtonPressed` on the [event bus][eventbus] instead.
+如果你不拥有要检查**鼠标**的屏幕，则可以改为监听[事件总线][eventbus]上 `ScreenEvent.MouseButtonPressed` 的 `Pre` 或 `Post` 事件。
 :::
 
 [eventbus]: ../concepts/events.md#registering-an-event-handler

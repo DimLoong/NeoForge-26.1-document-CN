@@ -48,9 +48,31 @@
   white-space: nowrap;
 }
 
-.chevron {
+/* “已翻译”徽标 */
+.badge {
   flex: 0 0 auto;
   margin-left: 0.5rem;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: var(--nf-admonition-tip-border, #2fa96b);
+  background: color-mix(in srgb, var(--nf-admonition-tip-border, #2fa96b) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--nf-admonition-tip-border, #2fa96b) 40%, transparent);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.optionLabel {
+  display: inline-flex;
+  align-items: center;
+}
+
+.chevron {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-left: 0.5rem;
   opacity: 0.6;
   transition: transform 160ms ease;
 }

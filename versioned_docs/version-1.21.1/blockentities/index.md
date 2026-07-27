@@ -1,16 +1,16 @@
-# Block Entities
+# 方块实体 {#block-entities}
 
-Block entities allow the storage of data on [blocks][block] in cases where [block states][blockstate] are not suitable. This is especially the case for data with a non-finite amount of options, such as inventories. Block entities are stationary and bound to a block, but otherwise share many similarities with entities, hence the name.
+当[方块状态][blockstate]不适用时，方块实体（BlockEntity）可以在[方块][block]上存储数据。对于取值不是有限的数据（例如物品栏内容）尤其如此。方块实体是静止的，并绑定到某个方块上，但在其他方面与实体有许多相似之处，因此得名。
 
 :::note
-If you have a finite and reasonably small amount (= a few hundred at most) of possible states for your block, you might want to consider using [block states][blockstate] instead.
+如果你的方块可能状态的数量是有限且相当小的（最多几百个），你或许应该考虑改用[方块状态][blockstate]。
 :::
 
-## Creating and Registering Block Entities
+## 创建并注册方块实体 {#creating-and-registering-block-entities}
 
-Like entities and unlike blocks, the `BlockEntity` class represents the block entity instance, not the [registered][registration] singleton object. The singleton is expressed through the `BlockEntityType<?>` class instead. We will need both to create a new block entity.
+与实体类似、而与方块不同的是，`BlockEntity` 类表示的是方块实体实例，而非[已注册的][registration]单例对象。单例改由 `BlockEntityType<?>` 类来表示。要创建一个新的方块实体，两者我们都需要。
 
-Let's begin by creating our block entity class:
+先从创建方块实体类开始：
 
 ```java
 public class MyBlockEntity extends BlockEntity {
@@ -20,9 +20,9 @@ public class MyBlockEntity extends BlockEntity {
 }
 ```
 
-As you may have noticed, we pass an undefined variable `type` to the super constructor. Let's leave that undefined variable there for a moment and instead move to registration.
+你可能注意到，我们向父类构造器传入了一个尚未定义的变量 `type`。暂且把这个未定义的变量放在那里，先转到注册环节。
 
-Registration happens in a similar fashion to entities. We create an instance of the associated singleton class `BlockEntityType<?>` and register it to the block entity type registry, like so:
+注册的方式与实体类似。我们创建关联的单例类 `BlockEntityType<?>` 的实例，并将其注册到方块实体类型注册表，如下所示：
 
 ```java
 public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
@@ -38,12 +38,12 @@ public static final Supplier<BlockEntityType<MyBlockEntity>> MY_BLOCK_ENTITY = B
                 // This assumes the existence of the referenced blocks as DeferredBlock<Block>s.
                 MyBlocks.MY_BLOCK_1.get(), MyBlocks.MY_BLOCK_2.get()
         )
-        // Build using null; vanilla does some datafixer shenanigans with the parameter that we don't need.
+        // Build using null; 原版 does some datafixer shenanigans with the parameter that we don't need.
         .build(null)
 );
 ```
 
-Now that we have our block entity type, we can use it in place of the `type` variable we left earlier:
+现在有了方块实体类型，我们就可以用它替换前面留下的 `type` 变量：
 
 ```java
 public class MyBlockEntity extends BlockEntity {
@@ -54,10 +54,10 @@ public class MyBlockEntity extends BlockEntity {
 ```
 
 :::info
-The reason for this rather confusing setup process is that `BlockEntityType.Builder#of` expects a `BlockEntityType.BlockEntitySupplier<T extends BlockEntity>`, which is basically a `BiFunction<BlockPos, BlockState, T extends BlockEntity>`. As such, having a constructor we can directly reference using `::new` is highly beneficial. However, we also need to provide the constructed block entity type to the default and only constructor of `BlockEntity`, so we need to pass references around a bit.
+这个略显绕的设置流程之所以如此，是因为 `BlockEntityType.Builder#of` 期望一个 `BlockEntityType.BlockEntitySupplier<T extends BlockEntity>`，它本质上就是一个 `BiFunction<BlockPos, BlockState, T extends BlockEntity>`。因此，拥有一个可以直接用 `::new` 引用的构造器非常有利。然而，我们同时又需要把构造好的方块实体类型提供给 `BlockEntity` 的默认（也是唯一）构造器，所以需要在几处之间来回传递引用。
 :::
 
-Finally, we need to modify the block class associated with the block entity. This means that we will not be able to attach block entities to simple instances of `Block`, instead, we need a subclass:
+最后，我们需要修改与方块实体关联的方块类。这意味着我们无法把方块实体附加到普通的 `Block` 实例上，而是需要一个子类：
 
 ```java
 // The important part is implementing the EntityBlock interface and overriding the #newBlockEntity method.
@@ -75,7 +75,7 @@ public class MyEntityBlock extends Block implements EntityBlock {
 }
 ```
 
-And then, you of course need to use this class as the type in your block registration:
+当然，随后你需要在方块注册中把这个类用作类型：
 
 ```java
 public static final DeferredBlock<MyEntityBlock> MY_BLOCK_1 =
@@ -84,15 +84,15 @@ public static final DeferredBlock<MyEntityBlock> MY_BLOCK_2 =
         BLOCKS.register("my_block_2", () -> new MyEntityBlock( /* ... */ ));
 ```
 
-## Storing Data
+## 存储数据 {#storing-data}
 
-One of the main purposes of `BlockEntity`s is to store data. Data storage on block entities can happen in two ways: directly reading and writing [NBT][nbt], or using [data attachments][dataattachments]. This section will cover reading and writing NBT directly; for data attachments, please refer to the linked article.
+`BlockEntity` 的主要用途之一是存储数据。方块实体上的数据存储可以通过两种方式进行：直接读写 [NBT][nbt]，或使用[数据附加（Data Attachment）][dataattachments]。本节介绍直接读写 NBT；关于数据附加，请参阅相应链接的文章。
 
 :::info
-The main purpose of data attachments is, as the name suggests, attaching data to existing block entities, such as those provided by vanilla or other mods. For your own mod's block entities, saving and loading directly to and from NBT is preferred.
+数据附加的主要用途，正如其名，是把数据附加到已有的方块实体上，例如原版或其他 Mod 提供的方块实体。对于你自己 Mod 的方块实体，直接向 NBT 保存和加载才是更好的做法。
 :::
 
-Data can be read from and written to a `CompoundTag` using the `#loadAdditional` and `#saveAdditional` methods, respectively. These methods are called when the block entity is synced to disk or over the network.
+可以分别使用 `#loadAdditional` 和 `#saveAdditional` 方法，从 `CompoundTag` 读取数据、以及把数据写入其中。当方块实体被同步到磁盘或通过网络同步时，这些方法会被调用。
 
 ```java
 public class MyBlockEntity extends BlockEntity {
@@ -121,13 +121,13 @@ public class MyBlockEntity extends BlockEntity {
 }
 ```
 
-In both methods, it is important that you call super, as that adds basic information such as the position. The tag names `id`, `x`, `y`, `z`, `NeoForgeData` and `neoforge:attachments` are reserved by the super methods, and as such, you should not use them yourself.
+在这两个方法中，务必调用 super，因为它会添加诸如位置之类的基本信息。标签名 `id`、 `x`、 `y`、 `z`、 `NeoForgeData` 和 `neoforge:attachments` 由父类方法保留，因此你不应自行使用它们。
 
-Of course, you will want to set other values and not just work with defaults. You can do so freely, like with any other field. However, if you want the game to save those changes, you must call `#setChanged()` afterward, which marks the block entity's chunk as dirty (= in need of being saved). If you do not call that method, the block entity might get skipped during saving, as Minecraft's saving system only saves chunks that have been marked as dirty.
+当然，你会希望设置其他值，而不仅仅是使用默认值。你可以像操作任何其他字段那样自由地这么做。不过，如果你希望游戏保存这些改动，之后必须调用 `#setChanged()`，它会把方块实体所在的区块标记为脏（= 需要被保存）。如果不调用该方法，方块实体可能在保存时被跳过，因为 Minecraft 的保存系统只保存被标记为脏的区块。
 
-## Tickers
+## 计时器 {#tickers}
 
-Another very common use of block entities, often in combination with some stored data, is ticking. Ticking means executing some code every game tick. This is done by overriding `EntityBlock#getTicker` and returning a `BlockEntityTicker`, which is basically a consumer with four arguments (level, position, blockstate and block entity), like so:
+方块实体另一个非常常见的用途——往往与某些已存储的数据结合使用——是计时（ticking）。计时是指每游戏刻执行某些代码。做法是重写 `EntityBlock#getTicker` 并返回一个 `BlockEntityTicker`，它本质上是一个带四个参数的消费者（level、位置、方块状态和方块实体），如下所示：
 
 ```java
 // Note: The ticker is defined in the block, not the block entity. However, it is good practice to
@@ -163,15 +163,15 @@ public class MyBlockEntity extends BlockEntity {
 }
 ```
 
-Be aware that the `#tick` method is actually called every tick. Due to this, you should avoid doing a lot of complex calculations in here if you can, for example by only calculating things every X ticks, or by caching the results.
+请注意，`#tick` 方法实际上每一刻都会被调用。因此，如果可能，你应避免在其中进行大量复杂计算，例如只每隔 X 刻计算一次，或缓存计算结果。
 
-## Syncing
+## 同步 {#syncing}
 
-Block entity logic is usually run on the server. As such, we need to tell the client what we are doing. There are three ways to do just that: on chunk load, on block update, or by using a custom packet. You should generally only sync information when it is necessary, to not needlessly clog up the network. 
+方块实体的逻辑通常在服务端运行。因此，我们需要告诉客户端我们在做什么。要做到这一点有三种方式：在区块加载时、在方块更新时，或使用自定义网络包。一般来说，只应在必要时才同步信息，以免无谓地阻塞网络。
 
-### Syncing on Chunk Load
+### 在区块加载时同步 {#syncing-on-chunk-load}
 
-A chunk is loaded (and by extension, this method is utilized) each time it is read from either network or disk. To send your data here, you need to override the following methods:
+每当区块从网络或磁盘被读取时，它就会被加载（这个方法也随之被使用）。要在此处发送数据，需要重写以下方法：
 
 ```java
 public class MyBlockEntity extends BlockEntity {
@@ -194,9 +194,9 @@ public class MyBlockEntity extends BlockEntity {
 }
 ```
 
-### Syncing on Block Update
+### 在方块更新时同步 {#syncing-on-block-update}
 
-This method is used whenever a block update occurs. Block updates must be triggered manually, but are generally processed faster than chunk syncing.
+每当发生方块更新时，就会使用这种方式。方块更新必须手动触发，但通常比区块同步处理得更快。
 
 ```java
 public class MyBlockEntity extends BlockEntity {
@@ -228,14 +228,14 @@ public class MyBlockEntity extends BlockEntity {
 }
 ```
 
-To actually send the packet, an update notification must be triggered on the server by calling `Level#sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags)`. The position should be the block entity's position, obtainable via `BlockEntity#getBlockPos`. Both blockstate parameters can be the blockstate at the block entity's position, obtainable via `BlockEntity#getBlockState`. Finally, the `flags` parameter is an update mask, as used in [`Level#setBlock`][setblock].
+要真正发送该网络包，必须在服务端调用 `Level#sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags)` 来触发一次更新通知。位置应为方块实体的位置，可通过 `BlockEntity#getBlockPos` 获取。两个方块状态参数都可以是方块实体所在位置的方块状态，可通过 `BlockEntity#getBlockState` 获取。最后，`flags` 参数是一个更新掩码，与 [`Level#setBlock`][setblock] 中使用的相同。
 
-### Using a Custom Packet
+### 使用自定义网络包 {#using-a-custom-packet}
 
-By using a dedicated update packet, you can send packets yourself whenever you need to. This is the most versatile, but also the most complex variant, as it requires setting up a network handler. You can send a packet to all players tracking the block entity by using `PacketDistrubtor#sendToPlayersTrackingChunk`. Please see the [Networking][networking] section for more information.
+通过使用专用的更新网络包，你可以在任何需要的时候自行发送网络包。这是最灵活、但也是最复杂的方式，因为它需要搭建一个网络处理器。你可以使用 `PacketDistrubtor#sendToPlayersTrackingChunk` 把网络包发送给所有追踪该方块实体的玩家。更多信息请参阅[网络通信][networking]章节。
 
 :::caution
-It is important that you do safety checks, as the `BlockEntity` might already be destroyed/replaced when the message arrives at the player. You should also check if the chunk is loaded via `Level#hasChunkAt`.
+务必进行安全检查，因为当消息到达玩家时，`BlockEntity` 可能已经被销毁/替换。你还应通过 `Level#hasChunkAt` 检查区块是否已加载。
 :::
 
 [block]: ../blocks/index.md

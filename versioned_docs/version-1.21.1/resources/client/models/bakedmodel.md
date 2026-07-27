@@ -1,82 +1,82 @@
-# Baked Models
+# 烘焙模型 {#baked-models}
 
-`BakedModel`s are the in-code representation of a shape with textures. They can originate from multiple sources, for example from a call to `UnbakedModel#bake` (default model loader) or `IUnbakedGeometry#bake` ([custom model loaders][modelloader]). Some [block entity renderers][ber] also make use of baked models. There is no limit to how complex a model may be.
+`BakedModel`s 是带有纹理的形状的代码内表示。它们可以来自多个源，例如来自对 `UnbakedModel#bake`（默认模型加载器）或 `IUnbakedGeometry#bake`（[自定义模型加载器][modelloader]）的调用。一些[块实体渲染器][ber]也使用烘焙模型。模型的复杂程度没有限制。
 
-Models are stored in the `ModelManager`, which can be accessed through `Minecraft.getInstance().modelManager`. Then, you can call `ModelManager#getModel` to get a certain model by its [`ResourceLocation`][rl] or [`ModelResourceLocation`][mrl]. Mods will basically always reuse a model that was previously automatically loaded and baked.
+模型存储在 `ModelManager` 中，可以通过 `Minecraft.getInstance().modelManager` 访问。然后，你可以调用 `ModelManager#getModel` 通过其[`ResourceLocation`][rl]或[`ModelResourceLocation`][mrl]来获取某个模型。 Mod 基本上总是会重用之前自动加载和烘焙的模型。
 
-## Methods of `BakedModel`
+## `BakedModel` 的方法 {#methods-of-bakedmodel}
 
-### `getQuads`
+### `getQuads` {#getquads}
 
-The most important method of a baked model is `getQuads`. This method is responsible for returning a list of `BakedQuad`s, which can then be sent to the GPU. A quad compares to a triangle in a modeling program (and in most other games), however due to Minecraft's general focus on squares, the developers elected to use quads (4 vertices) instead of triangles (3 vertices) for rendering in Minecraft. `getQuads` has five parameters that can be used:
+烘焙模型最重要的方法是 `getQuads`。此方法负责返回 `BakedQuad` 列表，然后可以将其发送到 GPU。在建模程序（以及大多数其他游戏）中，四边形相当于三角形，但是由于 Minecraft 一般关注正方形，因此开发人员选择使用四边形（4 个顶点）而不是三角形（3 个顶点）在 Minecraft 中进行渲染。 `getQuads` 有五个可用参数：
 
-- A `BlockState`: The [blockstate] being rendered. May be null, indicating that an item is being rendered.
-- A `Direction`: The direction of the face being culled against. May be null, which means quads that cannot be occluded should be returned.
-- A `RandomSource`: A client-bound random source you can use for randomization.
-- A `ModelData`: The extra model data to use. This may contain additional data from the block entity needed for rendering. Supplied by `BakedModel#getModelData`.
-- A `RenderType`: The [render type][rendertype] to use for rendering the block. May be null, indicating that the quads for all render types used by this model should be returned. Otherwise, it is one of the render types returned by `BakedModel#getRenderTypes` (see below).
+- A`BlockState`：正在渲染的[blockstate]。可能为 null，表示正在渲染某个物品。
+- A`Direction`：被剔除的面的方向。可能为空，这意味着应该返回不能被遮挡的四边形。
+- A`RandomSource`：可用于随机化的客户端绑定随机源。
+- A`ModelData`：要使用的额外模型数据。这可能包含渲染所需的来自块实体的附加数据。由 `BakedModel#getModelData` 提供。
+- A`RenderType`：用于渲染块的[渲染类型][rendertype]。可能为 null，表示应返回该模型使用的所有渲染类型的四边形。否则，它是 `BakedModel#getRenderTypes` 返回的渲染类型之一（见下文）。
 
-Models should heavily cache. This is because even though chunks are only rebuilt when a block in them changes, the computations done in this method still need to be as fast as possible and should ideally be cached heavily due to the amount of times this method will be called per chunk section (up to seven times per RenderType used by a given model * amount of RenderTypes used by the respective model * 4096 blocks per chunk section). In addition, [BERs][ber] or entity renderers may actually call this method several times per frame.
+模型应该大量缓存。这是因为，即使块仅在其中的块发生更改时才重建，但在此方法中完成的计算仍然需要尽可能快，并且理想情况下应该大量缓存，因为每个块部分调用此方法的次数（给定模型使用的每个 RenderType 最多 7 次 * 相应模型使用的 RenderType 数量 * 每个块部分 4096 个块）。此外，[BERs][ber] 或实体渲染器实际上可能每帧多次调用此方法。
 
-### `applyTransform` and `getTransforms`
+### `applyTransform` 和 `getTransforms` {#applytransform-and-gettransforms}
 
-`applyTransform` allows for applying custom logic when applying perspective transformations to the model, including returning a completely separate model. This method is added by NeoForge as a replacement for the vanilla `getTransforms()` method, which only allows you to customize the transforms themselves, but not the way they are applied. However, `applyTransform`'s default implementation defers to `getTransforms`, so if you only need custom transforms, you can also override `getTransforms` and be done with it. `applyTransforms` offers three parameters:
+`applyTransform` 允许在对模型应用透视变换时应用自定义逻辑，包括返回完全独立的模型。 NeoForge 添加此方法作为普通 `getTransforms()` 方法的替代，该方法只允许你自定义变换本身，但不能自定义它们的应用方式。但是，`applyTransform` 的默认实现遵循 `getTransforms`，因此如果你只需要自定义转换，你也可以覆盖 `getTransforms` 并完成它。 `applyTransforms` 提供三个参数：
 
-- An `ItemDisplayContext`: The [perspective] the model is being transformed to.
-- A `PoseStack`: The pose stack used for rendering.
-- A `boolean`: Whether to use modified values for left-hand rendering instead of the default right hand rendering; `true` if the rendered hand is the left hand (off hand, or main hand if left hand mode is enabled in the options)
+- `ItemDisplayContext`：模型正在转换到的[视角]。
+- A`PoseStack`：用于渲染的姿势堆栈。
+- A`boolean`：是否使用修改值进行左手渲染而不是默认的右手渲染；`true` 如果渲染的手是左手（副手，如果在选项中启用了左手模式，则为主手）
 
 :::note
-`applyTransform` and `getTransforms` only apply to item models.
+`applyTransform` 和 `getTransforms` 仅适用于商品模型。
 :::
 
-### Others
+### 其他 {#others}
 
-Other methods in `BakedModel` that you may override and/or query include:
+你可以覆盖和/或查询 `BakedModel` 中的其他方法包括：
 
-| Signature                                                                     | Effect                                                                                                                                                                                                                                                                                                                                                                                                      |
+|签名|效果|
 |-------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `TriState useAmbientOcclusion()`                                              | Whether to use [ambient occlusion][ao] or not. Accepts a `BlockState`, `RenderType` and `ModelData` parameter and returns a `TriState` which allows not only force-disabling AO but also force-enabling AO. Has two overloads that each return a `boolean` parameter and accept either only a `BlockState` or no parameters at all; both of these are deprecated for removal in favor of the first variant. |
-| `boolean isGui3d()`                                                           | Whether this model renders as 3d or flat in GUI slots.                                                                                                                                                                                                                                                                                                                                                      |
-| `boolean usesBlockLight()`                                                    | Whether to use 3D lighting (`true`) or flat lighting from the front (`false`) when lighting the model.                                                                                                                                                                                                                                                                                                      |
-| `boolean isCustomRenderer()`                                                  | If true, skips normal rendering and calls an associated [`BlockEntityWithoutLevelRenderer`][bewlr]'s `renderByItem` method instead. If false, renders through the default renderer.                                                                                                                                                                                                                         |
-| `ItemOverrides getOverrides()`                                                | Returns the [`ItemOverrides`][itemoverrides] associated with this model. This is only relevant on item models.                                                                                                                                                                                                                                                                                              |
-| `ModelData getModelData(BlockAndTintGetter, BlockPos, BlockState, ModelData)` | Returns the model data to use for the model. This method is passed an existing `ModelData` that is either the result of `BlockEntity#getModelData()` if the block has an associated block entity, or `ModelData.EMPTY` if that is not the case. This method can be used for blocks that need model data, but do not have a block entity, for example for blocks with connected textures.                    |
-| `TextureAtlasSprite getParticleIcon(ModelData)`                               | Returns the particle sprite to use for the model. May use the model data to use different particle sprites for different model data values. NeoForge-added, replacing the vanilla `getParticleIcon()` overload with no parameters.                                                                                                                                                                          |
-| `ChunkRenderTypeSet getRenderTypes(BlockState, RandomSource, ModelData)`      | Returns a `ChunkRenderTypeSet` containing the render type(s) to use for rendering the block model. A `ChunkRenderTypeSet` is a set-backed ordered `Iterable<RenderType>`. By default falls back to [getting the render type from the model JSON][rendertype]. Only used for block models, item models use the overload below.                                                                               |
-| `List<RenderType> getRenderTypes(ItemStack, boolean)`                         | Returns a `List<RenderType>` containing the render type(s) to use for rendering the item model. By default falls back to the normal model-bound render type lookup, which always yields a list with one element. Only used for item models, block models use the overload above.                                                                                                                            |
+|`TriState useAmbientOcclusion()`|是否使用[环境光遮挡][ao]。接受 `BlockState`、 `RenderType` 和 `ModelData` 参数并返回 `TriState`，它不仅允许强制禁用 AO，还允许强制启用 AO。有两个重载，每个重载都返回 `boolean` 参数，并且仅接受 `BlockState` 或根本不接受参数；这两个变体均已被弃用并删除，取而代之的是第一个变体。 |
+|`boolean isGui3d()`|该模型在 GUI 插槽中呈现为 3d 还是平面。                                                                                                                                                                                                                                                                                                                                                      |
+|`boolean usesBlockLight()`|为模型照明时是否使用 3D 照明 (`true`) 还是正面平面照明 (`false`)。                                                                                                                                                                                                                                                                                                      |
+|`boolean isCustomRenderer()`|如果为 true，则跳过正常渲染并调用关联的 [`BlockEntityWithoutLevelRenderer`][bewlr] 的 `renderByItem` 方法。如果为 false，则通过默认渲染器进行渲染。                                                                                                                                                                                                                         |
+|`ItemOverrides getOverrides()`|返回与此模型关联的 [`ItemOverrides`][itemoverrides]。这仅与物品模型相关。                                                                                                                                                                                                                                                                                              |
+|`ModelData getModelData(BlockAndTintGetter, BlockPos, BlockState, ModelData)`|返回用于模型的模型数据。此方法传递一个现有的 `ModelData`，如果该块具有关联的块实体，则该值是 `BlockEntity#getModelData()` 的结果；如果不是这种情况，则该值是 `ModelData.EMPTY` 的结果。此方法可用于需要模型数据但没有块实体的块，例如具有连接纹理的块。                    |
+|`TextureAtlasSprite getParticleIcon(ModelData)`|返回用于模型的粒子精灵。可以使用模型数据来针对不同的模型数据值使用不同的粒子精灵。添加了 NeoForge，替换了没有参数的普通 `getParticleIcon()` 重载。                                                                                                                                                                          |
+|`ChunkRenderTypeSet getRenderTypes(BlockState, RandomSource, ModelData)`|返回包含用于渲染方块模型的渲染类型的 `ChunkRenderTypeSet`。 `ChunkRenderTypeSet` 是设置支持的有序 `Iterable<RenderType>`。默认情况下回退到[从模型 JSON 获取渲染类型][rendertype]。仅用于方块模型，物品模型使用下面的重载。                                                                               |
+|`List<RenderType> getRenderTypes(ItemStack, boolean)`|返回包含用于渲染物品模型的渲染类型的 `List<RenderType>`。默认情况下，会退回到正常的模型绑定渲染类型查找，该查找始终会生成一个包含一个元素的列表。仅用于物品模型，方块模型使用上面的重载。                                                                                                                            |
 
-## Perspectives
+## 观点 {#perspectives}
 
-Minecraft's render engine recognizes a total of 8 perspective types (9 if you include the in-code fallback) for item rendering. These are used in a model JSON's `display` block, and represented in code through the `ItemDisplayContext` enum.
+Minecraft 的渲染引擎总共可识别 8 种透视类型（如果包含代码内后备，则为 9 种）进行物品渲染。它们在模型 JSON 的 `display` 块中使用，并通过 `ItemDisplayContext` 枚举在代码中表示。
 
-| Enum value                | JSON key                  | Usage                                                                                                            |
+|枚举值| JSON 密钥 |用途 |
 |---------------------------|---------------------------|------------------------------------------------------------------------------------------------------------------|
-| `THIRD_PERSON_RIGHT_HAND` | `"thirdperson_righthand"` | Right hand in third person (F5 view, or on other players)                                                        |
-| `THIRD_PERSON_LEFT_HAND`  | `"thirdperson_lefthand"`  | Left hand in third person (F5 view, or on other players)                                                         |
-| `FIRST_PERSON_RIGHT_HAND` | `"firstperson_righthand"` | Right hand in first person                                                                                       |
-| `FIRST_PERSON_LEFT_HAND`  | `"firstperson_lefthand"`  | Left hand in first person                                                                                        |
-| `HEAD`                    | `"head"`                  | When in a player's head armor slot (often only achievable via commands)                                          |
-| `GUI`                     | `"gui"`                   | Inventories, player hotbar                                                                                       |
-| `GROUND`                  | `"ground"`                | Dropped items; note that the rotation of the dropped item is handled by the dropped item renderer, not the model |
-| `FIXED`                   | `"fixed"`                 | Item frames                                                                                                      |
-| `NONE`                    | `"none"`                  | Fallback purposes in code, should not be used in JSON                                                            |
+|`THIRD_PERSON_RIGHT_HAND`|`"thirdperson_righthand"`|第三人称右手（F5 视图，或其他玩家）|
+|`THIRD_PERSON_LEFT_HAND`|`"thirdperson_lefthand"`|第三人称左手（F5 视图，或其他玩家）|
+|`FIRST_PERSON_RIGHT_HAND`|`"firstperson_righthand"`|第一人称右手 |
+|`FIRST_PERSON_LEFT_HAND`|`"firstperson_lefthand"`|第一人称左手|
+|`HEAD`|`"head"`|当处于玩家头部装甲槽中时（通常只能通过命令实现）|
+|`GUI`|`"gui"`|库存、玩家热栏|
+|`GROUND`|`"ground"`|掉落的物品；请注意，放置物品的旋转是由放置物品渲染器处理的，而不是模型 |
+|`FIXED`|`"fixed"`|物品框架|
+|`NONE`|`"none"`|代码中的后备用途，不应在 JSON 中使用 |
 
-## `ItemOverrides`
+## `ItemOverrides` {#itemoverrides}
 
-`ItemOverrides` is a class that provides a way for baked models to process the state of an [`ItemStack`][itemstack] and return a new baked model through the `#resolve` method. `#resolve` has five parameters:
+`ItemOverrides` 是一个类，它为烘焙模型提供了一种处理 [`ItemStack`][itemstack] 状态的方法，并通过 `#resolve` 方法返回新的烘焙模型。 `#resolve` 有五个参数：
 
-- A `BakedModel`: The original model.
-- An `ItemStack`: The item stack being rendered.
-- A `ClientLevel`: The level the model is being rendered in. This should only be used for querying the level, not mutating it in any way. May be null.
-- A `LivingEntity`: The entity the model is rendered on. May be null, e.g. when rendering from a [block entity renderer][ber].
-- An `int`: A seed for randomizing.
+- A`BakedModel`：原始模型。
+- `ItemStack`：正在渲染的物品堆栈。
+- A`ClientLevel`：模型正在渲染的关卡。这应该仅用于查询关卡，而不应以任何方式改变它。可能为空。
+- A`LivingEntity`：渲染模型的实体。可能为空，例如从[块实体渲染器][ber]渲染时。
+- `int`：用于随机化的种子。
 
-`ItemOverrides` also hold the model's override options as `BakedOverride`s. An object of `BakedOverride` is an in-code representation of a model's [`overrides`][overrides] block. It can be used by baked models to return different models depending on its contents. A list of all `BakedOverride`s of an `ItemOverrides` instance can be retrieved through `ItemOverrides#getOverrides()`.
+`ItemOverrides` 还将模型的覆盖选项保留为 `BakedOverride`。 `BakedOverride` 的对象是模型的 [`overrides`][overrides] 块的代码内表示。烘焙模型可以使用它根据其内容返回不同的模型。通过 `ItemOverrides#getOverrides()` 可以检索 `ItemOverrides` 实例的所有 `BakedOverride` 的列表。
 
-## `BakedModelWrapper`
+## `BakedModelWrapper` {#bakedmodelwrapper}
 
-A `BakedModelWrapper` can be used to modify an already existing `BakedModel`. `BakedModelWrapper` is a subclass of `BakedModel` that accepts another `BakedModel` (the "original" model) in the constructor and by default redirects all methods to the original model. Your implementation can then override only select methods, like so:
+`BakedModelWrapper` 可用于修改现有的 `BakedModel`。 `BakedModelWrapper` 是 `BakedModel` 的子类，它在构造函数中接受另一个 `BakedModel`（“原始”模型），并默认将所有方法重定向到原始模型。然后，你的实现可以仅重写选择的方法，如下所示：
 
 ```java
 // The generic parameter may optionally be a more specific subclass of BakedModel.
@@ -91,7 +91,7 @@ public class MyBakedModelWrapper extends BakedModelWrapper<BakedModel> {
 }
 ```
 
-After writing your model wrapper class, you must apply the wrappers to the models it should affect. Do so in a [client-side][sides] [event handler][event] for `ModelEvent.ModifyBakingResult`:
+编写模型包装器类后，你必须将包装器应用到它应该影响的模型。在 `ModelEvent.ModifyBakingResult` 的 [客户端][sides] [事件处理器][event] 中执行此操作：
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client
@@ -118,7 +118,7 @@ public static void modifyBakingResult(ModelEvent.ModifyBakingResult event) {
 ```
 
 :::warning
-It is generally encouraged to use a [custom model loader][modelloader] over wrapping baked models in `ModelEvent.ModifyBakingResult` when possible. Custom model loaders can also use `BakedModelWrapper`s if needed.
+如果可能的话，通常鼓励使用[自定义模型加载器][modelloader] 来将烘焙模型包裹在 `ModelEvent.ModifyBakingResult` 中。如果需要，自定义模型加载器也可以使用 `BakedModelWrapper`。
 :::
 
 [ao]: https://en.wikipedia.org/wiki/Ambient_occlusion

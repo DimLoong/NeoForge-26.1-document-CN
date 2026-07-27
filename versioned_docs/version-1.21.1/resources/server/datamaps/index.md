@@ -1,38 +1,38 @@
-# Data Maps
+# 数据映射 {#data-maps}
 
-A data map contains data-driven, reloadable objects that can be attached to a registered object. This system allows for more easily data-driving game behaviour, as they provide functionality such as syncing or conflict resolution, leading to a better and more configurable user experience. You can think of [tags] as registry object ➜ boolean maps, while data maps are more flexible registry object ➜ object maps. Similar to [tags], data maps will add to their corresponding data map rather than overwriting.
+数据映射包含数据驱动、可重载的对象，可以附加到已注册的对象上。该系统让游戏行为更易于数据驱动，因为它提供了诸如同步或冲突解决等功能，从而带来更好、更可配置的用户体验。你可以把[标签][tags]看作 注册对象 ➜ 布尔值 的映射，而数据映射则是更灵活的 注册对象 ➜ 对象 的映射。与[标签][tags]类似，数据映射会向其对应的数据映射中追加内容，而非覆盖。
 
-Data maps can be attached to both static, built-in, registries and dynamic data-driven datapack registries. Data maps support reloading through the use of the `/reload` command or any other means that reload server resources.
+数据映射既可以附加到静态的内置注册表，也可以附加到动态的、数据驱动的数据包注册表。数据映射支持通过 `/reload` 命令或任何其他重载服务端资源的方式进行重载。
 
-NeoForge provides various [built-in data maps][builtin] for common use cases, replacing hardcoded vanilla fields. More info can be found in the linked article.
+NeoForge 为常见用例提供了多种[内置数据映射][builtin]，用于替代硬编码的原版字段。更多信息请参阅所链接的文章。
 
-## File Location
+## 文件位置 {#file-location}
 
-Data maps are loaded from a JSON file located at `<mapNamespace>/data_maps/<registryNamespace>/<registryPath>/<mapPath>.json`, where:
+数据映射从位于 `<mapNamespace>/data_maps/<registryNamespace>/<registryPath>/<mapPath>.json` 的 JSON 文件中加载，其中：
 
-- `<mapNamespace>` is the namespace of the ID of the data map,
-- `<mapPath>` is the path of the ID of the data map,
-- `<registryNamespace>` is the namespace of the ID of the registry (omitted if it is `minecraft`), and
-- `<registryPath>` is the path of the ID of the registry.
+- `<mapNamespace>` 是数据映射 ID 的命名空间，
+- `<mapPath>` 是数据映射 ID 的路径，
+- `<registryNamespace>` 是注册表 ID 的命名空间（若为 `minecraft` 则省略），
+- `<registryPath>` 是注册表 ID 的路径。
 
-Examples:
+示例：
 
-- For a data map named `mymod:drop_healing` for the `minecraft:item` registry (as in the example below), the path will be `mymod/data_maps/item/drop_healing.json`.
-- For a data map named `somemod:somemap` for the `minecraft:block` registry, the path will be `somemod/data_maps/block/somemap.json`.
-- For a data map named `example:stuff` for the `somemod:custom` registry, the path will be `example/data_maps/somemod/custom/stuff.json`.
+- 对于名为 `mymod:drop_healing`、用于 `minecraft:item` 注册表的数据映射（如下例所示），路径将是 `mymod/data_maps/item/drop_healing.json`。
+- 对于名为 `somemod:somemap`、用于 `minecraft:block` 注册表的数据映射，路径将是 `somemod/data_maps/block/somemap.json`。
+- 对于名为 `example:stuff`、用于 `somemod:custom` 注册表的数据映射，路径将是 `example/data_maps/somemod/custom/stuff.json`。
 
-## JSON Structure
+## JSON 结构 {#json-structure}
 
-A data map file itself may contain the following fields:
+数据映射文件本身可以包含以下字段：
 
-- `replace`: A boolean that will clear the data map before adding the values of this file. This should never be shipped by mods, and only be used by pack developers that want to overwrite this map for their own purposes.
-- `neoforge:conditions`: A list of [loading conditions][conditions].
-- `values`: A map of registry IDs or tag IDs to values that should be added to the data map by your mod. The structure of the values themselves is defined by the data map's codec (see below).
-- `remove`: A list of registry IDs or tag IDs to be removed from the data map.
+- `replace`：一个布尔值，会在添加本文件的值之前清空数据映射。 Mod 绝不应发布此项，它只应由希望为自身目的覆盖此映射的资源包开发者使用。
+- `neoforge:conditions`：一个[加载条件][conditions]列表。
+- `values`：一个从 注册表 ID 或标签 ID 到值的映射，这些值将由你的 Mod 添加到数据映射中。值本身的结构由数据映射的 codec 定义（见下文）。
+- `remove`：一个要从数据映射中移除的 注册表 ID 或标签 ID 的列表。
 
-### Adding Values
+### 添加值 {#adding-values}
 
-For example, let's assume that we have a data map object with two float keys `amount` and `chance` for the registry `minecraft:item`. A corresponding data map file could look something like this:
+举例来说，假设我们有一个数据映射对象，它为 `minecraft:item` 注册表定义了两个浮点数键 `amount` 和 `chance`。对应的数据映射文件可能如下所示：
 
 ```json5
 {
@@ -51,7 +51,7 @@ For example, let's assume that we have a data map object with two float keys `am
 }
 ```
 
-Data maps may support [mergers][mergers], which will cause custom merging behavior in the case of a conflict, e.g. if two mods add a data map value for the same item. To avoid the merger from triggering, we can specify the `replace` field on the element level, like so:
+数据映射可以支持[合并器][mergers]，它会在发生冲突时触发自定义的合并行为，例如两个 Mod 为同一个物品添加了数据映射值。为避免触发合并器，我们可以在元素层级指定 `replace` 字段，如下所示：
 
 ```json5
 {
@@ -70,9 +70,9 @@ Data maps may support [mergers][mergers], which will cause custom merging behavi
 }
 ```
 
-### Removing Existing Values
+### 移除已有的值 {#removing-existing-values}
 
-Removing elements can be done by specifying a list of item IDs or tag IDs to remove:
+移除元素的方法是指定一个要移除的物品 ID 或标签 ID 列表：
 
 ```json5
 {
@@ -83,7 +83,7 @@ Removing elements can be done by specifying a list of item IDs or tag IDs to rem
 }
 ```
 
-Removals run after additions, so we can include a tag and then exclude certain elements from it again:
+移除在添加之后运行，因此我们可以先包含一个标签，然后再从中排除某些元素：
 
 ```json5
 {
@@ -97,7 +97,7 @@ Removals run after additions, so we can include a tag and then exclude certain e
 }
 ```
 
-Data maps may support custom [removers] with additional arguments. To supply these, the `remove` list can be transformed into a JSON object that contains the to-be-removed elements as map keys and the additional data as the associated value. For example, let's assume that our remover object is serialized to a string, then our remover map could look something like this:
+数据映射可以支持带有附加参数的自定义[移除器][removers]。要提供这些参数，可以将 `remove` 列表转换为一个 JSON 对象，其中以待移除的元素作为映射的键，以附加数据作为对应的值。例如，假设我们的移除器对象被序列化为一个字符串，那么我们的移除器映射可能如下所示：
 
 ```json5
 {
@@ -109,15 +109,15 @@ Data maps may support custom [removers] with additional arguments. To supply the
 }
 ```
 
-## Custom Data Maps
+## 自定义数据映射 {#custom-data-maps}
 
-To begin, we define the format of our data map entries. **Data map entries must be immutable**, making records ideal for this. Reiterating our example from above with two float values `amount` and `chance`, our data map entries will look something like this:
+首先，我们定义数据映射条目的格式。**数据映射条目必须是不可变的**，因此 record 是理想的选择。沿用上文中带有两个浮点值 `amount` 和 `chance` 的例子，我们的数据映射条目将如下所示：
 
 ```java
 public record ExampleData(float amount, float chance) {}
 ```
 
-Like many other things, data maps are serialized and deserialized using [codecs]. This means that we need to provide a codec for our data map entry that we will use in a bit:
+与许多其他内容一样，数据映射通过 [codec][codecs] 进行序列化和反序列化。这意味着我们需要为数据映射条目提供一个 codec，稍后会用到它：
 
 ```java
 public record ExampleData(float amount, float chance) {
@@ -128,7 +128,7 @@ public record ExampleData(float amount, float chance) {
 }
 ```
 
-Next, we create the data map itself:
+接下来，我们创建数据映射本身：
 
 ```java
 // In this example, we register the data map for the minecraft:item registry, hence we use Item as the generic.
@@ -144,7 +144,7 @@ public static final DataMapType<Item, ExampleData> EXAMPLE_DATA = DataMapType.bu
 ).build();
 ```
 
-Finally, register the data map during the [`RegisterDataMapTypesEvent`][events] on the [mod event bus][modbus]:
+最后，在[Mod 事件总线][modbus]上的 [`RegisterDataMapTypesEvent`][events] 期间注册该数据映射：
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -153,9 +153,9 @@ public static void registerDataMapTypes(RegisterDataMapTypesEvent event) {
 }
 ```
 
-### Syncing
+### 同步 {#syncing}
 
-Synced data maps will have their values synced to clients. A data map can be marked as synced by calling `#synced` on the builder, like so:
+已同步的数据映射会将其值同步到客户端。可以通过在构建器上调用 `#synced` 将数据映射标记为已同步，如下所示：
 
 ```java
 public static final DataMapType<Item, ExampleData> EXAMPLE_DATA = DataMapType.builder(...)
@@ -164,16 +164,16 @@ public static final DataMapType<Item, ExampleData> EXAMPLE_DATA = DataMapType.bu
                 // a codec with less fields, omitting parts of the object that are not required on the client.
                 ExampleData.CODEC,
                 // Whether the data map is mandatory or not. Marking a data map as mandatory will disconnect clients
-                // that are missing the data map on their side; this includes vanilla clients.
+                // that are missing the data map on their side; this includes 原版 clients.
                 false
         ).build();
 ```
 
-### Usage
+### 使用 {#usage}
 
-As data maps can be used on any registry, they must be queried through `Holder`s, not through actual registry objects. Moreover, it will only work for reference holders, not `Direct` holders. However, most places will return a reference holder, for example `Registry#wrapAsHolder`, `Registry#getHolder` or the different `builtInRegistryHolder` methods, so in most situations this shouldn't be a problem.
+由于数据映射可以用于任何注册表，因此必须通过 `Holder` 来查询它们，而不能通过实际的注册表对象。此外，它只对引用型 holder 有效，对 `Direct` holder 无效。不过，大多数场合都会返回引用型 holder，例如 `Registry#wrapAsHolder`、 `Registry#getHolder` 或各种 `builtInRegistryHolder` 方法，因此在大多数情况下这不成问题。
 
-You can then query the data map value via `Holder#getData(DataMapType)`. If an object does not have a data map value attached, the method will return `null`. Reusing our `ExampleData` from before, let's use them to heal the player whenever he picks them up:
+之后你可以通过 `Holder#getData(DataMapType)` 查询数据映射值。如果某个对象没有附加数据映射值，该方法将返回 `null`。沿用前面的 `ExampleData`，让我们用它在玩家捡起物品时为其治疗：
 
 ```java
 @SubscribeEvent // on the game event bus
@@ -194,23 +194,23 @@ public static void itemPickup(ItemPickupEvent event) {
 }
 ```
 
-This process of course also works for all data maps provided by NeoForge.
+这一流程当然同样适用于 NeoForge 提供的所有数据映射。
 
-## Advanced Data Maps
+## 高级数据映射 {#advanced-data-maps}
 
-Advanced data maps are data maps that use `AdvancedDataMapType` instead of the standard `DataMapType` (of which `AdvancedDataMapType` is a subclass). They have some extra functionality, namely the ability to specify custom mergers and custom removers. Implementing this is highly recommended for data maps whose values are collections or collection-likes, such as `List`s or `Map`s.
+高级数据映射是使用 `AdvancedDataMapType` 而非标准 `DataMapType`（`AdvancedDataMapType` 是其子类）的数据映射。它们拥有一些额外功能，即能够指定自定义的合并器和自定义的移除器。对于值为集合或类集合类型（如 `List` 或 `Map`）的数据映射，强烈推荐实现这一点。
 
-While `DataMapType` has two generics `R` (registry type) and `T` (data map value type), `AdvancedDataMapType` has one more: `VR extends DataMapValueRemover<R, T>`. This generic allows for datagenning removers with proper type safety.
+`DataMapType` 有两个泛型 `R`（注册表类型）和 `T`（数据映射值类型），而 `AdvancedDataMapType` 还多出一个：`VR extends DataMapValueRemover<R, T>`。这个泛型使得能够以恰当的类型安全性对移除器进行数据生成。
 
-`AdvancedDataMapType`s are created using `AdvancedDataMapType#builder()` instead of `DataMapType#builder()`, returning an `AdvancedDataMapType.Builder`. This builder has two extra methods `#remover` and `#merger` for specifying removers and mergers (see below), respectively. All other functionality, including syncing, remains the same.
+`AdvancedDataMapType` 使用 `AdvancedDataMapType#builder()` 而非 `DataMapType#builder()` 来创建，返回一个 `AdvancedDataMapType.Builder`。该构建器额外提供了两个方法 `#remover` 和 `#merger`，分别用于指定移除器和合并器（见下文）。包括同步在内的所有其他功能均保持不变。
 
-### Mergers
+### 合并器 {#mergers}
 
-A merger can be used to handle conflicts between multiple data packs that attempt to add a value for the same object. The default merger (`DataMapValueMerger#defaultMerger`) will overwrite existing values (from e.g. data packs with lower priority) with new values, so a custom merger is necessary if this isn't the desired behavior.
+合并器可用于处理多个数据包尝试为同一对象添加值时产生的冲突。默认合并器（`DataMapValueMerger#defaultMerger`）会用新值覆盖已有的值（例如来自优先级较低的数据包的值），因此如果这不是期望的行为，就需要自定义合并器。
 
-The merger will be given the two conflicting values, as well as the objects the values are being attached to (as an `Either<TagKey<R>, ResourceKey<R>>`, since values can be attached to all objects in a tag or a single object) and the object's owning registry, and should return the value that should actually be attached. Generally, mergers should simply merge and not perform overwrites if possible (i.e. only if merging the normal way doesn't work). If a data pack wants to bypass the merger, it should specify the `replace` field on the object (see [Adding Values][add]).
+合并器会接收两个相互冲突的值，以及这些值所附加的对象（以 `Either<TagKey<R>, ResourceKey<R>>` 的形式，因为值既可以附加到某个标签中的所有对象，也可以附加到单个对象上）和对象所属的注册表，并应返回实际应当附加的值。一般来说，只要有可能，合并器就应当直接合并而不进行覆盖（即只有在常规方式无法合并时才覆盖）。如果某个数据包想要绕过合并器，它应当在对象上指定 `replace` 字段（参见[添加值][add]）。
 
-Let's imagine a scenario where we have a data map that adds integers to items. We could then simply resolve conflicts by adding both values, like so:
+设想这样一个场景：我们有一个为物品添加整数的数据映射。这样我们就可以简单地通过把两个值相加来解决冲突，如下所示：
 
 ```java
 public class IntMerger implements DataMapValueMerger<Item, Integer> {
@@ -223,9 +223,9 @@ public class IntMerger implements DataMapValueMerger<Item, Integer> {
 }
 ```
 
-This way, if one pack specifies the value 12 for `minecraft:carrot` and another pack specifies the value 15 for `minecraft:carrot`, then the final value for `minecraft:carrot` will be 27. If either of these objects specify `"replace": true`, then that object's value will be used. If both specify `"replace": true`, then the higher datapack's value is used.
+这样一来，如果一个包为 `minecraft:carrot` 指定值 12，另一个包为 `minecraft:carrot` 指定值 15，那么 `minecraft:carrot` 的最终值将是 27。如果其中任一对象指定了 `"replace": true`，则会使用该对象的值。如果两者都指定了 `"replace": true`，则使用优先级较高的数据包的值。
 
-Finally, don't forget to actually specify the merger in the builder, like so:
+最后，别忘了在构建器中真正指定该合并器，如下所示：
 
 ```java
 // We assume AdvancedData contains an integer property of some sort.
@@ -235,16 +235,16 @@ AdvancedDataMapType<Item, AdvancedData> ADVANCED_MAP = AdvancedDataMapType.build
 ```
 
 :::tip
-NeoForge provides default mergers for lists, sets and maps in `DataMapValueMerger`.
+NeoForge 在 `DataMapValueMerger` 中为列表、集合（set）和映射（map）提供了默认合并器。
 :::
 
-### Removers
+### 移除器 {#removers}
 
-Similar to mergers for more complex data, removers can be used for proper handling of `remove` clauses for an element. The default remover (`DataMapValueRemover.Default.INSTANCE`) will simply remove any and all information related to the specified object, so we want to use a custom remover to remove only parts of the object's data.
+与用于处理更复杂数据的合并器类似，移除器可用于正确处理某个元素的 `remove` 子句。默认移除器（`DataMapValueRemover.Default.INSTANCE`）会直接移除与指定对象相关的所有信息，因此如果我们只想移除对象数据的一部分，就需要使用自定义移除器。
 
-The codec passed to the builder (read on) will be used to decode remover instances. The remover will then be passed the value currently attached to the object and its source, and should return an `Optional` of the value to replace the old value. Alternatively, an empty `Optional` will lead to the value being actually removed.
+传递给构建器的 codec（继续往下看）将用于解码移除器实例。随后，移除器会接收当前附加到对象上的值及其来源，并应返回一个 `Optional`，其中包含用于替换旧值的新值。此外，返回一个空的 `Optional` 会导致该值被真正移除。
 
-Consider the following example of a remover that will remove a value with a specific key from a `Map<String, String>`-based data map:
+考虑以下示例，这个移除器会从一个基于 `Map<String, String>` 的数据映射中移除具有特定键的值：
 
 ```java
 public record MapRemover(String key) implements DataMapValueRemover<Item, Map<String, String>> {
@@ -259,7 +259,7 @@ public record MapRemover(String key) implements DataMapValueRemover<Item, Map<St
 }
 ```
 
-With this remover in mind, consider the following data file:
+有了这个移除器，再来看以下数据文件：
 
 ```json5
 {
@@ -272,7 +272,7 @@ With this remover in mind, consider the following data file:
 }
 ```
 
-Now, consider this second data file that is placed at a higher priority than the first one:
+现在，考虑这第二个数据文件，它的优先级高于第一个：
 
 ```json5
 {
@@ -284,7 +284,7 @@ Now, consider this second data file that is placed at a higher priority than the
 }
 ```
 
-That way, after both files are applied, the final result will be (an in-memory representation of) this:
+这样，在两个文件都应用之后，最终结果将是（以下内容的内存表示）：
 
 ```json5
 {
@@ -296,7 +296,7 @@ That way, after both files are applied, the final result will be (an in-memory r
 }
 ```
 
-As with mergers, don't forget to add them to the builder. Note that we simply use the codec here:
+与合并器一样，别忘了将它们添加到构建器中。注意这里我们只需使用 codec：
 
 ```java
 // We assume AdvancedData contains a Map<String, String> property of some sort.
@@ -305,9 +305,9 @@ AdvancedDataMapType<Item, AdvancedData> ADVANCED_MAP = AdvancedDataMapType.build
         .build();
 ```
 
-## Data Generation
+## 数据生成 {#data-generation}
 
-Data maps can be [datagenned][datagen] by extending `DataMapProvider` and overriding `#gather` to create your entries. Reusing the `ExampleData` from before (with float values `amount` and `chance`), our datagen file could look something like this:
+可以通过继承 `DataMapProvider` 并重写 `#gather` 来创建条目，从而对数据映射进行[数据生成][datagen]。沿用前面的 `ExampleData`（带有浮点值 `amount` 和 `chance`），我们的数据生成文件可能如下所示：
 
 ```java
 public class MyDataMapProvider extends DataMapProvider {
@@ -334,7 +334,7 @@ public class MyDataMapProvider extends DataMapProvider {
 }
 ```
 
-This would then result in the following JSON file:
+这样便会生成以下 JSON 文件：
 
 ```json5
 {
@@ -361,7 +361,7 @@ This would then result in the following JSON file:
 }
 ```
 
-Like all data providers, don't forget to add the provider to the event:
+与所有数据提供器一样，别忘了将该提供器添加到事件中：
 
 ```java
 @SubscribeEvent // on the mod event bus

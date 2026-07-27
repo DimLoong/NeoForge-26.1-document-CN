@@ -1,16 +1,16 @@
-# Loot Functions
+# 战利品函数 {#loot-functions}
 
-Loot functions can be used to modify the result of a [loot entry][entry], or the multiple results of a [loot pool][pool] or [loot table][table]. In both cases, a list of functions is defined, which is run in order. During datagen, loot functions can be applied to `LootPoolSingletonContainer.Builder<?>`s, `LootPool.Builder`s and `LootTable.Builder`s by calling `#apply`. This article will outline the available loot functions. To create your own loot functions, see [Custom Loot Functions][custom].
+战利品函数可用于修改某个[战利品条目][entry]的结果，或修改某个[战利品池][pool]、[战利品表][table]的多个结果。这两种情况下都会定义一个函数列表，并按顺序依次运行。在数据生成期间，可以对 `LootPoolSingletonContainer.Builder<?>`、 `LootPool.Builder` 和 `LootTable.Builder` 调用 `#apply` 来应用战利品函数。本文将介绍可用的战利品函数。若要创建你自己的战利品函数，请参阅[自定义战利品函数][custom]。
 
 :::note
-Loot functions cannot be applied to composite loot entries (subclasses of `CompositeEntryBase` and their associated builder classes). They must be added to each singleton entry manually.
+战利品函数不能应用于复合战利品条目（`CompositeEntryBase` 的子类及其关联的构建器类）。它们必须手动添加到每个单例条目上。
 :::
 
-All vanilla loot functions except `minecraft:sequence` can specify [loot conditions][conditions] in a `conditions` block. If one of these conditions fails, the function will not be applied. On the code side, this is controlled by the `LootItemConditionalFunction`, which all loot functions except for `SequenceFunction` extend.
+除 `minecraft:sequence` 外的所有原版战利品函数都可以在 `conditions` 块中指定[战利品条件][conditions]。如果其中某个条件不满足，该函数将不会被应用。在代码层面，这由 `LootItemConditionalFunction` 控制，除 `SequenceFunction` 外的所有战利品函数都继承自它。
 
-## `minecraft:set_item`
+## `minecraft:set_item` {#minecraftset_item}
 
-Sets a different item to use in the result item stack.
+设置结果物品堆叠中要使用的另一种物品。
 
 ```json5
 {
@@ -20,11 +20,11 @@ Sets a different item to use in the result item stack.
 }
 ```
 
-It is currently not possible to create this function during datagen.
+目前无法在数据生成期间创建此函数。
 
-## `minecraft:set_count`
+## `minecraft:set_count` {#minecraftset_count}
 
-Sets an item count to use in the result item stack. Uses a [number provider][numberprovider].
+设置结果物品堆叠中要使用的物品数量。使用一个[数值提供器][numberprovider]。
 
 ```json5
 {
@@ -40,11 +40,11 @@ Sets an item count to use in the result item stack. Uses a [number provider][num
 }
 ```
 
-During datagen, call `SetItemCountFunction#setCount` with the desired number provider and optionally an `add` boolean to construct a builder for this function.
+在数据生成期间，调用 `SetItemCountFunction#setCount`，传入所需的数值提供器以及可选的 `add` 布尔值，即可构造该函数的构建器。
 
-## `minecraft:explosion_decay`
+## `minecraft:explosion_decay` {#minecraftexplosion_decay}
 
-Applies an explosion decay. The item has a chance of 1 / `explosion_radius` to "survive". This is run multiple times depending on the count. Requires the `minecraft:explosion_radius` loot parameter, no modification is performed if that parameter is absent.
+应用一次爆炸衰减。物品有 1 / `explosion_radius` 的概率“存活”。这会根据数量运行多次。需要 `minecraft:explosion_radius` 战利品参数，若该参数缺失则不进行任何修改。
 
 ```json5
 {
@@ -52,11 +52,11 @@ Applies an explosion decay. The item has a chance of 1 / `explosion_radius` to "
 }
 ```
 
-During datagen, call `ApplyExplosionDecay#explosionDecay` to construct a builder for this function.
+在数据生成期间，调用 `ApplyExplosionDecay#explosionDecay` 即可构造该函数的构建器。
 
-## `minecraft:limit_count`
+## `minecraft:limit_count` {#minecraftlimit_count}
 
-Clamps the count of the item stack between a given `IntRange`.
+将物品堆叠的数量限制在给定的 `IntRange` 范围之内。
 
 ```json5
 {
@@ -68,11 +68,11 @@ Clamps the count of the item stack between a given `IntRange`.
 }
 ```
 
-During datagen, call `LimitCount#limitCount` with the desired `IntRange` to construct a builder for this function.
+在数据生成期间，调用 `LimitCount#limitCount`，传入所需的 `IntRange`，即可构造该函数的构建器。
 
-## `minecraft:set_custom_data`
+## `minecraft:set_custom_data` {#minecraftset_custom_data}
 
-Sets custom NBT data on the item stack.
+在物品堆叠上设置自定义 NBT 数据。
 
 ```json5
 {
@@ -83,15 +83,15 @@ Sets custom NBT data on the item stack.
 }
 ```
 
-During datagen, call `SetCustomDataFunction#setCustomData` with the desired [`CompoundTag`][nbt] to construct a builder for this function.
+在数据生成期间，调用 `SetCustomDataFunction#setCustomData`，传入所需的 [`CompoundTag`][nbt]，即可构造该函数的构建器。
 
 :::warning
-This function should generally be considered deprecated. Use `minecraft:set_components` instead.
+此函数通常应视为已弃用。请改用 `minecraft:set_components`。
 :::
 
-## `minecraft:copy_custom_data`
+## `minecraft:copy_custom_data` {#minecraftcopy_custom_data}
 
-Copies custom NBT data from a block entity or entity source to the item stack. Use of this is discouraged for block entities, use `minecraft:copy_components` or `minecraft:set_contents` instead. For entities, this requires setting the [entity target][entitytarget]. Requires the loot parameter corresponding to the specified source (entity target or block entity), no modification is performed if that parameter is absent.
+将自定义 NBT 数据从方块实体或实体来源复制到物品堆叠上。不建议对方块实体使用此函数，应改用 `minecraft:copy_components` 或 `minecraft:set_contents`。对于实体，则需要设置[实体目标][entitytarget]。需要与指定来源（实体目标或方块实体）相对应的战利品参数，若该参数缺失则不进行任何修改。
 
 ```json5
 {
@@ -118,11 +118,11 @@ Copies custom NBT data from a block entity or entity source to the item stack. U
 }
 ```
 
-During datagen, call `CopyCustomDataFunction#copy` with the desired source and target values, as well as a merging strategy (optional, defaults to `replace`), to construct a builder for this function.
+在数据生成期间，调用 `CopyCustomDataFunction#copy`，传入所需的来源与目标值以及一个合并策略（可选，默认为 `replace`），即可构造该函数的构建器。
 
-## `minecraft:set_components`
+## `minecraft:set_components` {#minecraftset_components}
 
-Sets [data component][datacomponent] values on the item stack. Most vanilla use cases have specialized functions that are explained below.
+在物品堆叠上设置[数据组件][datacomponent]值。大多数原版用例都有专门的函数，将在下文说明。
 
 ```json5
 {
@@ -136,11 +136,11 @@ Sets [data component][datacomponent] values on the item stack. Most vanilla use 
 }
 ```
 
-During datagen, call `SetComponentsFunction#setComponent` with the desired data component and value to construct a builder for this function.
+在数据生成期间，调用 `SetComponentsFunction#setComponent`，传入所需的数据组件与值，即可构造该函数的构建器。
 
-## `minecraft:copy_components`
+## `minecraft:copy_components` {#minecraftcopy_components}
 
-Copies [data component][datacomponent] values from a block entity to the item stack. Requires the `minecraft:block_entity` loot parameter, no modification is performed if that parameter is absent.
+将[数据组件][datacomponent]值从方块实体复制到物品堆叠上。需要 `minecraft:block_entity` 战利品参数，若该参数缺失则不进行任何修改。
 
 ```json5
 {
@@ -154,11 +154,11 @@ Copies [data component][datacomponent] values from a block entity to the item st
 }
 ```
 
-During datagen, call `CopyComponentsFunction#copyComponents` with the desired data source (usually `CopyComponentsFunction.Source.BLOCK_ENTITY`) to construct a builder for this function.
+在数据生成期间，调用 `CopyComponentsFunction#copyComponents`，传入所需的数据来源（通常是 `CopyComponentsFunction.Source.BLOCK_ENTITY`），即可构造该函数的构建器。
 
-## `minecraft:copy_state`
+## `minecraft:copy_state` {#minecraftcopy_state}
 
-Copies block state properties into the item stack's `block_state` [data component][datacomponent], used when trying to place a block. The block state properties to copy must be explicitly specified. Requires the `minecraft:block_state` loot parameter, no modification is performed if that parameter is absent.
+将方块状态属性复制到物品堆叠的 `block_state` [数据组件][datacomponent]中，在尝试放置方块时使用。要复制的方块状态属性必须显式指定。需要 `minecraft:block_state` 战利品参数，若该参数缺失则不进行任何修改。
 
 ```json5
 {
@@ -172,11 +172,11 @@ Copies block state properties into the item stack's `block_state` [data componen
 }
 ```
 
-During datagen, call `CopyBlockState#copyState` with the block to construct a builder for this condition. The desired block state property values can then be set on the builder using `#copy`.
+在数据生成期间，调用 `CopyBlockState#copyState`，传入方块，即可构造该条件的构建器。随后可通过 `#copy` 在构建器上设置所需的方块状态属性值。
 
-## `minecraft:set_contents`
+## `minecraft:set_contents` {#minecraftset_contents}
 
-Sets contents of the item stack.
+设置物品堆叠的内容物。
 
 ```json5
 {
@@ -197,11 +197,11 @@ Sets contents of the item stack.
 }
 ```
 
-During datagen, call `SetContainerContents#setContents` with the desired contents component to construct a builder for this function. Then, call `#withEntry` on the builder to add entries.
+在数据生成期间，调用 `SetContainerContents#setContents`，传入所需的内容物组件，即可构造该函数的构建器。随后在构建器上调用 `#withEntry` 以添加条目。
 
-## `minecraft:modify_contents`
+## `minecraft:modify_contents` {#minecraftmodify_contents}
 
-Applies a function to the contents of the item stack.
+对物品堆叠的内容物应用一个函数。
 
 ```json5
 {
@@ -213,11 +213,11 @@ Applies a function to the contents of the item stack.
 }
 ```
 
-It is currently not possible to create this function during datagen.
+目前无法在数据生成期间创建此函数。
 
-## `minecraft:set_loot_table`
+## `minecraft:set_loot_table` {#minecraftset_loot_table}
 
-Sets a container loot table on the result item stack. Intended for chests and other loot containers that retain this property when placed down.
+在结果物品堆叠上设置一个容器战利品表。适用于箱子以及其他在放置后仍保留此属性的战利品容器。
 
 ```json5
 {
@@ -231,11 +231,11 @@ Sets a container loot table on the result item stack. Intended for chests and ot
 }
 ```
 
-During datagen, call `SetContainerLootTable#withLootTable` with the desired block entity type, loot table resource key and optionally a seed to construct a builder for this function.
+在数据生成期间，调用 `SetContainerLootTable#withLootTable`，传入所需的方块实体类型、战利品表资源键以及可选的种子，即可构造该函数的构建器。
 
-## `minecraft:set_name`
+## `minecraft:set_name` {#minecraftset_name}
 
-Sets a name for the result item stack. The name can be a [`Component`][component] instead of a literal string. It can also be resolved from an [entity target][entitytarget]. Requires the corresponding entity loot parameter if applicable, no modification is performed if that parameter is absent.
+为结果物品堆叠设置名称。该名称可以是一个 [`Component`][component]，而不必是字面字符串。它也可以从一个[实体目标][entitytarget]解析而来。如适用，需要相应的实体战利品参数，若该参数缺失则不进行任何修改。
 
 ```json5
 {
@@ -249,11 +249,11 @@ Sets a name for the result item stack. The name can be a [`Component`][component
 }
 ```
 
-During datagen, call `SetNameFunction#setName` with the desired name component, the desired name target and optionally an entity target to construct a builder for this function.
+在数据生成期间，调用 `SetNameFunction#setName`，传入所需的名称组件、所需的名称目标以及可选的实体目标，即可构造该函数的构建器。
 
-## `minecraft:copy_name`
+## `minecraft:copy_name` {#minecraftcopy_name}
 
-Copies an [entity target][entitytarget]'s or block entity's name into the result item stack. Requires the loot parameter corresponding to the specified source (entity target or block entity), no modification is performed if that parameter is absent.
+将一个[实体目标][entitytarget]或方块实体的名称复制到结果物品堆叠上。需要与指定来源（实体目标或方块实体）相对应的战利品参数，若该参数缺失则不进行任何修改。
 
 ```json5
 {
@@ -263,11 +263,11 @@ Copies an [entity target][entitytarget]'s or block entity's name into the result
 }
 ```
 
-During datagen, call `CopyNameFunction#copyName` with the desired entity source to construct a builder for this function.
+在数据生成期间，调用 `CopyNameFunction#copyName`，传入所需的实体来源，即可构造该函数的构建器。
 
-## `minecraft:set_lore`
+## `minecraft:set_lore` {#minecraftset_lore}
 
-Sets lore (tooltip lines) for the result item stack. The lines can be [`Component`][component]s instead of literal strings. It can also be resolved from an [entity target][entitytarget]. Requires the corresponding entity loot parameter if applicable, no modification is performed if that parameter is absent.
+为结果物品堆叠设置说明文本（工具提示行）。这些行可以是 [`Component`][component]，而不必是字面字符串。它也可以从一个[实体目标][entitytarget]解析而来。如适用，需要相应的实体战利品参数，若该参数缺失则不进行任何修改。
 
 ```json5
 {
@@ -293,11 +293,11 @@ Sets lore (tooltip lines) for the result item stack. The lines can be [`Componen
 }
 ```
 
-During datagen, call `SetLoreFunction#setLore` to construct a builder for this function. Then, call `#addLine`, `#setMode` and `#setResolutionContext` as needed on the builder.
+在数据生成期间，调用 `SetLoreFunction#setLore` 即可构造该函数的构建器。随后根据需要在构建器上调用 `#addLine`、 `#setMode` 和 `#setResolutionContext`。
 
-## `minecraft:toggle_tooltips`
+## `minecraft:toggle_tooltips` {#minecrafttoggle_tooltips}
 
-Enables or disables certain component tooltips.
+启用或禁用特定组件的工具提示。
 
 ```json5
 {
@@ -318,11 +318,11 @@ Enables or disables certain component tooltips.
 }
 ```
 
-It is currently not possible to create this function during datagen.
+目前无法在数据生成期间创建此函数。
 
-## `minecraft:enchant_with_levels`
+## `minecraft:enchant_with_levels` {#minecraftenchant_with_levels}
 
-Randomly enchants the item stack with a given amount of levels. Uses a [number provider][numberprovider].
+用给定的等级数量随机附魔物品堆叠。使用一个[数值提供器][numberprovider]。
 
 ```json5
     {
@@ -341,11 +341,11 @@ Randomly enchants the item stack with a given amount of levels. Uses a [number p
 }
 ```
 
-During datagen, call `EnchantWithLevelsFunction#enchantWithLevels` with the desired number provider to construct a builder for this function. Then, if desired, set a list of enchantments on the builder using `#fromOptions`.
+在数据生成期间，调用 `EnchantWithLevelsFunction#enchantWithLevels`，传入所需的数值提供器，即可构造该函数的构建器。随后如有需要，可使用 `#fromOptions` 在构建器上设置一个附魔列表。
 
-## `minecraft:enchant_randomly`
+## `minecraft:enchant_randomly` {#minecraftenchant_randomly}
 
-Enchants the item with one random enchantment.
+用一个随机附魔为物品附魔。
 
 ```json5
 {
@@ -360,11 +360,11 @@ Enchants the item with one random enchantment.
 }
 ```
 
-During datagen, call `EnchantRandomlyFunction#randomEnchantment` or `EnchantRandomlyFunction#randomApplicableEnchantment` to construct a builder for this function. Then, if desired, call `#withEnchantment` or `#withOneOf` on the builder.
+在数据生成期间，调用 `EnchantRandomlyFunction#randomEnchantment` 或 `EnchantRandomlyFunction#randomApplicableEnchantment` 即可构造该函数的构建器。随后如有需要，可在构建器上调用 `#withEnchantment` 或 `#withOneOf`。
 
-## `minecraft:set_enchantments`
+## `minecraft:set_enchantments` {#minecraftset_enchantments}
 
-Sets enchantments on the result item stack.
+在结果物品堆叠上设置附魔。
 
 ```json5
 {
@@ -383,11 +383,11 @@ Sets enchantments on the result item stack.
 }
 ```
 
-During datagen, call `new SetEnchantmentsFunction.Builder` with the `add` boolean value (optionally) to construct a builder for this function. Then, call `#withEnchantment` to add an enchantment to set.
+在数据生成期间，调用 `new SetEnchantmentsFunction.Builder`，（可选地）传入 `add` 布尔值，即可构造该函数的构建器。随后调用 `#withEnchantment` 以添加要设置的附魔。
 
-## `minecraft:enchanted_count_increase`
+## `minecraft:enchanted_count_increase` {#minecraftenchanted_count_increase}
 
-Increases the item stack count based on the enchantment value. Uses a [number provider][numberprovider]. Requires the `minecraft:attacking_entity` loot parameter, no modification is performed if that parameter is absent.
+根据附魔数值增加物品堆叠的数量。使用一个[数值提供器][numberprovider]。需要 `minecraft:attacking_entity` 战利品参数，若该参数缺失则不进行任何修改。
 
 ```json5
 {
@@ -405,11 +405,11 @@ Increases the item stack count based on the enchantment value. Uses a [number pr
 }
 ```
 
-During datagen, call `EnchantedCountIncreaseFunction#lootingMultiplier` with the desired number provider to construct a builder for this function. Optionally, call `#setLimit` on the builder afterwards.
+在数据生成期间，调用 `EnchantedCountIncreaseFunction#lootingMultiplier`，传入所需的数值提供器，即可构造该函数的构建器。随后可选地在构建器上调用 `#setLimit`。
 
-## `minecraft:apply_bonus`
+## `minecraft:apply_bonus` {#minecraftapply_bonus}
 
-Applies an increase to the item stack count based on the enchantment value and various formulas. Requires the `minecraft:tool` loot parameter, no modification is performed if that parameter is absent.
+根据附魔数值和各种公式对物品堆叠数量应用一个增量。需要 `minecraft:tool` 战利品参数，若该参数缺失则不进行任何修改。
 
 ```json5
 {
@@ -430,11 +430,11 @@ Applies an increase to the item stack count based on the enchantment value and v
 }
 ```
 
-During datagen, call `ApplyBonusCount#addBonusBinomialDistributionCount`, `ApplyBonusCount#addOreBonusCount` or `ApplyBonusCount#addUniformBonusCount` with the enchantment and other required parameters (depending on the formula) to construct a builder for this function.
+在数据生成期间，调用 `ApplyBonusCount#addBonusBinomialDistributionCount`、 `ApplyBonusCount#addOreBonusCount` 或 `ApplyBonusCount#addUniformBonusCount`，传入附魔以及其他必需参数（取决于公式），即可构造该函数的构建器。
 
-## `minecraft:furnace_smelt`
+## `minecraft:furnace_smelt` {#minecraftfurnace_smelt}
 
-Attempts to smelt the item as if it were in a furnace, returning the unmodified item stack if it could not be smelted.
+尝试将物品当作在熔炉中一样熔炼，如果无法熔炼则返回未修改的物品堆叠。
 
 ```json5
 {
@@ -442,11 +442,11 @@ Attempts to smelt the item as if it were in a furnace, returning the unmodified 
 }
 ```
 
-During datagen, call `SmeltItemFunction#smelted` to construct a builder for this function.
+在数据生成期间，调用 `SmeltItemFunction#smelted` 即可构造该函数的构建器。
 
-## `minecraft:set_damage`
+## `minecraft:set_damage` {#minecraftset_damage}
 
-Sets a durability damage value on the result item stack. Uses a [number provider][numberprovider].
+在结果物品堆叠上设置一个耐久度损伤值。使用一个[数值提供器][numberprovider]。
 
 ```json5
 {
@@ -462,11 +462,11 @@ Sets a durability damage value on the result item stack. Uses a [number provider
 }
 ```
 
-During datagen, call `SetItemDamageFunction#setDamage` with the desired number provider and optionally an `add` boolean to construct a builder for this function.
+在数据生成期间，调用 `SetItemDamageFunction#setDamage`，传入所需的数值提供器以及可选的 `add` 布尔值，即可构造该函数的构建器。
 
-## `minecraft:set_attributes`
+## `minecraft:set_attributes` {#minecraftset_attributes}
 
-Adds a list of attribute modifiers to the result item stack.
+向结果物品堆叠添加一组属性修饰符。
 
 ```json5
 {
@@ -495,11 +495,11 @@ Adds a list of attribute modifiers to the result item stack.
 }
 ```
 
-During datagen, call `SetAttributesFunction#setAttributes` to construct a builder for this function. Then, add modifiers using `#withModifier` on the builder. Use `SetAttributesFunction#modifier` to get a modifier.
+在数据生成期间，调用 `SetAttributesFunction#setAttributes` 即可构造该函数的构建器。随后使用构建器上的 `#withModifier` 添加修饰符。使用 `SetAttributesFunction#modifier` 获取一个修饰符。
 
-## `minecraft:set_potion`
+## `minecraft:set_potion` {#minecraftset_potion}
 
-Sets a potion on the result item stack.
+在结果物品堆叠上设置一种药水。
 
 ```json5
 {
@@ -509,11 +509,11 @@ Sets a potion on the result item stack.
 }
 ```
 
-During datagen, call `SetPotionFunction#setPotion` with the desired potion to construct a builder for this function.
+在数据生成期间，调用 `SetPotionFunction#setPotion`，传入所需的药水，即可构造该函数的构建器。
 
-## `minecraft:set_stew_effect`
+## `minecraft:set_stew_effect` {#minecraftset_stew_effect}
 
-Sets a list of stew effects on the result item stack.
+在结果物品堆叠上设置一组炖菜效果。
 
 ```json5
 {
@@ -530,11 +530,11 @@ Sets a list of stew effects on the result item stack.
 }
 ```
 
-During datagen, call `SetStewEffectFunction#stewEffect` to construct a builder for this function. Then, call `#withModifier` on the builder.
+在数据生成期间，调用 `SetStewEffectFunction#stewEffect` 即可构造该函数的构建器。随后在构建器上调用 `#withModifier`。
 
-## `minecraft:set_ominous_bottle_amplifier`
+## `minecraft:set_ominous_bottle_amplifier` {#minecraftset_ominous_bottle_amplifier}
 
-Sets an ominous bottle amplifier on the result item stack. Uses a [number provider][numberprovider].
+在结果物品堆叠上设置不祥之瓶的增幅等级。使用一个[数值提供器][numberprovider]。
 
 ```json5
 {
@@ -548,11 +548,11 @@ Sets an ominous bottle amplifier on the result item stack. Uses a [number provid
 }
 ```
 
-During datagen, call `SetOminousBottleAmplifierFunction#amplifier` with the desired number provider to construct a builder for this function.
+在数据生成期间，调用 `SetOminousBottleAmplifierFunction#amplifier`，传入所需的数值提供器，即可构造该函数的构建器。
 
-## `minecraft:exploration_map`
+## `minecraft:exploration_map` {#minecraftexploration_map}
 
-Transforms the result item stack into an exploration map if and only if it is a map. Requires the `minecraft:origin` loot parameter, no modification is performed if that parameter is absent.
+当且仅当结果物品堆叠是地图时，将其转换为探险地图。需要 `minecraft:origin` 战利品参数，若该参数缺失则不进行任何修改。
 
 ```json5
 {
@@ -572,11 +572,11 @@ Transforms the result item stack into an exploration map if and only if it is a 
 }
 ```
 
-During datagen, call `ExplorationMapFunction#makeExplorationMap` to construct a builder for this function. Then, call the various setters on the builder if desired.
+在数据生成期间，调用 `ExplorationMapFunction#makeExplorationMap` 即可构造该函数的构建器。随后如有需要，可在构建器上调用各个 setter 方法。
 
-## `minecraft:fill_player_head`
+## `minecraft:fill_player_head` {#minecraftfill_player_head}
 
-Sets the player head owner on the result item stack based on the given [entity target][entitytarget]. Requires the corresponding loot parameter, no modification is performed if that parameter is absent.
+根据给定的[实体目标][entitytarget]，在结果物品堆叠上设置玩家头颅的所有者。需要相应的战利品参数，若该参数缺失则不进行任何修改。
 
 ```json5
 {
@@ -586,11 +586,11 @@ Sets the player head owner on the result item stack based on the given [entity t
 }
 ```
 
-During datagen, call `FillPlayerHead#fillPlayerHead` with the desired entity target to construct a builder for this function.
+在数据生成期间，调用 `FillPlayerHead#fillPlayerHead`，传入所需的实体目标，即可构造该函数的构建器。
 
-## `minecraft:set_banner_pattern`
+## `minecraft:set_banner_pattern` {#minecraftset_banner_pattern}
 
-Sets banner patterns on the result item stack. This is for banners, not banner pattern items.
+在结果物品堆叠上设置旗帜图案。这适用于旗帜，而非旗帜图案物品。
 
 ```json5
 {
@@ -609,11 +609,11 @@ Sets banner patterns on the result item stack. This is for banners, not banner p
 }
 ```
 
-During datagen, call `SetBannerPatternFunction#setBannerPattern` with the `append` boolean to construct a builder for this function. Then, call `#addPattern` to add patterns to the function.
+在数据生成期间，调用 `SetBannerPatternFunction#setBannerPattern`，传入 `append` 布尔值，即可构造该函数的构建器。随后调用 `#addPattern` 向该函数添加图案。
 
-## `minecraft:set_instrument`
+## `minecraft:set_instrument` {#minecraftset_instrument}
 
-Sets the instrument tag on the result item stack.
+在结果物品堆叠上设置乐器标签。
 
 ```json5
 {
@@ -623,9 +623,9 @@ Sets the instrument tag on the result item stack.
 }
 ```
 
-During datagen, call `SetInstrumentFunction#setInstrumentOptions` with the desired instrument tag to construct a builder for this function.
+在数据生成期间，调用 `SetInstrumentFunction#setInstrumentOptions`，传入所需的乐器标签，即可构造该函数的构建器。
 
-## `minecraft:set_fireworks`
+## `minecraft:set_fireworks` {#minecraftset_fireworks}
 
 ```json5
 {
@@ -633,7 +633,7 @@ During datagen, call `SetInstrumentFunction#setInstrumentOptions` with the desir
     // The explosions to use. Optional, uses the existing data component value if absent.
     "explosions": [
         {
-            // The firework explosion shape to use. Valid vanilla values are "small_ball", "large_ball",
+            // The firework explosion shape to use. Valid 原版 values are "small_ball", "large_ball",
             // "star", "creeper" and "burst". Optional, defaults to "small_ball".
             "shape": "star",
             // The colors to use. Optional, defaults to an empty list.
@@ -657,16 +657,16 @@ During datagen, call `SetInstrumentFunction#setInstrumentOptions` with the desir
 }
 ```
 
-It is currently not possible to create this function during datagen.
+目前无法在数据生成期间创建此函数。
 
-## `minecraft:set_firework_explosion`
+## `minecraft:set_firework_explosion` {#minecraftset_firework_explosion}
 
-Sets a firework explosion on the result item stack.
+在结果物品堆叠上设置一次烟花爆炸。
 
 ```json5
 {
     "function": "minecraft:set_firework_explosion",
-    // The firework explosion shape to use. Valid vanilla values are "small_ball", "large_ball",
+    // The firework explosion shape to use. Valid 原版 values are "small_ball", "large_ball",
     // "star", "creeper" and "burst". Optional, defaults to "small_ball".
     "shape": "star",
     // The colors to use. Optional, defaults to an empty list.
@@ -686,11 +686,11 @@ Sets a firework explosion on the result item stack.
 }
 ```
 
-During datagen, call `SetItemCountFunction#setCount` with the desired number provider and optionally an `add` boolean to construct a builder for this function.
+在数据生成期间，调用 `SetItemCountFunction#setCount`，传入所需的数值提供器以及可选的 `add` 布尔值，即可构造该函数的构建器。
 
-## `minecraft:set_book_cover`
+## `minecraft:set_book_cover` {#minecraftset_book_cover}
 
-Sets a written book's non-page-specific content.
+设置成书中与具体页面无关的内容。
 
 ```json5
 {
@@ -705,11 +705,11 @@ Sets a written book's non-page-specific content.
 }
 ```
 
-During datagen, call `new SetBookCoverFunction` with the desired parameters to construct a builder for this function.
+在数据生成期间，调用 `new SetBookCoverFunction`，传入所需的参数，即可构造该函数的构建器。
 
-## `minecraft:set_written_book_pages`
+## `minecraft:set_written_book_pages` {#minecraftset_written_book_pages}
 
-Sets the pages of a written book.
+设置成书的页面。
 
 ```json5
 {
@@ -735,11 +735,11 @@ Sets the pages of a written book.
 }
 ```
 
-It is currently not possible to create this function during datagen.
+目前无法在数据生成期间创建此函数。
 
-## `minecraft:set_writable_book_pages`
+## `minecraft:set_writable_book_pages` {#minecraftset_writable_book_pages}
 
-Sets the pages of a writable book (book and quill).
+设置书与笔的页面。
 
 ```json5
 {
@@ -765,11 +765,11 @@ Sets the pages of a writable book (book and quill).
 }
 ```
 
-It is currently not possible to create this function during datagen.
+目前无法在数据生成期间创建此函数。
 
-## `minecraft:set_custom_model_data`
+## `minecraft:set_custom_model_data` {#minecraftset_custom_model_data}
 
-Sets the custom model data of the result item stack.
+设置结果物品堆叠的自定义模型数据。
 
 ```json5
 {
@@ -779,11 +779,11 @@ Sets the custom model data of the result item stack.
 }
 ```
 
-It is currently not possible to create this function during datagen.
+目前无法在数据生成期间创建此函数。
 
-## `minecraft:filtered`
+## `minecraft:filtered` {#minecraftfiltered}
 
-This function accepts an `ItemPredicate` that is checked against the `tool` loot parameter; if the check succeeds, the other function is run. An `ItemPredicate` can specify a list of valid item ids (`items`), a min/max range for the item count (`count`), a `DataComponentPredicate` (`components`) and an `ItemSubPredicate` (`predicates`); all fields are optional. Requires the `minecraft:tool` loot parameter, always failing if that parameter is absent.
+此函数接受一个 `ItemPredicate`，并针对 `tool` 战利品参数进行检查；如果检查通过，则运行另一个函数。 `ItemPredicate` 可以指定一个有效物品 id 列表（`items`）、物品数量的最小/最大范围（`count`）、一个 `DataComponentPredicate`（`components`）以及一个 `ItemSubPredicate`（`predicates`）；所有字段均为可选。需要 `minecraft:tool` 战利品参数，若该参数缺失则始终失败。
 
 ```json5
 {
@@ -799,15 +799,15 @@ This function accepts an `ItemPredicate` that is checked against the `tool` loot
 }
 ```
 
-It is currently not possible to create this function during datagen.
+目前无法在数据生成期间创建此函数。
 
 :::warning
-This function should generally be considered deprecated. Use the passed function with a `minecraft:match_tool` condition instead.
+此函数通常应视为已弃用。请改用带有 `minecraft:match_tool` 条件的目标函数。
 :::
 
-## `minecraft:reference`
+## `minecraft:reference` {#minecraftreference}
 
-This function references an item modifier and applies it to the result item stack. See [Item Modifiers][itemmodifiers] for more information.
+此函数引用一个物品修饰符，并将其应用于结果物品堆叠。更多信息请参阅[物品修饰符][itemmodifiers]。
 
 ```json5
 {
@@ -817,11 +817,11 @@ This function references an item modifier and applies it to the result item stac
 }
 ```
 
-During datagen, call `FunctionReference#functionReference` with the id of the referenced predicate file to construct a builder for this function.
+在数据生成期间，调用 `FunctionReference#functionReference`，传入被引用的谓词文件的 id，即可构造该函数的构建器。
 
-## `minecraft:sequence`
+## `minecraft:sequence` {#minecraftsequence}
 
-This function runs other loot functions one after another.
+此函数依次运行其他战利品函数。
 
 ```json5
 {
@@ -839,11 +839,11 @@ This function runs other loot functions one after another.
 }
 ```
 
-During datagen, call `SequenceFunction#of` with the other functions to construct a builder for this condition.
+在数据生成期间，调用 `SequenceFunction#of`，传入其他函数，即可构造该条件的构建器。
 
-## See Also
+## 另请参阅 {#see-also}
 
-- [Item Modifiers][itemmodifiers] on the [Minecraft Wiki][mcwiki]
+- [Minecraft Wiki][mcwiki] 上的[物品修饰符][itemmodifiers]
 
 [component]: ../../client/i18n.md#components
 [conditions]: lootconditions

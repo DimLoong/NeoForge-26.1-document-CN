@@ -1,80 +1,80 @@
 ---
 sidebar_position: 2
 ---
-# Capabilities
+# Capability {#capabilities}
 
-Capabilities allow exposing features in a dynamic and flexible way without having to resort to directly implementing many interfaces.
+Capability 允许以动态且灵活的方式公开 Capability，而无需直接实现许多接口。
 
-In general terms, each capability provides a feature in the form of an interface.
+一般来说，每个 Capability 都以接口的形式提供一个 Capability。
 
-NeoForge adds capability support to blocks, entities, and item stacks. This will be explained in more detail in the following sections.
+NeoForge 增加了对方块、实体和物品堆栈的 Capability 支持。这将在以下部分中更详细地解释。
 
-## Why Use Capabilities?
+## 为什么要使用 Capability？ {#why-use-capabilities}
 
-Capabilities are designed to separate **what** a block, entity or item stack can do from **how** it does it. If you are wondering whether capabilities are the right tool for a job, ask yourself the following questions:
+Capability 旨在将方块、实体或物品堆栈可以做什么和它如何做分开。如果你想知道 Capability 是否是适合工作的工具，请问自己以下问题：
 
-1. Do I only care about **what** a block, entity or item stack can do, but not about **how** it does it?
-1. Is the **what**, the behavior, only available for some blocks, entities, or item stacks, but not all of them?
-1. Is the **how**, the implementation of that behavior, dependent on the specific block, entity or item stack?
+1. 我是否只关心方块、实体或物品堆栈可以做什么，而不关心它如何做？
+1. **什么**行为是否仅适用于某些方块、实体或物品堆栈，而不是全部？
+1. 该行为的实现方式取决于特定的方块、实体或物品堆栈吗？
 
-Here are a few examples of good capability usage:
+以下是良好使用 Capability 的一些示例：
 
-- *"I want my fluid container to be compatible with fluid containers from other mods, but I don't know the specifics of each fluid container."* - Yes, use the `IFluidHandler` capability.
-- *"I want to count how many items are in some entity, but I do not know how the entity might store them."* - Yes, use the `IItemHandler` capability.
-- *"I want to fill some item stack with power, but I do not know how the item stack might store it."* - Yes, use the `IEnergyStorage` capability.
-- *"I want to apply some color to whatever block a player is currently targeting, but I do not know how the block will be transformed."* - Yes. NeoForge does not provide a capability to color blocks, but you can implement one yourself.
+- *“我希望我的流体容器与其他 Mod 的流体容器兼容，但我不知道每个流体容器的具体细节。”* - 是的，使用 `IFluidHandler` Capability。
+- *“我想计算某个实体中有多少个物品，但我不知道该实体如何存储它们。”* - 是的，使用 `IItemHandler` Capability。
+- *“我想用能量填充一些物品堆栈，但我不知道物品堆栈如何存储它。”* - 是的，使用 `IEnergyStorage` Capability。
+- *“我想对玩家当前瞄准的任何方块应用一些颜色，但我不知道该方块将如何转换。”* - 是的。 NeoForge 不提供对方块进行着色的 Capability，但你可以自己实现。
 
-Here is an example of discouraged capability usage:
+以下是不鼓励使用 Capability 的示例：
 
-- *"I want to check if an entity is within the range of my machine."* - No, use a helper method instead.
+- *“我想检查一个实体是否在我的机器范围内。”* - 不，请使用辅助方法。
 
-## NeoForge-provided capabilities
+## NeoForge 提供的 Capability {#neoforge-provided-capabilities}
 
-NeoForge provides capabilities for the following three interfaces: `IItemHandler`, `IFluidHandler` and `IEnergyStorage`.
+NeoForge 提供以下三个接口的 Capability：`IItemHandler`、 `IFluidHandler` 和 `IEnergyStorage`。
 
-`IItemHandler` exposes an interface for handling inventory slots. The capabilities of type `IItemHandler` are:
+`IItemHandler` 公开了一个用于处理库存槽位的接口。 `IItemHandler` 型的 Capability 为：
 
-- `Capabilities.ItemHandler.BLOCK`: automation-accessible inventory of a block (for chests, machines, etc).
-- `Capabilities.ItemHandler.ENTITY`: inventory contents of an entity (extra player slots, mob/creature inventories/bags).
-- `Capabilities.ItemHandler.ENTITY_AUTOMATION`: automation-accessible inventory of an entity (boats, minecarts, etc).
-- `Capabilities.ItemHandler.ITEM`: contents of an item stack (portable backpacks and such).
+- `Capabilities.ItemHandler.BLOCK`：可自动访问的方块库存（用于箱子、机器等）。
+- `Capabilities.ItemHandler.ENTITY`：实体的库存内容（额外的玩家位置、生物/生物库存/袋子）。
+- `Capabilities.ItemHandler.ENTITY_AUTOMATION`：可自动访问的实体库存（船、矿车等）。
+- `Capabilities.ItemHandler.ITEM`：物品堆栈的内容（便携式背包等）。
 
-`IFluidHandler` exposes an interface for handling fluid inventories. The capabilities of type `IFluidHandler` are:
+`IFluidHandler` 公开了用于处理流体库存的接口。 `IFluidHandler` 型的 Capability 为：
 
-- `Capabilities.FluidHandler.BLOCK`: automation-accessible fluid inventory of a block.
-- `Capabilities.FluidHandler.ENTITY`: fluid inventory of an entity.
-- `Capabilities.FluidHandler.ITEM`: fluid inventory of an item stack.
-This capability is of the special `IFluidHandlerItem` type due to the way buckets hold fluids.
+- `Capabilities.FluidHandler.BLOCK`：可自动访问的方块的流体库存。
+- `Capabilities.FluidHandler.ENTITY`：实体的流体库存。
+- `Capabilities.FluidHandler.ITEM`：物品堆栈的流动库存。
+由于桶容纳流体的方式，此 Capability 属于特殊的 `IFluidHandlerItem` 类型。
 
-`IEnergyStorage` exposes an interface for handling energy containers. It is based on the RedstoneFlux API by TeamCoFH. The capabilities of type `IEnergyStorage` are:
+`IEnergyStorage` 公开了用于处理能量容器的接口。它基于 TeamCoFH 的 RedstoneFlux API。 `IEnergyStorage` 型的 Capability 为：
 
-- `Capabilities.EnergyStorage.BLOCK`: energy contained inside a block.
-- `Capabilities.EnergyStorage.ENTITY`: energy containing inside an entity.
-- `Capabilities.EnergyStorage.ITEM`: energy contained inside an item stack.
+- `Capabilities.EnergyStorage.BLOCK`：方块内包含的能量。
+- `Capabilities.EnergyStorage.ENTITY`：实体内部包含的能量。
+- `Capabilities.EnergyStorage.ITEM`：物品堆栈中包含的能量。
 
-## Creating a capability
+## 创建 Capability {#creating-a-capability}
 
-NeoForge supports capabilities for blocks, entities, and item stacks.
+NeoForge 支持方块、实体和物品堆栈的 Capability。
 
-Capabilities allow looking up implementations of some APIs with some dispatching logic. The following kinds of capabilities are implemented in NeoForge:
+Capability 允许使用某些调度逻辑查找某些 API 的实现。 NeoForge 中实现了以下几种 Capability：
 
-- `BlockCapability`: capabilities for blocks and block entities; behavior depends on the specific `Block`.
-- `EntityCapability`: capabilities for entities: behavior dependends on the specific `EntityType`.
-- `ItemCapability`: capabilities for item stacks: behavior depends on the specific `Item`.
+- `BlockCapability`：方块和方块实体的 Capability；行为取决于特定的 `Block`。
+- `EntityCapability`：实体的 Capability：行为取决于特定的 `EntityType`。
+- `ItemCapability`：物品堆栈的 Capability：行为取决于特定的 `Item`。
 
 :::tip
-For compatibility with other mods, we recommend using the capabilities provided by NeoForge in the `Capabilities` class if possible. Otherwise, you can create your own as described in this section.
+为了与其他 mod 兼容，如果可能，我们建议使用 NeoForge 在 `Capabilities` 类中提供的 Capability。否则，你可以按照本节中的描述创建自己的。
 :::
 
-Creating a capability is a single function call, and the resulting object should be stored in a `static final` field. The following parameters must be provided:
+创建 Capability 是单个函数调用，生成的对象应存储在 `static final` 字段中。必须提供以下参数：
 
-- The name of the capability.
-    - Creating a capability with the same name multiple times will always return the same object.
-    - Capabilities with different names are **completely independent**, and can be used for different purposes.
-- The behavior type that is being queried. This is the `T` type parameter.
-- The type for additional context in the query. This is the `C` type parameter.
+- Capability 的名称。
+    - 多次创建同名的 Capability 将始终返回相同的对象。
+    - 不同名称的 Capability**完全独立**，可以用于不同的目的。
+- 正在查询的行为类型。这是 `T` 类型参数。
+- 查询中附加上下文的类型。这是 `C` 类型参数。
 
-For example, here is how a capability for side-aware block `IItemHandler`s might be declared:
+例如，以下是如何声明侧面感知方块 `IItemHandler`s 的 Capability：
 
 ```java
 public static final BlockCapability<IItemHandler, @Nullable Direction> ITEM_HANDLER_BLOCK =
@@ -87,7 +87,7 @@ public static final BlockCapability<IItemHandler, @Nullable Direction> ITEM_HAND
         Direction.class);
 ```
 
-A `@Nullable Direction` is so common for blocks that there is a dedicated helper:
+`@Nullable Direction` 对于方块来说非常常见，因此有一个专门的帮助程序：
 
 ```java
 public static final BlockCapability<IItemHandler, @Nullable Direction> ITEM_HANDLER_BLOCK =
@@ -98,7 +98,7 @@ public static final BlockCapability<IItemHandler, @Nullable Direction> ITEM_HAND
         IItemHandler.class);
 ```
 
-If no context is required, `Void` should be used. There is also a dedicated helper for context-less capabilities:
+如果不需要上下文，则应使用 `Void`。还有一个用于无上下文 Capability 的专用助手：
 
 ```java
 public static final BlockCapability<IItemHandler, Void> ITEM_HANDLER_NO_CONTEXT =
@@ -109,15 +109,15 @@ public static final BlockCapability<IItemHandler, Void> ITEM_HANDLER_NO_CONTEXT 
         IItemHandler.class);
 ```
 
-For entities and item stacks, similar methods exist in `EntityCapability` and `ItemCapability` respectively.
+对于实体和物品堆栈，类似的方法分别存在于 `EntityCapability` 和 `ItemCapability` 中。
 
-## Querying capabilities
+## 查询 Capability {#querying-capabilities}
 
-Once we have our `BlockCapability`, `EntityCapability`, or `ItemCapability` object in a static field, we can query a capability.
+一旦我们在静态字段中拥有 `BlockCapability`、 `EntityCapability` 或 `ItemCapability` 对象，我们就可以查询 Capability。
 
-For entities and item stacks, we can try to find implementations of a capability with `getCapability`. If the result is `null`, there no implementation is available.
+对于实体和物品堆栈，我们可以尝试使用 `getCapability` 查找 Capability 的实现。如果结果是 `null`，则没有可用的实现。
 
-For example:
+例如：
 
 ```java
 var object = entity.getCapability(CAP, context);
@@ -133,7 +133,7 @@ if (object != null) {
 }
 ```
 
-Block capabilities are used a bit differently because blocks without a block entity can have capabilities as well. The query is now performed on a `level`, with the `pos`ition that we are looking for as an additional parameter:
+方块 Capability 的使用有点不同，因为没有方块实体的方块也可以具有 Capability。现在在 `level` 上执行查询，并使用我们正在查找的 `pos`ition 作为附加参数：
 
 ```java
 var object = level.getCapability(CAP, pos, context);
@@ -142,7 +142,7 @@ if (object != null) {
 }
 ```
 
-If the block entity and/or the block state is known, they can be passed to save on query time:
+如果方块实体和/或方块状态已知，则可以传递它们以节省查询时间：
 
 ```java
 var object = level.getCapability(CAP, pos, blockState, blockEntity, context);
@@ -151,7 +151,7 @@ if (object != null) {
 }
 ```
 
-To give a more concrete example, here is how one might query an `IItemHandler` capability for a block, from the `Direction.NORTH` side:
+举一个更具体的例子，下面是如何从 `Direction.NORTH` 端查询一个方块的 `IItemHandler` Capability：
 
 ```java
 IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, Direction.NORTH);
@@ -160,22 +160,22 @@ if (handler != null) {
 }
 ```
 
-## Block capability caching
+## 方块 Capability 缓存 {#block-capability-caching}
 
-When a capability is looked up, the system will perform the following steps under the hood:
+当查找 Capability 时，系统将在后台执行以下步骤：
 
-1. Fetch block entity and block state if they were not supplied.
-1. Fetch registered capability providers. (More on this below).
-1. Iterate the providers and ask them if they can provide the capability.
-1. One of the providers will return a capability instance, potentially allocating a new object.
+1. 如果未提供方块实体和方块状态，则获取它们。
+1. 获取已注册的 Capability 提供者。 （更多内容见下文）。
+1. 迭代提供商并询问他们是否可以提供该 Capability。
+1. 其中一个提供者将返回一个 Capability 实例，可能会分配一个新对象。
 
-The implementation is rather efficient, but for queries that are performed frequently, for example every game tick, these steps can take a significant amount of server time. The `BlockCapabilityCache` system provides a dramatic speedup for capabilities that are frequently queried at a given position.
+该实现相当高效，但对于频繁执行的查询（例如每个游戏周期），这些步骤可能会占用大量服务器时间。 `BlockCapabilityCache` 系统为给定位置频繁查询的 Capability 提供了显着的加速。
 
 :::tip
-Generally, a `BlockCapabilityCache` will be created once and then stored in a field of the object performing frequent capability queries. When and where exactly you store the cache is up to you.
+一般情况下，会创建一次 `BlockCapabilityCache`，然后将其存储在频繁进行 Capability 查询的对象的字段中。存储缓存的具体时间和位置取决于你。
 :::
 
-To create a cache, call `BlockCapabilityCache.create` with the capability to query, the level, the position, and the query context.
+要创建缓存，请调用具有查询 Capability、级别、位置和查询上下文的 `BlockCapabilityCache.create`。
 
 ```java
 // Declare the field:
@@ -190,7 +190,7 @@ this.capCache = BlockCapabilityCache.create(
 );
 ```
 
-Querying the cache is then done with `getCapability()`:
+然后使用 `getCapability()` 查询缓存：
 
 ```java
 IItemHandler handler = this.capCache.getCapability();
@@ -199,16 +199,16 @@ if (handler != null) {
 }
 ```
 
-**The cache is automatically cleared by the garbage collector, there is no need to unregister it.**
+**缓存会被垃圾收集器自动清除，无需注销。**
 
-It is also possible to receive notifications when the capability object changes! This includes capabilities changing (`oldHandler != newHandler`), becoming unavailable (`null`) or becoming available again (not `null` anymore).
+当 Capability 对象发生变化时也可以收到通知！这包括 Capability 更改 (`oldHandler != newHandler`)、变得不可用 (`null`) 或再次可用（不再是 `null`）。
 
-The cache then needs to be created with two additional parameters:
+然后需要使用两个附加参数创建缓存：
 
-- A validity check, that is used to determine if the cache is still valid.
-    - In the simplest usage as a block entity field, `() -> !this.isRemoved()` will do.
-- An invalidation listener, that is called when the capability changes.
-    - This is where you can react to capability changes, removals, or appearances.
+- 有效性检查，用于确定缓存是否仍然有效。
+    - 在作为方块实体字段的最简单用法中，`() -> !this.isRemoved()` 就可以了。
+- 失效监听器，在 Capability 更改时调用。
+    - 你可以在此处对 Capability 更改、删除或外观做出反应。
 
 ```java
 // With optional invalidation listener:
@@ -222,39 +222,39 @@ this.capCache = BlockCapabilityCache.create(
 );
 ```
 
-## Block capability invalidation
+## 区块 Capability 失效 {#block-capability-invalidation}
 
 :::info
-Invalidation is exclusive to block capabilities. Entity and item stack capabilities cannot be cached and do not need to be invalidated.
+失效是方块 Capability 独有的。实体和物品堆栈 Capability 无法缓存，也不需要失效。
 :::
 
-To make sure that caches can correctly update their stored capability, **modders must call `level.invalidateCapabilities(pos)` whenever a capability changes, appears, or disappears**.
+为了确保缓存可以正确更新其存储的 Capability，**修改者必须在 Capability 更改、出现或消失时调用 `level.invalidateCapabilities(pos)`**。
 
 ```java
 // whenever a capability changes, appears, or disappears:
 level.invalidateCapabilities(pos);
 ```
 
-NeoForge already handles common cases such as chunk load/unloads and block entity creation/removal, but other cases need to be handled explicitly by modders. For example, modders must invalidate capabilities in the following cases:
+NeoForge 已经处理常见情况，例如方块加载/卸载和方块实体创建/删除，但其他情况需要由 Mod 开发者显式处理。例如，Mod 开发者必须在以下情况下使 Capability 失效：
 
-- If a previously returned capability is no longer valid.
-- If a capability-providing block (without a block entity) is placed or changes state, by overriding `onPlace`.
-- If a capability-providing block (without a block entity) is removed, by overriding `onRemove`.
+- 如果之前返回的 Capability 不再有效。
+- 如果通过覆盖 `onPlace` 来放置 Capability 提供方块（没有方块实体）或更改状态。
+- 如果通过覆盖 `onRemove` 来删除提供 Capability 的方块（没有方块实体）。
 
-For a plain block example, refer to the `ComposterBlock.java` file.
+有关普通方块示例，请参阅 `ComposterBlock.java` 文件。
 
-For more information, refer to the javadoc of [`IBlockCapabilityProvider`][block-cap-provider].
+有关更多信息，请参阅[`IBlockCapabilityProvider`][block-cap-provider]的 javadoc。
 
-## Registering capabilities
+## 注册 Capability {#registering-capabilities}
 
-A capability _provider_ is what ultimately supplies a capability. A capability provider is a function that can either return a capability instance, or `null` if it cannot provide the capability. Providers are specific to:
+Capability_提供者_是最终提供 Capability 的东西。 Capability 提供者是一个可以返回 Capability 实例的函数，如果无法提供该 Capability，则可以返回 `null`。提供商具体针对：
 
-- the given capability that they are providing for, and
-- the block instance, block entity type, entity type, or item instance that they are providing for.
+- 他们提供的给定 Capability，以及
+- 它们所提供的方块实例、方块实体类型、实体类型或物品实例。
 
-They need to be registered in the `RegisterCapabilitiesEvent`.
+它们需要在 `RegisterCapabilitiesEvent` 中注册。
 
-Block providers are registered with `registerBlock`. For example:
+区块提供商注册为 `registerBlock`。例如：
 
 ```java
 @SubscribeEvent  // on the mod event bus
@@ -269,7 +269,7 @@ public static void registerCapabilities(RegisterCapabilitiesEvent event) {
 }
 ```
 
-In general, registration will be specific to some block entity types, so the `registerBlockEntity` helper method is provided as well:
+一般来说，注册将特定于某些方块实体类型，因此还提供了 `registerBlockEntity` 帮助器方法：
 
 ```java
 event.registerBlockEntity(
@@ -280,10 +280,10 @@ event.registerBlockEntity(
 ```
 
 :::danger
-If the capability previously returned by a block or block entity provider is no longer valid, *you must invalidate the caches** by calling `level.invalidateCapabilities(pos)`. Refer to the [invalidation section][invalidation] above for more information.
+如果之前由方块或方块实体提供者返回的 Capability 不再有效，*你必须通过调用 `level.invalidateCapabilities(pos)` 使缓存无效**。更多信息请参阅上面的[无效部分][invalidation]。
 :::
 
-Entity registration is similar, using `registerEntity`:
+实体注册类似，使用 `registerEntity`：
 
 ```java
 event.registerEntity(
@@ -293,7 +293,7 @@ event.registerEntity(
 );
 ```
 
-Item registration is similar too. Note that the provider receives the stack:
+物品注册也类似。请注意，提供者接收堆栈：
 
 ```java
 event.registerItem(
@@ -305,11 +305,11 @@ event.registerItem(
 );
 ```
 
-## Registering capabilities for all objects
+## 所有对象的注册 Capability {#registering-capabilities-for-all-objects}
 
-If for some reason you need to register a provider for all blocks, entities, or items, you will need to iterate the corresponding registry and register the provider for each object.
+如果由于某种原因你需要为所有方块、实体或物品注册提供程序，则你将需要迭代相应的注册表并为每个对象注册提供程序。
 
-For example, NeoForge uses this system to register a fluid handler capability for all `BucketItem`s (excluding subclasses):
+例如，NeoForge 使用此系统为所有 `BucketItem`（不包括子类）注册流体处理器 Capability：
 
 ```java
 // For reference, you can find this code in the `CapabilityHooks` class.
@@ -320,9 +320,9 @@ for (Item item : BuiltInRegistries.ITEM) {
 }
 ```
 
-Providers are asked for a capability in the order that they are registered. Should you want to run before a provider that NeoForge already registers for one of your objects, register your `RegisterCapabilitiesEvent` handler with a higher priority.
+提供商需要按照注册的顺序提供 Capability。如果你想在 NeoForge 已经为你的对象之一注册的提供程序之前运行，请以更高的优先级注册你的 `RegisterCapabilitiesEvent` 处理器。
 
-For example:
+例如：
 
 ```java
 modBus.addListener(RegisterCapabilitiesEvent.class, event -> {
@@ -334,7 +334,7 @@ modBus.addListener(RegisterCapabilitiesEvent.class, event -> {
 }, EventPriority.HIGH); // use HIGH priority to register before NeoForge!
 ```
 
-See [`CapabilityHooks`][capability-hooks] for a list of the providers registered by NeoForge itself.
+有关 NeoForge 本身注册的提供程序列表，请参阅 [`CapabilityHooks`][capability-hooks]。
 
 [block-cap-provider]: https://github.com/neoforged/NeoForge/blob/1.21.x/src/main/java/net/neoforged/neoforge/capabilities/IBlockCapabilityProvider.java
 [capability-hooks]: https://github.com/neoforged/NeoForge/blob/1.21.x/src/main/java/net/neoforged/neoforge/capabilities/CapabilityHooks.java

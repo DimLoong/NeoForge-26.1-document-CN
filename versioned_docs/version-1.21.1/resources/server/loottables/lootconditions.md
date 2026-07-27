@@ -1,10 +1,10 @@
-# Loot Conditions
+# 战利品条件 {#loot-conditions}
 
-Loot conditions can be used to check whether a [loot entry][entry] or [loot pool][pool] should be used in the current context. In both cases, a list of conditions is defined; the entry or pool is only used if all conditions pass. During datagen, they are added to a `LootPoolEntryContainer.Builder<?>` or `LootPool.Builder` by calling `#when` with an instance of the desired condition. This article will outline the available loot conditions. To create your own loot conditions, see [Custom Loot Conditions][custom].
+战利品条件可用于检查是否应在当前上下文中使用[战利品条目][entry]或[战利品池][pool]。在这两种情况下，都定义了一系列条件；仅当所有条件都满足时才使用条目或池。在数据生成期间，通过使用所需条件的实例调用 `#when`，将它们添加到 `LootPoolEntryContainer.Builder<?>` 或 `LootPool.Builder` 中。本文将概述可用的战利品条件。要创建你自己的战利品条件，请参阅[自定义战利品条件][custom]。
 
-## `minecraft:inverted`
+## `minecraft:inverted` {#minecraftinverted}
 
-This condition accepts another condition and inverts its result. Requires whatever loot parameters the other condition requires.
+该条件接受另一个条件并反转其结果。需要其他条件所需的任何战利品参数。
 
 ```json5
 {
@@ -15,11 +15,11 @@ This condition accepts another condition and inverts its result. Requires whatev
 }
 ```
 
-During datagen, call `InvertedLootItemCondition#invert` with the condition to invert to construct a builder for this condition.
+在 datagen 期间，使用反转条件调用 `InvertedLootItemCondition#invert` 来构造此条件的构建器。
 
-## `minecraft:all_of`
+## `minecraft:all_of` {#minecraftall_of}
 
-This condition accepts any number of other conditions and returns true if all sub conditions return true. If the list is empty, it returns false. Requires whatever loot parameters the other conditions require.
+此条件接受任意数量的其他条件，并且如果所有子条件都返回 true，则返回 true。如果列表为空，则返回 false。需要其他条件所需的任何战利品参数。
 
 ```json5
 {
@@ -38,11 +38,11 @@ This condition accepts any number of other conditions and returns true if all su
 }
 ```
 
-During datagen, call `AllOfCondition#allOf` with the desired condition(s) to construct a builder for this condition.
+在数据生成期间，使用所需的条件调用 `AllOfCondition#allOf` 来构造该条件的构建器。
 
-## `minecraft:any_of`
+## `minecraft:any_of` {#minecraftany_of}
 
-This condition accepts any number of other conditions and returns true if at least one sub condition returns true. If the list is empty, it returns false. Requires whatever loot parameters the other conditions require.
+此条件接受任意数量的其他条件，并且如果至少一个子条件返回 true，则返回 true。如果列表为空，则返回 false。需要其他条件所需的任何战利品参数。
 
 ```json5
 {
@@ -61,11 +61,11 @@ This condition accepts any number of other conditions and returns true if at lea
 }
 ```
 
-During datagen, call `AnyOfCondition#anyOf` with the desired condition(s) to construct a builder for this condition.
+在数据生成期间，使用所需的条件调用 `AnyOfCondition#anyOf` 来构造该条件的构建器。
 
-## `minecraft:random_chance`
+## `minecraft:random_chance` {#minecraftrandom_chance}
 
-This condition accepts a [number provider][numberprovider] representing a chance between 0 and 1, and randomly returns true or false depending on that chance. The number provider should generally not return values outside the `[0, 1]` interval.
+此条件接受代表 0 到 1 之间机会的 [number provider][numberprovider]，并根据该机会随机返回 true 或 false。号码提供者通常不应返回 `[0, 1]` 间隔之外的值。
 
 ```json5
 {
@@ -75,11 +75,11 @@ This condition accepts a [number provider][numberprovider] representing a chance
 }
 ```
 
-During datagen, call `RandomChance#randomChance` with the number provider or a (constant) float value to construct a builder for this condition.
+在数据生成期间，使用数字提供程序或（常量）浮点值调用 `RandomChance#randomChance` 来构造此条件的构建器。
 
-## `minecraft:random_chance_with_enchanted_bonus`
+## `minecraft:random_chance_with_enchanted_bonus` {#minecraftrandom_chance_with_enchanted_bonus}
 
-This condition accepts an enchantment id, a [`LevelBasedValue`][numberprovider] and a constant fallback float value. If the specified enchantment is present, the `LevelBasedValue` is queried for a value. If the specified enchantment is absent, or no value could be retrieved from the `LevelBasedValue`, the constant fallback value is used. The condition then randomly returns true or false, with the previously determined value denoting the chance that true is returned. Requires the `minecraft:attacking_entity` parameter, falling back to level 0 if absent.
+此条件接受结界 id、[`LevelBasedValue`][numberprovider] 和常量后备浮点值。如果指定的附魔存在，则查询 `LevelBasedValue` 的值。如果指定的附魔不存在，或者无法从 `LevelBasedValue` 检索到任何值，则使用常量后备值。然后，条件随机返回 true 或 false，之前确定的值表示返回 true 的机会。需要 `minecraft:attacking_entity` 参数，如果不存在则回落到级别 0。
 
 ```json5
 {
@@ -96,11 +96,11 @@ This condition accepts an enchantment id, a [`LevelBasedValue`][numberprovider] 
 }
 ```
 
-During datagen, call `LootItemRandomChanceWithEnchantedBonusCondition#randomChanceAndLootingBoost` with the registry lookup (`HolderLookup.Provider`), the base value and the increase per level to construct a builder for this condition. Alternatively, call `new LootItemRandomChanceWithEnchantedBonusCondition` to further specify the values.
+在数据生成期间，使用注册表查找 (`HolderLookup.Provider`)、基值和每级增量调用 `LootItemRandomChanceWithEnchantedBonusCondition#randomChanceAndLootingBoost`，以为此条件构建构建器。或者，调用 `new LootItemRandomChanceWithEnchantedBonusCondition` 进一步指定值。
 
-## `minecraft:value_check`
+## `minecraft:value_check` {#minecraftvalue_check}
 
-This condition accepts a [number provider][numberprovider] and an `IntRange`, returning true if the result of the number provided is within the range.
+此条件接受 [号码提供者][numberprovider] 和 `IntRange`，如果提供的号码结果在范围内，则返回 true。
 
 ```json5
 {
@@ -119,11 +119,11 @@ This condition accepts a [number provider][numberprovider] and an `IntRange`, re
 }
 ```
 
-During datagen, call `ValueCheckCondition#hasValue` with the number provider and the range to construct a builder for this condition.
+在数据生成期间，使用号码提供程序和范围调用 `ValueCheckCondition#hasValue`，以为此条件构建构建器。
 
-## `minecraft:time_check`
+## `minecraft:time_check` {#minecrafttime_check}
 
-This condition checks if the world time is within an `IntRange`. Optionally, a `period` parameter can be provided to modulo the time with; this can be used to e.g. check the time of day if `period` is 24000 (one in-game day/night cycle has 24000 ticks).
+此条件检查世界时间是否在 `IntRange` 范围内。或者，可以提供 `period` 参数来对时间取模；这可以用于例如检查一天中的时间 `period` 是否为 24000（游戏中的一个日/夜周期有 24000 个刻度）。
 
 ```json5
 {
@@ -140,11 +140,11 @@ This condition checks if the world time is within an `IntRange`. Optionally, a `
 }
 ```
 
-During datagen, call `TimeCheck#time` with the desired range to construct a builder for this condition. The `period` value can then be set on the builder using `#setPeriod`.
+在数据生成期间，使用所需的范围调用 `TimeCheck#time` 来构造针对此条件的构建器。然后可以使用 `#setPeriod` 在构建器上设置 `period` 值。
 
-## `minecraft:weather_check`
+## `minecraft:weather_check` {#minecraftweather_check}
 
-This condition checks the current weather for raining and thundering.
+此条件检查当前天气是否下雨和打雷。
 
 ```json5
 {
@@ -158,11 +158,11 @@ This condition checks the current weather for raining and thundering.
 }
 ```
 
-During datagen, call `WeatherCheck#weather` to construct a builder for this condition. The `raining` and `thundering` values can then be set on the builder using `#setRaining` and `#setThundering`, respectively.
+在 datagen 期间，调用 `WeatherCheck#weather` 来构造此条件的构建器。然后可以分别使用 `#setRaining` 和 `#setThundering` 在构建器上设置 `raining` 和 `thundering` 值。
 
-## `minecraft:location_check`
+## `minecraft:location_check` {#minecraftlocation_check}
 
-This condition accepts a `LocationPredicate` and an optional offset value for each axis direction. `LocationPredicate`s allow checking conditions such as the position itself, the block or fluid state at that position, the dimension, biome or structure at that position, the light level, whether the sky is visible, etc. All possible values can be viewed in the `LocationPredicate` class definition. Requires the `minecraft:origin` loot parameter, always failing if that parameter is absent.
+此条件接受 `LocationPredicate` 和每个轴方向的可选偏移值。 `LocationPredicate` 允许检查位置本身、该位置的方块或流体状态、该位置的尺寸、生物群落或结构、光照水平、天空是否可见等条件。所有可能的值都可以在 `LocationPredicate` 类定义中查看。需要 `minecraft:origin` 战利品参数，如果该参数不存在，则始终失败。
 
 ```json5
 {
@@ -179,11 +179,11 @@ This condition accepts a `LocationPredicate` and an optional offset value for ea
 }
 ```
 
-During datagen, call `LocationCheck#checkLocation` with the `LocationPredicate` and optionally a `BlockPos` to construct a builder for this condition.
+在数据生成期间，使用 `LocationPredicate` 和可选的 `BlockPos` 调用 `LocationCheck#checkLocation` 来构造针对此条件的构建器。
 
-## `minecraft:block_state_property`
+## `minecraft:block_state_property` {#minecraftblock_state_property}
 
-This condition checks for the specified block state properties to have the specified value in the broken block state. Requires the `minecraft:block_state` loot parameter, always failing if that parameter is absent.
+此条件检查指定的方块状态属性是否在损坏的方块状态下具有指定的值。需要 `minecraft:block_state` 战利品参数，如果该参数不存在，则始终失败。
 
 ```json5
 {
@@ -199,11 +199,11 @@ This condition checks for the specified block state properties to have the speci
 }
 ```
 
-During datagen, call `LootItemBlockStatePropertyCondition#hasBlockStateProperties` with the block to construct a builder for this condition. The desired block state property values can then be set on the builder using `#setProperties`.
+在数据生成期间，使用块调用 `LootItemBlockStatePropertyCondition#hasBlockStateProperties` 来构造此条件的构建器。然后可以使用 `#setProperties` 在构建器上设置所需的块状态属性值。
 
-## `minecraft:survives_explosion`
+## `minecraft:survives_explosion` {#minecraftsurvives_explosion}
 
-This condition randomly destroys the drops. The chance for drops to survive is 1 / `explosion_radius` loot parameter. This function is used by all block drops, with very few exceptions such as the beacon or the dragon egg. Requires the `minecraft:explosion_radius` loot parameter, always succeeding if that parameter is absent.
+这种情况会随机破坏掉落物。掉落物存活的机会是 1 /`explosion_radius` 战利品参数。除信标或龙蛋等极少数例外外，所有方块掉落物都使用此功能。需要 `minecraft:explosion_radius` 战利品参数，如果该参数不存在，则始终成功。
 
 ```json5
 {
@@ -211,11 +211,11 @@ This condition randomly destroys the drops. The chance for drops to survive is 1
 }
 ```
 
-During datagen, call `ExplosionCondition#survivesExplosion` to construct a builder for this condition.
+在 datagen 期间，调用 `ExplosionCondition#survivesExplosion` 来构造此条件的构建器。
 
-## `minecraft:match_tool`
+## `minecraft:match_tool` {#minecraftmatch_tool}
 
-This condition accepts an `ItemPredicate` that is checked against the `tool` loot parameter. An `ItemPredicate` can specify a list of valid item ids (`items`), a min/max range for the item count (`count`), a `DataComponentPredicate` (`components`) and an `ItemSubPredicate` (`predicates`); all fields are optional. Requires the `minecraft:tool` loot parameter, always failing if that parameter is absent.
+此条件接受根据 `tool` 战利品参数进行检查的 `ItemPredicate`。 `ItemPredicate` 可以指定有效物品 ID 列表 (`items`)、物品计数的最小/最大范围 (`count`)、 `DataComponentPredicate`(`components`) 和 `ItemSubPredicate`(`predicates`)；所有字段都是可选的。需要 `minecraft:tool` 战利品参数，如果该参数不存在，则始终失败。
 
 ```json5
 {
@@ -230,11 +230,11 @@ This condition accepts an `ItemPredicate` that is checked against the `tool` loo
 }
 ```
 
-During datagen, call `MatchTool#toolMatches` with an `ItemPredicate.Builder` to invert to construct a builder for this condition.
+在数据生成期间，使用 `ItemPredicate.Builder` 调用 `MatchTool#toolMatches` 来反转以构造针对此条件的构建器。
 
-## `minecraft:enchantment_active`
+## `minecraft:enchantment_active` {#minecraftenchantment_active}
 
-This condition returns whether an enchantment is active or not. Requires the `minecraft:enchantment_active` loot parameter, always failing if that parameter is absent.
+此条件返回结界是否处于活动状态。需要 `minecraft:enchantment_active` 战利品参数，如果该参数不存在，则始终失败。
 
 ```json5
 {
@@ -244,11 +244,11 @@ This condition returns whether an enchantment is active or not. Requires the `mi
 }
 ```
 
-During datagen, call `EnchantmentActiveCheck#enchantmentActiveCheck` or `#enchantmentInactiveCheck` to construct a builder for this condition.
+在 datagen 期间，调用 `EnchantmentActiveCheck#enchantmentActiveCheck` 或 `#enchantmentInactiveCheck` 来构造此条件的构建器。
 
-## `minecraft:table_bonus`
+## `minecraft:table_bonus` {#minecrafttable_bonus}
 
-This condition is similar to `minecraft:random_chance_with_enchanted_bonus`, but with fixed values instead of randomized values. Requires the `minecraft:tool` loot parameter, always failing if that parameter is absent.
+此条件类似于 `minecraft:random_chance_with_enchanted_bonus`，但使用固定值而不是随机值。需要 `minecraft:tool` 战利品参数，如果该参数不存在，则始终失败。
 
 ```json5
 {
@@ -261,11 +261,11 @@ This condition is similar to `minecraft:random_chance_with_enchanted_bonus`, but
 }
 ```
 
-During datagen, call `BonusLevelTableCondition#bonusLevelFlatChance` with the enchantment id and the chances to construct a builder for this condition.
+在数据生成期间，使用结界 id 和为此条件构建构建器的机会调用 `BonusLevelTableCondition#bonusLevelFlatChance`。
 
-## `minecraft:entity_properties`
+## `minecraft:entity_properties` {#minecraftentity_properties}
 
-This condition checks a given `EntityPredicate` against an [entity target][entitytarget]. The `EntityPredicate` can check the entity type, mob effects, nbt values, equipment, location etc.
+此条件根据[实体目标][entitytarget]检查给定的 `EntityPredicate`。 `EntityPredicate` 可以查看实体类型、生物效果、 nbt 值、装备、位置等。
 
 ```json5
 {
@@ -282,11 +282,11 @@ This condition checks a given `EntityPredicate` against an [entity target][entit
 }
 ```
 
-During datagen, call `LootItemEntityPropertyCondition#entityPresent` with the entity target, or `LootItemEntityPropertyCondition#hasProperties` with the entity target and the `EntityPredicate`, to construct a builder for this condition.
+在数据生成期间，使用实体目标调用 `LootItemEntityPropertyCondition#entityPresent`，或使用实体目标和 `EntityPredicate` 调用 `LootItemEntityPropertyCondition#hasProperties`，以为此条件构造构建器。
 
-## `minecraft:damage_source_properties`
+## `minecraft:damage_source_properties` {#minecraftdamage_source_properties}
 
-This condition checks a given `DamageSourcePredicate` against the damage source loot parameter. Requires the `minecraft:origin` and `minecraft:damage_source` loot parameters, always failing if those parameter are absent.
+此条件根据损坏源战利品参数检查给定的 `DamageSourcePredicate`。需要 `minecraft:origin` 和 `minecraft:damage_source` 战利品参数，如果这些参数不存在，则总是失败。
 
 ```json5
 {
@@ -300,11 +300,11 @@ This condition checks a given `DamageSourcePredicate` against the damage source 
 }
 ```
 
-During datagen, call `DamageSourceCondition#hasDamageSource` with a `DamageSourcePredicate.Builder` to construct a builder for this condition.
+在 datagen 期间，使用 `DamageSourcePredicate.Builder` 调用 `DamageSourceCondition#hasDamageSource` 来构造针对此条件的构建器。
 
-## `minecraft:killed_by_player`
+## `minecraft:killed_by_player` {#minecraftkilled_by_player}
 
-This condition determines whether the kill was a player kill. Used by some entity drops, for example blaze rods dropped by blazes. Requires the `minecraft:last_player_damage` loot parameter, always failing if that parameter is absent.
+这个条件决定了杀戮是否是玩家杀戮。被某些实体掉落物使用，例如火焰掉落的火焰棒。需要 `minecraft:last_player_damage` 战利品参数，如果该参数不存在，则始终失败。
 
 ```json5
 {
@@ -312,11 +312,11 @@ This condition determines whether the kill was a player kill. Used by some entit
 }
 ```
 
-During datagen, call `LootItemKilledByPlayerCondition#killedByPlayer` to construct a builder for this condition.
+在 datagen 期间，调用 `LootItemKilledByPlayerCondition#killedByPlayer` 来构造此条件的构建器。
 
-## `minecraft:entity_scores`
+## `minecraft:entity_scores` {#minecraftentity_scores}
 
-This condition checks the [entity target][entitytarget]'s scoreboard. Requires the loot parameter corresponding to the specified entity target, always failing if that parameter is absent.
+此条件检查[实体目标][entitytarget]的记分板。需要与指定实体目标相对应的战利品参数，如果该参数不存在，则始终失败。
 
 ```json5
 {
@@ -339,11 +339,11 @@ This condition checks the [entity target][entitytarget]'s scoreboard. Requires t
 }
 ```
 
-During datagen, call `EntityHasScoreCondition#hasScores` with an entity target to construct a builder for this condition. Then, add required scores to the builder using `#withScore`.
+在数据生成期间，使用实体目标调用 `EntityHasScoreCondition#hasScores` 来构造此条件的构建器。然后，使用 `#withScore` 将所需分数添加到构建器。
 
-## `minecraft:reference`
+## `minecraft:reference` {#minecraftreference}
 
-This condition references a predicate file and returns its result. See [Item Predicates][predicate] for more information.
+此条件引用谓词文件并返回其结果。有关详细信息，请参阅[物品谓词][predicate]。
 
 ```json5
 {
@@ -353,11 +353,11 @@ This condition references a predicate file and returns its result. See [Item Pre
 }
 ```
 
-During datagen, call `ConditionReference#conditionReference` with the id of the referenced predicate file to construct a builder for this condition.
+在 datagen 期间，使用引用的谓词文件的 id 调用 `ConditionReference#conditionReference` 来构造此条件的构建器。
 
-## `neoforge:loot_table_id`
+## `neoforge:loot_table_id` {#neoforgeloot_table_id}
 
-This condition only returns true if the surrounding loot table id matches. This is typically used within [global loot modifiers][glm].
+仅当周围的战利品表 ID 匹配时，此条件才会返回 true。这通常用在[全局战利品修饰符][glm]中。
 
 ```json5
 {
@@ -367,11 +367,11 @@ This condition only returns true if the surrounding loot table id matches. This 
 }
 ```
 
-During datagen, call `LootTableIdCondition#builder` with the desired loot table id to construct a builder for this condition.
+在数据生成期间，使用所需的战利品表 ID 调用 `LootTableIdCondition#builder` 来构造针对此条件的构建器。
 
-## `neoforge:can_item_perform_ability`
+## `neoforge:can_item_perform_ability` {#neoforgecan_item_perform_ability}
 
-This condition only returns true if the item in the `tool` loot context parameter (`LootContextParams.TOOL`), usually the item used to break the block or kill the entity, can perform the specified [`ItemAbility`][itemability]. Requires the `minecraft:tool` loot parameter, always failing if that parameter is absent.
+仅当 `tool` 战利品上下文参数 (`LootContextParams.TOOL`) 中的物品（通常用于打破方块或杀死实体的物品）可以执行指定的 [`ItemAbility`][itemability] 时，此条件才返回 true。需要 `minecraft:tool` 战利品参数，如果该参数不存在，则始终失败。
 
 ```json5
 {
@@ -381,11 +381,11 @@ This condition only returns true if the item in the `tool` loot context paramete
 }
 ```
 
-During datagen, call `CanItemPerformAbility#canItemPerformAbility` with the id of the desired item ability to construct a builder for this condition.
+在数据生成期间，使用所需物品能力的 id 调用 `CanItemPerformAbility#canItemPerformAbility`，以便为此条件构建构建器。
 
-## See Also
+## 另请参见 {#see-also}
 
-- [Item Predicates][predicatejson] on the [Minecraft Wiki][mcwiki]
+- [物品谓词][predicatejson] 在 [Minecraft Wiki][mcwiki] 上
 
 [custom]: custom.md#custom-loot-conditions
 [entitytarget]: index.md#entity-targets

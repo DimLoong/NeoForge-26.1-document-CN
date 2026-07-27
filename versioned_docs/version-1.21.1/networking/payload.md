@@ -1,9 +1,9 @@
 ---
 sidebar_position: 1
 ---
-# Registering Payloads
+# 注册网络载荷 {#registering-payloads}
 
-Payloads are a way to send arbitrary data between the client and the server. They are registered using the `PayloadRegistrar` from the `RegisterPayloadHandlersEvent` event.
+网络载荷（Payload）是一种在客户端与服务端之间发送任意数据的方式。它们通过 `RegisterPayloadHandlersEvent` 事件提供的 `PayloadRegistrar` 进行注册。
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -13,13 +13,13 @@ public static void register(final RegisterPayloadHandlersEvent event) {
 }
 ```
 
-Assuming we want to send the following data:
+假设我们想要发送如下数据：
 
 ```java
 public record MyData(String name, int age) {}
 ```
 
-Then we can implement the `CustomPacketPayload` interface to create a payload that can be used to send and receive this data.
+那么可以实现 `CustomPacketPayload` 接口，创建一个能够收发这些数据的载荷。
 
 ```java
 public record MyData(String name, int age) implements CustomPacketPayload {
@@ -45,9 +45,9 @@ public record MyData(String name, int age) implements CustomPacketPayload {
 }
 ```
 
-As you can see from the example above the `CustomPacketPayload` interface requires us to implement the `type` method. The `type` method is responsible for returning a unique identifier for this payload. We then also need a reader to register this later on with the `StreamCodec` to read and write the payload data.
+从上面的示例可以看到，`CustomPacketPayload` 接口要求我们实现 `type` 方法。 `type` 方法负责为该载荷返回一个唯一标识符。此外，我们还需要一个读取器，稍后连同 `StreamCodec` 一起注册，用于读写载荷数据。
 
-Finally, we can register this payload with the registrar:
+最后，我们可以把这个载荷注册到注册器上：
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -64,17 +64,17 @@ public static void register(final RegisterPayloadHandlersEvent event) {
 }
 ```
 
-Dissecting the code above we can notice a couple of things:
-- The registrar has `play*` methods, that can be used for registering payloads which are sent during the play phase of the game.
-    - Not visible in this code are the methods `configuration*` and `common*`; however, they can also be used to register payloads for the configuration phase. The `common` method can be used to register payloads for both the configuration and play phase simultaneously.
-- The registrar uses a `*Bidirectional` method, that can be used for registering payloads which are sent to both the logical server and logical client.
-    - Not visible in this code are the methods `*ToClient` and `*ToServer`; however, they can also be used to register payloads to only the logical client or only the logical server, respectively.
-- The type of the payload is used as a unique identifier for the payload.
-- The [stream codec][streamcodec] is used to read and write the payload to and from the buffer sent across the network
-- The payload handler is a callback for when the payload arrives on one of the logical sides.
-    - If a `*Bidirectional` method is used, a `DirectionalPayloadHandler` can be used to provide two separate payload handlers for each of the logical sides.
+剖析上面的代码，可以注意到几点：
+- 注册器提供了 `play*` 系列方法，用于注册在游戏的游玩阶段（play phase）发送的载荷。
+    - 代码中未出现的还有 `configuration*` 和 `common*` 系列方法；它们同样可用于注册配置阶段的载荷。 `common` 方法可以同时为配置阶段和游玩阶段注册载荷。
+- 注册器使用了 `*Bidirectional` 方法，用于注册同时发往逻辑服务端和逻辑客户端的载荷。
+    - 代码中未出现的还有 `*ToClient` 和 `*ToServer` 方法；它们可分别用于只向逻辑客户端或只向逻辑服务端注册载荷。
+- 载荷的类型（type）被用作该载荷的唯一标识符。
+- [流式编解码器][streamcodec]用于把载荷读写到通过网络发送的缓冲区中，或从中读出。
+- 载荷处理器是一个回调，在载荷到达某一逻辑端时触发。
+    - 如果使用了 `*Bidirectional` 方法，可以用 `DirectionalPayloadHandler` 为两个逻辑端分别提供各自的载荷处理器。
 
-Now that we have registered the payload we need to implement a handler. For this example we will specifically take a look at the client side handler, however the server side handler is very similar.
+注册好载荷之后，我们需要实现一个处理器。本示例专门看客户端一侧的处理器，不过服务端一侧的处理器非常相似。
 
 ```java
 public class ClientPayloadHandler {
@@ -86,13 +86,13 @@ public class ClientPayloadHandler {
 }
 ```
 
-Here a couple of things are of note:
+这里有几点值得注意：
 
-- The handling method here gets the payload, and a contextual object.
-- The handling method of the payload is, by default, invoked on the main thread.
+- 这个处理方法接收载荷本身以及一个上下文对象。
+- 默认情况下，载荷的处理方法在主线程上被调用。
 
 
-If you need to do some computation that is resource intensive, then the work should be done on the network thread, instead of blocking the main thread. This is done by setting the `HandlerThread` of the `PayloadRegistrar` to `HandlerThread#NETWORK` via `PayloadRegistrar#executesOn` before registering the payload.
+如果你需要执行一些资源消耗较大的计算，就应当把工作放到网络线程上进行，而不是阻塞主线程。做法是在注册载荷之前，通过 `PayloadRegistrar#executesOn` 把 `PayloadRegistrar` 的 `HandlerThread` 设为 `HandlerThread#NETWORK`。
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -111,7 +111,7 @@ public static void register(final RegisterPayloadHandlersEvent event) {
 ```
 
 :::note
-All payloads registered after an `executesOn` call will retain the same thread execution location until `executesOn` is called again.
+在一次 `executesOn` 调用之后注册的所有载荷都会沿用相同的线程执行位置，直到再次调用 `executesOn` 为止。
 
 ```java
 PayloadRegistrar registrar = event.registrar("1");
@@ -134,12 +134,12 @@ registrar.playBidirectional(...); // On the main thread
 ```
 :::
 
-Here a couple of things are of note:
+这里有几点值得注意：
 
-- If you want to run code on the main game thread you can use `enqueueWork` to submit a task to the main thread.
-    - The method will return a `CompletableFuture` that will be completed on the main thread.
-    - Notice: A `CompletableFuture` is returned, this means that you can chain multiple tasks together, and handle exceptions in a single place.
-    - If you do not handle the exception in the `CompletableFuture` then it will be swallowed, **and you will not be notified of it**.
+- 如果你想在游戏主线程上运行代码，可以使用 `enqueueWork` 向主线程提交一个任务。
+    - 该方法会返回一个 `CompletableFuture`，它将在主线程上完成。
+    - 注意：返回的是 `CompletableFuture`，这意味着你可以把多个任务串联起来，并在同一处集中处理异常。
+    - 如果你不在 `CompletableFuture` 中处理异常，异常会被吞掉，**而你完全不会收到任何提示**。
 
 ```java
 public class ClientPayloadHandler {
@@ -161,13 +161,13 @@ public class ClientPayloadHandler {
 }
 ```
 
-With your own payloads you can then use those to configure the client and server using [Configuration Tasks][configuration].
+有了自己的载荷之后，你就可以借助它们，通过[配置任务][configuration]来配置客户端和服务端。
 
-## Sending Payloads
+## 发送网络载荷 {#sending-payloads}
 
-`CustomPacketPayload`s are sent across the network using vanilla's packet system by wrapping the payload via `ServerboundCustomPayloadPacket` when sending to the server, or `ClientboundCustomPayloadPacket` when sending to the client. Payloads sent to the client can only contain at most 1 MiB of data while payloads to the server can only contain less than 32 KiB. 
+`CustomPacketPayload` 通过原版的数据包系统在网络上发送：发往服务端时用 `ServerboundCustomPayloadPacket` 包装载荷，发往客户端时用 `ClientboundCustomPayloadPacket` 包装。发往客户端的载荷最多只能包含 1 MiB 数据，而发往服务端的载荷则必须小于 32 KiB。
 
-All payloads are sent via `Connection#send` with some level of abstraction; however, it is generally inconvenient to call these methods if you want to send packets to multiple people based on a given condition. Therefore, `PacketDistributor` contains a number of convenience implementations to send payloads. There is only one method to send packets to the server (`sendToServer`); however, there are numerous methods to send packets to the client depending on which players should receive the payload.
+所有载荷都通过 `Connection#send` 发送并带有一定程度的抽象；不过，如果你想根据某个条件把数据包发给多个人，直接调用这些方法通常并不方便。为此，`PacketDistributor` 提供了若干便捷实现来发送载荷。向服务端发送数据包只有一个方法（`sendToServer`）；而向客户端发送数据包则有多个方法，具体取决于应由哪些玩家接收该载荷。
 
 ```java
 // ON THE CLIENT
@@ -187,7 +187,7 @@ PacketDistributor.sendToPlayersTrackingChunk(serverLevel, chunkPos, new MyData(.
 PacketDistributor.sendToAllPlayers(new MyData(...));
 ```
 
-See the `PacketDistributor` class for more implementations.
+更多实现请参阅 `PacketDistributor` 类。
 
 [configuration]: ./configuration-tasks.md
 [streamcodec]: ./streamcodecs.md

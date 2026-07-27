@@ -1,48 +1,48 @@
-# Resource Locations
+# 资源位置 {#resource-locations}
 
-`ResourceLocation`s are one of the most important things in Minecraft. They are used as keys in [registries][registries], as identifiers for data or resource files, as references to models in code, and in a lot of other places. A `ResourceLocation` consists of two parts: a namespace and a path, separated by a `:`.
+`ResourceLocation` 是 Minecraft 中最重要的东西之一。它们被用作[注册表][registries]中的键、数据或资源文件的标识符、代码中模型的引用以及许多其他地方。 `ResourceLocation` 由两部分组成：命名空间和路径，由 `:` 分隔。
 
-The namespace denotes what mod, resource pack or datapack the location refers to. For example, a mod with the mod id `examplemod` will use the `examplemod` namespace. Minecraft uses the `minecraft` namespace. Extra namespaces can be defined at will simply by creating a corresponding data folder, this is usually done by datapacks to keep their logic separate from the point where they integrate with vanilla.
+命名空间表示该位置所指的 Mod、资源包或数据包。例如，Mod ID 为 `examplemod` 的 Mod 将使用 `examplemod` 命名空间。 Minecraft 使用 `minecraft` 命名空间。只需创建相应的数据文件夹即可随意定义额外的命名空间，这通常由数据包完成，以保持其逻辑与其与普通集成的点分开。
 
-The path is a reference to whatever object you want, inside your namespace. For example, `minecraft:cow` is a reference to something named `cow` in the `minecraft` namespace - usually this location would be used to get the cow entity from the entity registry. Another example would be `examplemod:example_item`, which would probably be used to get your mod's `example_item` from the item registry.
+该路径是对命名空间内你想要的任何对象的引用。例如，`minecraft:cow` 是对 `minecraft` 命名空间中名为 `cow` 的引用 - 通常此位置将用于从实体注册表中获取奶牛实体。另一个例子是 `examplemod:example_item`，它可能用于从物品注册表中获取 mod 的 `example_item`。
 
-`ResourceLocation`s may only contain lowercase letters, digits, underscores, dots and hyphens. Paths may additionally contain forward slashes. Note that due to Java module restrictions, mod ids may not contain hyphens, which by extension means that mod namespaces may not contain hyphens either (they are still permitted in paths).
+`ResourceLocation` 只能包含小写字母、数字、下划线、点和连字符。路径还可以包含正斜杠。请注意，由于 Java 模块限制，mod id 可能不包含连字符，这意味着 mod 命名空间也可能不包含连字符（它们在路径中仍然允许）。
 
 :::info
-A `ResourceLocation` on its own says nothing about what kind of objects we are using it for. Objects named `minecraft:dirt` exist in multiple places, for example. It is up to whatever receives the `ResourceLocation` to associate an object with it.
+`ResourceLocation` 本身并没有说明我们将其用于何种对象。例如，名为 `minecraft:dirt` 的对象存在于多个位置。接收到 `ResourceLocation` 的对象可以与它关联。
 :::
 
-A new `ResourceLocation` can be created by calling `ResourceLocation.fromNamespaceAndPath("examplemod", "example_item")` or `ResourceLocation.parse("examplemod:example_item")`. If `withDefaultNamespace` is used, the string will be used as the path, and `minecraft` will be used as the namespace. So for example, `ResourceLocation.withDefaultNamespace("example_item")` will result in `minecraft:example_item`.
+可以通过调用 `ResourceLocation.fromNamespaceAndPath("examplemod", "example_item")` 或 `ResourceLocation.parse("examplemod:example_item")` 来创建新的 `ResourceLocation`。如果使用 `withDefaultNamespace`，则字符串将用作路径，`minecraft` 将用作命名空间。例如，`ResourceLocation.withDefaultNamespace("example_item")` 将导致 `minecraft:example_item`。
 
-The namespace and path of a `ResourceLocation` can be retrieved using `ResourceLocation#getNamespace()` and `#getPath()`, respectively, and the combined form can be retrieved through `ResourceLocation#toString`.
+`ResourceLocation` 的命名空间和路径可以分别使用 `ResourceLocation#getNamespace()` 和 `#getPath()` 检索，并且可以通过 `ResourceLocation#toString` 检索组合形式。
 
-`ResourceLocation`s are immutable. All utility methods on `ResourceLocation`, such as `withPrefix` or `withSuffix`, return a new `ResourceLocation`.
+`ResourceLocation` 是不可变的。 `ResourceLocation` 上的所有实用程序方法（例如 `withPrefix` 或 `withSuffix`）都会返回新的 `ResourceLocation`。
 
-## Resolving `ResourceLocation`s
+## 解析 `ResourceLocation` {#resolving-resourcelocations}
 
-Some places, for example registries, use `ResourceLocation`s directly. Some other places, however, will resolve the `ResourceLocation` as needed. For example:
+有些地方，例如注册中心，直接使用 `ResourceLocation`。然而，其他一些地方将根据需要解析 `ResourceLocation`。例如：
 
-- `ResourceLocation`s are used as identifiers for GUI background. For example, the furnace GUI uses the resource location `minecraft:textures/gui/container/furnace.png`. This maps to the file `assets/minecraft/textures/gui/container/furnace.png` on disk. Note that the `.png` suffix is required in this resource location.
-- `ResourceLocation`s are used as identifiers for block models. For example, the block model of dirt uses the resource location `minecraft:block/dirt`. This maps to the file `assets/minecraft/models/block/dirt.json` on disk. Note that the `.json` suffix is not required here. Note as well that this resource location automatically maps into the `models` subfolder.
-- `ResourceLocation`s are used as identifiers for recipes. For example, the iron block crafting recipe uses the resource location `minecraft:iron_block`. This maps to the file `data/minecraft/recipe/iron_block.json` on disk. Note that the `.json` suffix is not required here. Note as well that this resource location automatically maps into the `recipe` subfolder.
+- `ResourceLocation`s 用作 GUI 背景的标识符。例如，熔炉 GUI 使用资源位置 `minecraft:textures/gui/container/furnace.png`。这映射到磁盘上的文件 `assets/minecraft/textures/gui/container/furnace.png`。请注意，此资源位置需要 `.png` 后缀。
+- `ResourceLocation` 用作块模型的标识符。例如，污垢的块模型使用资源位置 `minecraft:block/dirt`。这映射到磁盘上的文件 `assets/minecraft/models/block/dirt.json`。请注意，此处不需要 `.json` 后缀。另请注意，此资源位置会自动映射到 `models` 子文件夹。
+- `ResourceLocation` 用作配方的标识符。例如，铁块制作配方使用资源位置 `minecraft:iron_block`。这映射到磁盘上的文件 `data/minecraft/recipe/iron_block.json`。请注意，此处不需要 `.json` 后缀。另请注意，此资源位置会自动映射到 `recipe` 子文件夹。
 
-Whether the `ResourceLocation` expects a file suffix, or what exactly the resource location resolves to, depends on the use case.
+`ResourceLocation` 是否需要文件后缀，或者资源位置到底解析为什么，取决于用例。
 
-## `ModelResourceLocation`s
+## `ModelResourceLocation`s {#modelresourcelocations}
 
-`ModelResourceLocation`s are a special kind of resource location that includes a third part, called the variant. Minecraft uses these mainly to differentiate between different variants of models, where the different variants are used in different display contexts (for example with tridents, which have different models in first person, third person and inventories). The variant is always `inventory` for items, and the comma-delimited string of property-value pairs for blockstates (for example `facing=north,waterlogged=false`, empty for blocks with no blockstate properties).
+`ModelResourceLocation` 是一种特殊类型的资源位置，其中包括称为变体的第三部分。 Minecraft 使用这些主要是为了区分模型的不同变体，其中不同的变体用于不同的显示上下文（例如三叉戟，其在第一人称、第三人称和库存中具有不同的模型）。对于物品，变体始终为 `inventory`，对于方块状态，则为逗号分隔的属性值对字符串（例如 `facing=north,waterlogged=false`，对于没有方块状态属性的方块为空）。
 
-The variant is appended to the regular resource location, along with a `#`. For example, the full name of the diamond sword's item model is `minecraft:diamond_sword#inventory`. However, in most contexts, the `inventory` variant can be omitted.
+该变体与 `#` 一起附加到常规资源位置。例如，钻石剑的物品模型全名为 `minecraft:diamond_sword#inventory`。但是，在大多数情况下，可以省略 `inventory` 变体。
 
-`ModelResourceLocation` is a [client only][sides] class. This means that servers referencing this class will crash with a `NoClassDefFoundError`.
+`ModelResourceLocation` 是一个[仅限客户端][sides] 类。这意味着引用此类的服务器将崩溃并显示 `NoClassDefFoundError`。
 
-## `ResourceKey`s
+## `ResourceKey`s {#resourcekeys}
 
-`ResourceKey`s combine a registry id with a registry name. An example would be a registry key with the registry id `minecraft:item` and the registry name `minecraft:diamond_sword`. Unlike a `ResourceLocation`, `ResourceKey`s actually refer to a unique element, thus being able to clearly identify an element. They are most commonly used in contexts where many different registries come in contact with one another. A common use case are datapacks, especially worldgen.
+`ResourceKey`s 将注册表 ID 与注册表名称组合在一起。例如，注册表 ID 为 `minecraft:item` 且注册表名称为 `minecraft:diamond_sword` 的注册表项。与 `ResourceLocation` 不同，`ResourceKey` 实际上指的是唯一的元素，因此能够清楚地识别元素。它们最常用于许多不同注册管理机构相互接触的情况。一个常见的用例是数据包，尤其是 worldgen。
 
-A new `ResourceKey` can be created through the static method `ResourceKey#create(ResourceKey<? extends Registry<T>>, ResourceLocation)`. The second parameter here is the registry name, while the first parameter is what is known as a registry key. Registry keys are a special kind of `ResourceKey` whose registry is the root registry (i.e. the registry of all other registries). A registry key can be created via `ResourceKey#createRegistryKey(ResourceLocation)` with the desired registry's id.
+可以通过静态方法 `ResourceKey#create(ResourceKey<? extends Registry<T>>, ResourceLocation)` 创建一个新的 `ResourceKey`。这里的第二个参数是注册表名称，而第一个参数是所谓的注册表项。注册表项是一种特殊的 `ResourceKey`，其注册表是根注册表（即所有其他注册表的注册表）。可以通过 `ResourceKey#createRegistryKey(ResourceLocation)` 使用所需注册表 ID 创建注册表项。
 
-`ResourceKey`s are interned at creation. This means that comparing by reference equality (`==`) is possible and encouraged, but their creation is comparatively expensive.
+`ResourceKey` 在创建时被拘留。这意味着通过引用相等进行比较（`==`）是可能的并且受到鼓励，但它们的创建相对昂贵。
 
 [registries]: ../concepts/registries.md
 [sides]: ../concepts/sides.md

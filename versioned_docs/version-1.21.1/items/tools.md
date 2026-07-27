@@ -1,13 +1,13 @@
 ---
 sidebar_position: 3
 ---
-# Tools & Armor
+# 工具与盔甲 {#tools--armor}
 
-Tools are [items][item] whose primary use is to break [blocks][block]. Many mods add new tool sets (for example copper tools) or new tool types (for example hammers).
+工具是[物品][item]，其主要用途是破坏[方块][block]。许多 Mod 会添加新的工具套装（例如铜制工具）或新的工具类型（例如锤子）。
 
-## Custom Tool Sets
+## 自定义工具套装 {#custom-tool-sets}
 
-A tool set typically consists of five items: a pickaxe, an axe, a shovel, a hoe and a sword. (Swords aren't tools in the classical sense, but are included here for consistency as well.) All of those items have their corresponding class: `PickaxeItem`, `AxeItem`, `ShovelItem`, `HoeItem` and `SwordItem`, respectively. The class hierarchy of tools looks as follows:
+一套工具通常由五件物品组成：镐、斧、锹、锄和剑。（剑在传统意义上并不算工具，但为保持一致这里也一并列入。）这些物品都有各自对应的类：分别是 `PickaxeItem`、 `AxeItem`、 `ShovelItem`、 `HoeItem` 和 `SwordItem`。工具的类继承结构如下：
 
 ```text
 Item
@@ -20,9 +20,9 @@ Item
     - SwordItem
 ```
 
-`TieredItem` is a class that contains helpers for items with a certain `Tier` (read on). `DiggerItem` contains helpers for items that are designed to break blocks. Note that other items usually considered tools, such as shears, are not included in this hierarchy. Instead, they directly extend `Item` and hold the breaking logic themselves.
+`TieredItem` 是一个包含辅助方法的类，用于处理具有某个 `Tier`（层级，下文详述）的物品。 `DiggerItem` 包含用于处理专门破坏方块的物品的辅助方法。注意，其他一些通常被视为工具的物品（例如剪刀）并不在这个继承结构中。它们直接继承 `Item`，并自行持有破坏逻辑。
 
-To create a standard set of tools, you must first define a `Tier`. For reference values, see Minecraft's `Tiers` enum. This example uses copper tools, you can use your own material here and adjust the values as needed.
+要创建一套标准工具，你必须先定义一个 `Tier`。参考数值可查看 Minecraft 的 `Tiers` 枚举。本示例使用铜制工具，你可以在此换用自己的材料，并按需调整数值。
 
 ```java
 // We place copper somewhere between stone and iron.
@@ -46,7 +46,7 @@ public static final Tier COPPER_TIER = new SimpleTier(
 );
 ```
 
-Now that we have our `Tier`, we can use it for registering tools. All tool constructors have the same four parameters.
+有了 `Tier` 之后，我们就可以用它来注册工具。所有工具的构造函数都有相同的四个参数。
 
 ```java
 //ITEMS is a DeferredRegister<Item>
@@ -73,13 +73,13 @@ public static final Supplier<ShovelItem> COPPER_SHOVEL = ITEMS.register("copper_
 public static final Supplier<HoeItem> COPPER_HOE = ITEMS.register("copper_hoe", () -> new HoeItem(...));
 ```
 
-### Tags
+### 标签 {#tags}
 
-When creating a `Tier`, it is assigned a block [tag][tags] containing blocks that will not drop anything if broken with this tool. For example, the `minecraft:incorrect_for_stone_tool` tag contains blocks like Diamond Ore, and the `minecraft:incorrect_for_iron_tool` tag contains blocks like Obsidian and Ancient Debris. To make it easier to assign blocks to their incorrect mining levels, a tag also exists for blocks that need this tool to be mined. For example, the `minecraft:needs_iron_tool` tag containslike Diamond Ore, and the `minecraft:needs_diamond_tool` tag contains blocks like Obsidian and Ancient Debris.
+创建 `Tier` 时，会为它指定一个方块[标签][tags]，其中包含用此工具破坏后不会掉落任何东西的方块。例如，`minecraft:incorrect_for_stone_tool` 标签包含钻石矿石之类的方块，而 `minecraft:incorrect_for_iron_tool` 标签包含黑曜石和远古残骸之类的方块。为了更方便地将方块归入其错误的挖掘等级，还存在一个用于表示需要此工具才能挖掘的方块的标签。例如，`minecraft:needs_iron_tool` 标签包含钻石矿石之类的方块，而 `minecraft:needs_diamond_tool` 标签包含黑曜石和远古残骸之类的方块。
 
-You can reuse one of the incorrect tags for your tool if you're fine with that. For example, if we wanted our copper tools to just be more durable stone tools, we'd pass in `BlockTags#INCORRECT_FOR_STONE_TOOL`.
+如果你觉得可以接受，也可以直接复用现成的某个 incorrect 标签。例如，如果我们希望铜制工具只是更耐用的石制工具，就可以传入 `BlockTags#INCORRECT_FOR_STONE_TOOL`。
 
-Alternatively, we can create our own tag, like so:
+或者，我们也可以创建自己的标签，如下所示：
 
 ```java
 // This tag will allow us to add these blocks to the incorrect tags that cannot mine them
@@ -89,7 +89,7 @@ public static final TagKey<Block> NEEDS_COPPER_TOOL = TagKey.create(BuiltInRegis
 public static final TagKey<Block> INCORRECT_FOR_COPPER_TOOL = TagKey.create(BuiltInRegistries.BLOCK.key(), ResourceLocation.fromNamespaceAndPath(MOD_ID, "incorrect_for_cooper_tool"));
 ```
 
-And then, we populate our tag. For example, let's make copper able to mine gold ores, gold blocks and redstone ore, but not diamonds or emeralds. (Redstone blocks are already mineable by stone tools.) The tag file is located at `src/main/resources/data/mod_id/tags/block/needs_copper_tool.json` (where `mod_id` is your mod id):
+然后，我们填充这个标签。例如，让我们使铜工具能够挖掘金矿石、金块和红石矿石，但不能挖掘钻石或绿宝石。（红石块本来就能用石制工具挖掘。）标签文件位于 `src/main/resources/data/mod_id/tags/block/needs_copper_tool.json`（其中 `mod_id` 是你的 mod id）：
 
 ```json5
 {
@@ -104,7 +104,7 @@ And then, we populate our tag. For example, let's make copper able to mine gold 
 }
 ```
 
-Then, for our tag to pass into the tier, we can provide a negative constraint for any tools that are incorrect for stone tools but within our copper tools tag. The tag file is located at `src/main/resources/data/mod_id/tags/block/incorrect_for_cooper_tool.json`:
+接着，为了得到要传入层级的标签，我们可以设置一个否定约束：对于所有对石制工具而言是错误的、但又落在我们铜制工具标签之内的方块进行处理。标签文件位于 `src/main/resources/data/mod_id/tags/block/incorrect_for_cooper_tool.json`：
 
 ```json5
 {
@@ -117,44 +117,44 @@ Then, for our tag to pass into the tier, we can provide a negative constraint fo
 }
 ```
 
-Finally, we can pass our tag into our tier creation, as seen above.
+最后，我们就可以像上文那样，将我们的标签传入层级的创建过程。
 
-If you want to check if a tool can make a block state drop its blocks, call `Tool#isCorrectForDrops`. The `Tool` can be obtained by calling `ItemStack#get` with `DataComponents#TOOL`.
+如果你想检查某个工具是否能让某个方块状态掉落其方块，请调用 `Tool#isCorrectForDrops`。 `Tool` 可以通过以 `DataComponents#TOOL` 调用 `ItemStack#get` 获得。
 
-## Custom Tools
+## 自定义工具 {#custom-tools}
 
-Custom tools can be created by adding a `Tool` [data component][datacomponents] (via `DataComponents#TOOL`) to the list of default components on your item via `Item.Properties#component`. `DiggerItem` is an implementation which takes in a `Tier`, as explained above, to construct the `Tool`. `DiggerItem` also provides a convenience method called `#createAttributes` to supply to `Item.Properties#attributes` for your tool, such as the modified attack damage and attack speed.
+自定义工具可以通过 `Item.Properties#component` 向物品的默认组件列表中添加一个 `Tool` [数据组件][datacomponents]（借助 `DataComponents#TOOL`）来创建。 `DiggerItem` 就是这样一种实现，如上文所述，它接收一个 `Tier` 来构造 `Tool`。 `DiggerItem` 还提供了一个名为 `#createAttributes` 的便捷方法，可供 `Item.Properties#attributes` 使用，用于设置工具经修改后的攻击伤害和攻击速度等属性。
 
-A `Tool` contains a list of `Tool.Rule`s, the default mining speed when holding the tool (`1` by default), and the amount of damage the tool should take when mining a block (`1` by default). A `Tool.Rule` contains three pieces of information: a `HolderSet` of blocks to apply the rule to, an optional speed at which to mine the blocks in the set, and an optional boolean at which to determine whether these blocks can drop from this tool. If the optional are not set, then the other rules will be checked. The default behavior if all rules fail is the default mining speed and that the block cannot be dropped.
+一个 `Tool` 包含一组 `Tool.Rule`、持握工具时的默认挖掘速度（默认为 `1`），以及挖掘方块时工具应承受的损耗量（默认为 `1`）。一条 `Tool.Rule` 包含三部分信息：一个用于套用该规则的方块 `HolderSet`、一个可选的挖掘集合内方块的速度，以及一个可选的布尔值，用于决定这些方块能否从此工具掉落。如果这些可选项未设置，则会检查其他规则。当所有规则都不匹配时的默认行为是使用默认挖掘速度，且方块不会掉落。
 
 :::note
-A `HolderSet` can be created from a `TagKey` via `Registry#getOrCreateTag`.
+`HolderSet` 可以通过 `Registry#getOrCreateTag` 从 `TagKey` 创建。
 :::
 
-Creating a multitool-like item (i.e. an item that combines two or more tools into one, e.g. an axe and a pickaxe as one item) or any tool-like does not need to extend any of the existing `TieredItem`s. It simply can be implemented using a combination of the following parts:
+创建一个类似多功能工具的物品（即将两种或更多工具合而为一的物品，例如把斧和镐合为一件物品），或任何类工具的物品，都无需继承任何现有的 `TieredItem`。它可以简单地通过组合以下几个部分来实现：
 
-- Adding a `Tool` with your own rules by setting `DataComponents#TOOL` via `Item.Properties#component`.
-- Adding attributes to the item (e.g. attack damage, attack speed) via `Item.Properties#attributes`.
-- Overriding `IItemExtension#canPerformAction` to determine what [`ItemAbility`s][itemability] the item can perform.
-- Calling `IBlockExtension#getToolModifiedState` if you want your item to modify the block state on right click based on the `ItemAbility`s.
-- Adding your tool to some of the `minecraft:enchantable/*` tags so that your item can have certain enchantments applied to it.
+- 通过 `Item.Properties#component` 设置 `DataComponents#TOOL`，添加一个带有你自己规则的 `Tool`。
+- 通过 `Item.Properties#attributes` 为物品添加属性（例如攻击伤害、攻击速度）。
+- 重写 `IItemExtension#canPerformAction`，以决定该物品能执行哪些 [`ItemAbility`][itemability]。
+- 如果你希望物品在右键点击时根据 `ItemAbility` 修改方块状态，则调用 `IBlockExtension#getToolModifiedState`。
+- 将你的工具添加到某些 `minecraft:enchantable/*` 标签中，以便你的物品可以被施加特定的附魔。
 
-## `ItemAbility`s
+## `ItemAbility` {#itemabilitys}
 
-`ItemAbility`s are an abstraction over what an item can and cannot do. This includes both left-click and right-click behavior. NeoForge provides default `ItemAbility`s in the `ItemAbilities` class:
+`ItemAbility` 是对某个物品能做什么、不能做什么的一层抽象。它同时涵盖左键点击和右键点击的行为。 NeoForge 在 `ItemAbilities` 类中提供了一些默认的 `ItemAbility`：
 
-- Digging abilities. These exist for all four `DiggerItem` types as mentioned above, as well as sword and shears digging.
-- Axe right-click abilities for stripping (logs), scraping (oxidized copper) and unwaxing (waxed copper).
-- Shear abilities for harvesting (honeycombs), carving (pumpkins) and disarming (tripwires).
-- Abilities for shovel flattening (dirt paths), sword sweeping, hoe tilling, shield blocking, and fishing rod casting.
+- 挖掘能力。这些能力存在于上文提到的全部四种 `DiggerItem` 类型，以及剑和剪刀的挖掘。
+- 斧的右键点击能力：剥皮（原木）、刮除（氧化的铜）和去蜡（涂蜡的铜）。
+- 剪刀能力：收获（蜂巢）、雕刻（南瓜）和拆除（绊线）。
+- 用于锹平整（土径）、剑横扫、锄耕地、盾牌格挡和钓鱼竿抛竿的能力。
 
-To create your own `ItemAbility`s, use `ItemAbility#get` - it will create a new `ItemAbility` if needed. Then, in a custom tool type, override `IItemExtension#canPerformAction` as needed.
+要创建自己的 `ItemAbility`，请使用 `ItemAbility#get`——如有需要，它会创建一个新的 `ItemAbility`。然后，在自定义的工具类型中，按需重写 `IItemExtension#canPerformAction`。
 
-To query if an `ItemStack` can perform a certain `ItemAbility`, call `IItemStackExtension#canPerformAction`. Note that this works on any `Item`, not just tools.
+要查询某个 `ItemStack` 能否执行特定的 `ItemAbility`，请调用 `IItemStackExtension#canPerformAction`。注意，这适用于任何 `Item`，而不仅仅是工具。
 
-## Armor
+## 盔甲 {#armor}
 
-Similar to tools, armor uses a tier system (although a different one). What is called `Tier` for tools is called `ArmorMaterial` for armors. Like above, this example shows how to add copper armor; this can be adapted as needed. However, unlike `Tier`s, `ArmorMaterial`s need to be [registered]. For the vanilla values, see the `ArmorMaterials` class.
+与工具类似，盔甲也使用一套层级系统（尽管是不同的一套）。对工具而言称为 `Tier` 的东西，对盔甲而言称为 `ArmorMaterial`。与上文一样，本示例展示如何添加铜制盔甲；可按需改编。不过，与 `Tier` 不同的是，`ArmorMaterial` 需要被[注册][registered]。原版的数值可查看 `ArmorMaterials` 类。
 
 ```java
 // ARMOR_MATERIALS is a DeferredRegister<ArmorMaterial>
@@ -208,7 +208,7 @@ public static final Holder<ArmorMaterial> COPPER_ARMOR_MATERIAL =
     ));
 ```
 
-And then, we use that armor material in item registration.
+然后，我们在物品注册中使用这个盔甲材料。
 
 ```java
 //ITEMS is a DeferredRegister<Item>
@@ -220,7 +220,7 @@ public static final Supplier<ArmorItem> COPPER_HELMET = ITEMS.register("copper_h
         // The item properties where we set the durability.
         // ArmorItem.Type is an enum of five values: HELMET, CHESTPLATE, LEGGINGS, BOOTS, and BODY.
         // BODY is used for non-player entities like wolves or horses.
-        // Vanilla armor materials determine this by using a base value and multiplying it with a type-specific constant.
+        // 原版 armor materials determine this by using a base value and multiplying it with a type-specific constant.
         // The constants are 13 for BOOTS, 15 for LEGGINGS, 16 for CHESTPLATE, 11 for HELMET, and 16 for BODY.
         // If we don't want to use these ratios, we can set the durability normally.
         new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(15))
@@ -230,7 +230,7 @@ public static final Supplier<ArmorItem> COPPER_LEGGINGS = ITEMS.register("copper
 public static final Supplier<ArmorItem> COPPER_BOOTS = ITEMS.register("copper_boots", () -> new ArmorItem(...));
 ```
 
-When creating your armor texture, it is a good idea to work on top of the vanilla armor texture to see which part goes where.
+在制作盔甲纹理时，最好在原版盔甲纹理的基础上进行绘制，以便看清每个部分对应的位置。
 
 [block]: ../blocks/index.md
 [datacomponents]: ./datacomponents.md

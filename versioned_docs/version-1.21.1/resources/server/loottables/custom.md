@@ -1,12 +1,12 @@
-# Custom Loot Objects
+# 自定义战利品对象 {#custom-loot-objects}
 
-Due to the complexity of the loot table system, there are several [registries] at work, all of which can be used by a modder to add more behavior.
+由于战利品表系统较为复杂，其中有多个[注册表][registries]在协同工作，Mod 开发者都可以借助它们来添加更多行为。
 
-All loot table related registries follow a similar pattern. To add a new registry entry, you generally extend some class or implement some interface that holds your functionality. Then, you define a [codec] for serialization, and register that codec to the corresponding registry, using `DeferredRegister` like normal. This goes along with the "one base object, many instances" approach most registries (for example also blocks/blockstates and items/item stacks) use.
+所有与战利品表相关的注册表都遵循类似的模式。要添加一个新的注册项，你通常需要继承某个类或实现某个接口来承载你的功能。然后，你为其定义一个用于序列化的 [codec]，并像平常一样使用 `DeferredRegister` 把该 codec 注册到对应的注册表中。这与大多数注册表（例如方块/方块状态、物品/物品堆叠）所采用的“一个基础对象，多个实例”思路一致。
 
-## Custom Loot Entry Types
+## 自定义战利品条目类型 {#custom-loot-entry-types}
 
-To create a custom loot entry type, extend `LootPoolEntryContainer` or one of its two direct subclasses, `LootPoolSingletonContainer` or `CompositeEntryBase`. For the sake of example, we want to create a loot entry type that returns the drops of a entity - this is purely for example purposes, in practice it would be more ideal to directly reference the other loot table. Let's start by creating our loot entry type class:
+要创建自定义的战利品条目类型，可以继承 `LootPoolEntryContainer` 或它的两个直接子类之一：`LootPoolSingletonContainer` 或 `CompositeEntryBase`。作为示例，我们想创建一个返回某实体掉落物的战利品条目类型——这纯粹是为了演示，实际中直接引用另一个战利品表会更为理想。我们先从创建战利品条目类型类开始：
 
 ```java
 // We extend LootPoolSingletonContainer since we have a "finite" set of drops.
@@ -36,14 +36,14 @@ public class EntityLootEntry extends LootPoolSingletonContainer {
     public void createItemStack(Consumer<ItemStack> consumer, LootContext context) {
         // Get the entity's loot table. If it doesn't exist, an empty loot table will be returned, so null-checking is not necessary.
         LootTable table = context.getLevel().reloadableRegistries().getLootTable(entity.value().getDefaultLootTable());
-        // Use the raw version here, because vanilla does it too. :P
+        // Use the raw version here, because 原版 does it too. :P
         // #getRandomItemsRaw calls consumer#accept for us on the results of the roll.
         table.getRandomItemsRaw(context, consumer);
     }
 }
 ```
 
-Next up, we create a `MapCodec` for our loot entry:
+接下来，我们为战利品条目创建一个 `MapCodec`：
 
 ```java
 // This is placed as a constant in EntityLootEntry.
@@ -59,7 +59,7 @@ public static final MapCodec<EntityLootEntry> CODEC = RecordCodecBuilder.mapCode
 );
 ```
 
-We then use this codec in registration:
+然后我们在注册中使用这个 codec：
 
 ```java
 public static final DeferredRegister<LootPoolEntryType> LOOT_POOL_ENTRY_TYPES =
@@ -69,7 +69,7 @@ public static final Supplier<LootPoolEntryType> ENTITY_LOOT =
         LOOT_POOL_ENTRY_TYPES.register("entity_loot", () -> new LootPoolEntryType(EntityLootEntry.CODEC));
 ```
 
-Finally, in our loot entry class, we must override `getType()`:
+最后，在我们的战利品条目类中，必须重写 `getType()`：
 
 ```java
 public class EntityLootEntry extends LootPoolSingletonContainer {
@@ -82,9 +82,9 @@ public class EntityLootEntry extends LootPoolSingletonContainer {
 }
 ```
 
-## Custom Number Providers
+## 自定义数值提供器 {#custom-number-providers}
 
-To create a custom number provider, implement the `NumberProvider` interface. For the sake of example, let's assume we want to create a number provider that changes the sign of the provided number:
+要创建自定义的数值提供器（number provider），需实现 `NumberProvider` 接口。作为示例，假设我们想创建一个把所提供数字取反的数值提供器：
 
 ```java
 // We accept another number provider as our base.
@@ -115,7 +115,7 @@ public record InvertedSignProvider(NumberProvider base) implements NumberProvide
 }
 ```
 
-Like with custom loot entry types, we then use this codec in registration:
+与自定义战利品条目类型一样，我们随后在注册中使用这个 codec：
 
 ```java
 public static final DeferredRegister<LootNumberProviderType> LOOT_NUMBER_PROVIDER_TYPES =
@@ -125,7 +125,7 @@ public static final Supplier<LootNumberProviderType> INVERTED_SIGN =
         LOOT_NUMBER_PROVIDER_TYPES.register("inverted_sign", () -> new LootNumberProviderType(InvertedSignProvider.CODEC));
 ```
 
-And similarly, in our number provider class, we must override `getType()`:
+同样地，在我们的数值提供器类中，必须重写 `getType()`：
 
 ```java
 public record InvertedSignProvider(NumberProvider base) implements NumberProvider {
@@ -138,9 +138,9 @@ public record InvertedSignProvider(NumberProvider base) implements NumberProvide
 }
 ```
 
-## Custom Level-Based Values
+## 自定义基于等级的数值 {#custom-level-based-values}
 
-Custom `LevelBasedValue`s can be created by implementing the `LevelBasedValue` interface in a record. Again, for the sake of example, let's assume that we want to invert the output of another `LevelBasedValue`:
+要创建自定义的 `LevelBasedValue`，可以在一个记录中实现 `LevelBasedValue` 接口。同样作为示例，假设我们想把另一个 `LevelBasedValue` 的输出取反：
 
 ```java
 public record InvertedSignLevelBasedValue(LevelBasedValue base) implements LevelBaseValue {
@@ -162,7 +162,7 @@ public record InvertedSignLevelBasedValue(LevelBasedValue base) implements Level
 }
 ```
 
-And again, we then use the codec in registration, though this time directly:
+然后，我们再次在注册中使用该 codec，不过这次是直接注册：
 
 ```java
 public static final DeferredRegister<MapCodec<? extends LevelBasedValue>> LEVEL_BASED_VALUES =
@@ -172,9 +172,9 @@ public static final Supplier<MapCodec<? extends LevelBasedValue>> INVERTED_SIGN 
         LEVEL_BASED_VALUES.register("inverted_sign", () -> InvertedSignLevelBasedValue.CODEC);
 ```
 
-## Custom Loot Conditions
+## 自定义战利品条件 {#custom-loot-conditions}
 
-To get started, we create our loot item condition class that implements `LootItemCondition`. For the sake of example, let's assume we only want the condition to pass if the player killing the mob has a certain xp level:
+开始时，我们创建实现 `LootItemCondition` 的战利品条件类。作为示例，假设我们希望仅当击杀生物的玩家拥有特定经验等级时，条件才通过：
 
 ```java
 public record HasXpLevelCondition(int level) implements LootItemCondition {
@@ -199,7 +199,7 @@ public record HasXpLevelCondition(int level) implements LootItemCondition {
 }
 ```
 
-We can register the condition type to the registry using the condition's codec:
+我们可以使用该条件的 codec 把条件类型注册到注册表：
 
 ```java
 public static final DeferredRegister<LootItemConditionType> LOOT_CONDITION_TYPES =
@@ -209,7 +209,7 @@ public static final Supplier<LootItemConditionType> MIN_XP_LEVEL =
         LOOT_CONDITION_TYPES.register("min_xp_level", () -> new LootItemConditionType(HasXpLevelCondition.CODEC));
 ```
 
-After we have done that, we need to override `#getType` in our condition and return the registered type:
+完成后，我们需要在条件中重写 `#getType` 并返回已注册的类型：
 
 ```java
 public record HasXpLevelCondition(int level) implements LootItemCondition {
@@ -222,12 +222,12 @@ public record HasXpLevelCondition(int level) implements LootItemCondition {
 }
 ```
 
-## Custom Loot Functions
+## 自定义战利品函数 {#custom-loot-functions}
 
-To get started, we create our own class extending `LootItemFunction`. `LootItemFunction` extends `BiFunction<ItemStack, LootContext, ItemStack>`, so what we want is to use the existing item stack and the loot context to return a new, modified item stack. However, almost all loot functions don't directly extend `LootItemFunction`, but extend `LootItemConditionalFunction` instead. This class has built-in functionality for applying loot conditions to the function - the function is only applied if the loot conditions apply. For the sake of example, let's apply a random enchantment with a specified level to the item:
+开始时，我们创建自己的类来继承 `LootItemFunction`。 `LootItemFunction` 继承自 `BiFunction<ItemStack, LootContext, ItemStack>`，因此我们要做的就是利用现有的物品堆叠和战利品上下文，返回一个新的、经过修改的物品堆叠。不过，几乎所有战利品函数都不直接继承 `LootItemFunction`，而是继承 `LootItemConditionalFunction`。该类内置了将战利品条件应用于函数的功能——只有当战利品条件满足时，函数才会被应用。作为示例，我们来给物品施加一个指定等级的随机附魔：
 
 ```java
-// Code adapted from vanilla's EnchantRandomlyFunction class.
+// Code adapted from 原版's EnchantRandomlyFunction class.
 // LootItemConditionalFunction is an abstract class, not an interface, so we cannot use a record here.
 public class RandomEnchantmentWithLevelFunction extends LootItemConditionalFunction {
     // Our context: an optional list of enchantments, and a level.
@@ -270,7 +270,7 @@ public class RandomEnchantmentWithLevelFunction extends LootItemConditionalFunct
 }
 ```
 
-We can then register the function type to the registry using the function's codec:
+随后我们可以使用该函数的 codec 把函数类型注册到注册表：
 
 ```java
 public static final DeferredRegister<LootItemFunctionType<?>> LOOT_FUNCTION_TYPES =
@@ -280,7 +280,7 @@ public static final Supplier<LootItemFunctionType<RandomEnchantmentWithLevelFunc
         LOOT_FUNCTION_TYPES.register("random_enchantment_with_level", () -> new LootItemFunctionType(RandomEnchantmentWithLevelFunction.CODEC));
 ```
 
-After we have done that, we need to override `#getType` in our condition and return the registered type:
+完成后，我们需要在条件中重写 `#getType` 并返回已注册的类型：
 
 ```java
 public class RandomEnchantmentWithLevelFunction extends LootItemConditionalFunction {

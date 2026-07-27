@@ -1,84 +1,84 @@
-# Versioning
+# 版本号 {#versioning}
 
-This article will break down how versioning works in Minecraft and NeoForge, and will give some recommendations for mod versioning as well.
+本文将拆解 Minecraft 和 NeoForge 中版本号的工作方式，并对 Mod 的版本号给出一些建议。
 
-## Minecraft
+## 我的世界 {#minecraft}
 
-Minecraft uses [semantic versioning][semver]. Semantic versioning, or "semver" for short, has the format `major.minor.patch`. So for example, Minecraft 1.20.2 has the major version 1, the minor version 20 and the patch version 2.
+Minecraft 使用[语义化版本][semver]。语义化版本，简称 "semver"，采用 `major.minor.patch` 的格式。例如，Minecraft 1.20.2 的主版本号为 1，次版本号为 20，修订版本号为 2。
 
-Minecraft has used `1` as the major version since 2011, when Minecraft 1.0 was introduced. Before that, the versioning scheme changed often, and there were versions like `a1.1` (Alpha 1.1), `b1.7.3` (Beta 1.7.3) or even the `infdev` versions, which didn't follow a clear versioning scheme at all. Due to the `1` major version holding up for over a decade now, and due to the in-joke that is Minecraft 2, it is generally considered unlikely that this is ever going to change.
+自 2011 年 Minecraft 1.0 推出以来，Minecraft 一直以 `1` 作为主版本号。在此之前，版本号方案频繁变动，出现过诸如 `a1.1`（Alpha 1.1）、 `b1.7.3`（Beta 1.7.3），甚至完全不遵循清晰版本号方案的 `infdev` 版本。由于 `1` 这个主版本号已经维持了十多年，再加上关于 Minecraft 2 的内部梗，人们普遍认为它几乎不可能再改变。
 
-### Snapshots
+### 快照 {#snapshots}
 
-Snapshots deviate from the standard semver scheme. They are labeled as `YYwWWa`, where `YY` represents the last two digits of the year (e.g. `23`) and `WW` represents the week of that year (e.g. `01`). So for example, snapshot `23w01a` is the snapshot released in the first week of 2023.
+快照偏离了标准的 semver 方案。它们的标记形式为 `YYwWWa`，其中 `YY` 表示年份的后两位（例如 `23`），`WW` 表示该年的周数（例如 `01`）。举例来说，快照 `23w01a` 就是 2023 年第一周发布的快照。
 
-The `a` suffix exists for occasions where two snapshots get released in the same week (where the second snapshot would then be named something like `23w01b`). Mojang has occasionally used this in the past. The alternative suffix has also been used for snapshots like `20w14infinite`, which was the [2020 infinite dimensions April Fool's joke][infinite].
+`a` 后缀用于同一周内发布两个快照的情形（此时第二个快照会被命名为类似 `23w01b` 的形式）。 Mojang 过去偶尔这样用过。这个后缀位也被用于像 `20w14infinite` 这样的快照，也就是 [2020 年无限维度愚人节玩笑][infinite]。
 
-### Pre-releases and Release Candidates
+### 预发布版与候选发布版 {#pre-releases-and-release-candidates}
 
-When a snapshot cycle is coming completion, Mojang starts releasing so-called pre-releases. Pre-releases are deemed feature-complete for a version and focus solely on bugfixes. They use the semver notation for the version it is for, suffixed by `-preX`. So for example, the first pre-release for 1.20.2 was named `1.20.2-pre1`. There can be and usually are multiple pre-releases, which are accordingly suffixed with `-pre2`, `-pre3`, etc.
+当一个快照周期接近尾声时，Mojang 会开始发布所谓的预发布版（pre-release）。预发布版被认为在功能上已经完整，只专注于修复 Bug。它们采用对应版本的 semver 记法，并以 `-preX` 作为后缀。例如，1.20.2 的第一个预发布版名为 `1.20.2-pre1`。预发布版可以有、通常也确实有多个，会相应地以 `-pre2`、 `-pre3` 等后缀标记。
 
-Similarly, when the pre-release cycle completes, Mojang releases Release Candidate 1 (suffixing the version with `-rc1`, for example `1.20.2-rc1`). Mojang aims to have one release candidate that they can release if no further bugs occur. However, if an unexpected bug occurs, then there can also be an `-rc2`, `-rc3`, etc. version, similar to pre-releases.
+同样地，当预发布周期结束时，Mojang 会发布候选发布版 1（Release Candidate 1，以 `-rc1` 作为版本后缀，例如 `1.20.2-rc1`）。 Mojang 的目标是只做一个候选发布版，如果没有更多 Bug 出现就直接发布它。不过，如果出现了意料之外的 Bug，也可能会有 `-rc2`、 `-rc3` 等版本，与预发布版类似。
 
-## NeoForge
+## NeoForge {#neoforge}
 
-NeoForge uses an adapted semver system: The major version is Minecraft's minor version, the minor version is Minecraft's patch version, and the patch version is the "actual" NeoForge version. So for example, NeoForge 20.2.59 is the 60th version (we start at 0) for Minecraft 1.20.2. The `1` at the beginning is omitted because it is very unlikely that it will ever change, see [above][minecraft] for why that is the case.
+NeoForge 使用一套改编过的 semver 系统：主版本号是 Minecraft 的次版本号，次版本号是 Minecraft 的修订版本号，而修订版本号才是 NeoForge “真正的”版本号。例如，NeoForge 20.2.59 就是针对 Minecraft 1.20.2 的第 60 个版本（我们从 0 开始计数）。开头的 `1` 被省略，因为它几乎不可能改变，原因参见[上文][minecraft]。
 
-A few places in NeoForge also use [Maven version ranges][mvr], for example the Minecraft and NeoForge version ranges in the [`neoforge.mods.toml`][neoforgemodstoml] file. These are mostly, but not fully compatible with semver (the `pre`-tag is not considered by it, for example).
+NeoForge 中也有少数地方使用 [Maven 版本范围][mvr]，例如 [`neoforge.mods.toml`][neoforgemodstoml] 文件中的 Minecraft 和 NeoForge 版本范围。这些范围大体上与 semver 兼容，但并非完全兼容（例如它不考虑 `pre` 标记）。
 
-## Mods
+## 模型 {#mods}
 
-There is no definitive best versioning system. Different styles of development, scopes of projects, etc. all influence the decision of what versioning system to use. Sometimes, versioning system can also be combined. This section attempts to give an overview over some commonly used versioning systems, with real-life examples.
+并不存在一种绝对最优的版本号系统。不同的开发风格、项目规模等都会影响该选用哪种版本号系统的决定。有时，版本号系统也可以组合使用。本节尝试概览一些常用的版本号系统，并配以现实中的例子。
 
-Usually, a mod's file name looks like `modid-<version>.jar`. So if our mod id is `examplemod` and our version is `1.2.3`, our mod file would be named `examplemod-1.2.3.jar`.
+通常，一个 Mod 的文件名形如 `modid-<version>.jar`。所以如果我们的 mod id 是 `examplemod`，版本是 `1.2.3`，那么我们的 Mod 文件就会命名为 `examplemod-1.2.3.jar`。
 
 :::note
-Versioning systems are suggestions, rather than strictly enforced rules. This is especially true with regard to when the version is changed ("bumped"), and in what way. If you want to use a different versioning system, nobody is going to stop you.
+版本号系统只是建议，而非严格强制的规则。这一点在“何时”以及“以何种方式”变更（“提升”，bump）版本号上尤为明显。如果你想使用不同的版本号系统，没人会阻止你。
 :::
 
-### Semantic Versioning
+### 语义化版本 {#semantic-versioning}
 
-Semantic versioning ("semver") consists of three parts: `major.minor.patch`. The major version is bumped when major changes are made to the codebase, which usually correlates with major new features and bugfixes. The minor version is bumped when minor features are introduced, and patch bumps happen when an update only includes bug-fixes.
+语义化版本（"semver"）由三部分组成：`major.minor.patch`。当代码库发生重大改动时提升主版本号，这通常与重大新功能和 Bug 修复相关联。当引入次要功能时提升次版本号，而当一次更新只包含 Bug 修复时提升修订版本号。
 
-It is generally agreed upon that any version `0.x.x` is a development version, and with the first (full) release, the version should be bumped to `1.0.0`.
+人们普遍认为，任何 `0.x.x` 版本都属于开发版本，而在首个（完整）发布时，版本号应当提升到 `1.0.0`。
 
-The "minor for features, patch for bugfixes" rule is often disregarded in practice. A popular example for this is Minecraft itself, which does major features through the minor version number, minor features through the patch number, and bugfixes in snapshots (see above).
+“次版本号用于功能、修订版本号用于 Bug 修复”这条规则在实践中常被无视。一个典型例子就是 Minecraft 本身，它通过次版本号推出重大功能，通过修订版本号推出次要功能，并在快照中修复 Bug（见上文）。
 
-Depending on how often a mod is updated, these numbers can be smaller or larger. For example, [Supplementaries][supplementaries] is on version `2.6.31` (at the time of writing). Triple- or even quadruple-digit numbers, especially in the `patch`, are absolutely possible.
+视一个 Mod 更新的频繁程度，这些数字可大可小。例如，[Supplementaries][supplementaries]（撰写本文时）的版本是 `2.6.31`。三位甚至四位的数字，尤其是在 `patch` 位上，是完全有可能出现的。
 
-### "Reduced" and "Expanded" Semver
+### “精简版”与“扩展版” Semver {#reduced-and-expanded-semver}
 
-Sometimes, semver can be seen with only two numbers. This is a sort of "reduced" semver, or "2-part" semver. Their version numbers only have a `major.minor` scheme. This is commonly used by small mods that only add a few simple objects and thus rarely need updates (except Minecraft version updates), often staying at version `1.0` forever.
+有时，semver 只用两个数字，这算是一种“精简版” semver，或“两段式” semver。它们的版本号只有 `major.minor` 方案。这常见于那些只添加少量简单对象、因而很少需要更新（除了 Minecraft 版本更新之外）的小型 Mod，它们往往永远停留在 `1.0` 版本。
 
-"Expanded" semver, or "4-part" semver, has four numbers (so something like `1.0.0.0`). Depending on the mod, the format can be `major.api.minor.patch`, or `major.minor.patch.hotfix`, or something different entirely - there is no standard way to do it.
+“扩展版” semver，或“四段式” semver，有四个数字（例如 `1.0.0.0`）。视 Mod 而定，其格式可以是 `major.api.minor.patch`，也可以是 `major.minor.patch.hotfix`，或是完全不同的其他形式——并没有标准做法。
 
-For `major.api.minor.patch`, the `major` version is decoupled from the `api` version. This means that the `major` (feature) bit and the `api` bit can be bumped independently. This is commonly used by mods that expose an API for other modders to use. For example, [Mekanism][mekanism] is currently on version 10.4.5.19 (at the time of writing).
+对于 `major.api.minor.patch`，`major` 版本与 `api` 版本是解耦的。这意味着 `major`（功能）位和 `api` 位可以各自独立提升。这常见于那些向其他 Mod 开发者暴露 API 的 Mod。例如，[Mekanism][mekanism]（撰写本文时）的版本为 10.4.5.19。
 
-For `major.minor.patch.hotfix`, the patch level is split into two. This is the approach used by the [Create][create] mod, which is currently on version 0.5.1f (at the time of writing). Note that Create denotes the hotfix as a letter instead of a fourth number, in order to stay compatible with regular semver.
+对于 `major.minor.patch.hotfix`，修订层级被拆成了两部分。[Create][create] Mod 采用的就是这种方式，它（撰写本文时）的版本为 0.5.1f。请注意，Create 用一个字母而非第四个数字来表示 hotfix，以便与常规 semver 保持兼容。
 
 :::info
-Reduced semver, expanded semver, 2-part semver and 4-part semver are not official terms or standardized formats in any way.
+精简版 semver、扩展版 semver、两段式 semver 和四段式 semver 都不是任何意义上的官方术语或标准化格式。
 :::
 
-### Alpha, Beta, Release
+### Alpha、 Beta、发布 {#alpha-beta-release}
 
-Like Minecraft itself, modding is often done in the classical `alpha`/`beta`/`release` stages known from software engineering, where `alpha` denotes an unstable/experimental version (sometimes also called `experimental` or `snapshot`), `beta` denotes a semi-stable version, and `release` denotes a stable version (sometimes called `stable` instead of `release`).
+和 Minecraft 本身一样，Mod 开发常常沿用软件工程中经典的 `alpha`/`beta`/`release` 阶段划分：`alpha` 表示不稳定/试验性版本（有时也称 `experimental` 或 `snapshot`），`beta` 表示半稳定版本，`release` 表示稳定版本（有时用 `stable` 代替 `release`）。
 
-Some mods use their major version to denote a Minecraft version bump. An example of this is [JEI][jei], which uses `13.x.x.x` for Minecraft 1.19.2, `14.x.x.x` for 1.19.4, and `15.x.x.x` for 1.20.1 (there are no versions for 1.19.3 and 1.20.0). Others append the tag to the mod name, for example the [Minecolonies][minecolonies] mod, which is on `1.1.328-BETA` at the time of writing.
+一些 Mod 用它们的主版本号来表示 Minecraft 版本的跃升。一个例子是 [JEI][jei]，它对 Minecraft 1.19.2 使用 `13.x.x.x`，对 1.19.4 使用 `14.x.x.x`，对 1.20.1 使用 `15.x.x.x`（没有针对 1.19.3 和 1.20.0 的版本）。另一些则把标记附加到 Mod 名称上，例如 [Minecolonies][minecolonies] Mod，它（撰写本文时）的版本为 `1.1.328-BETA`。
 
-### Including the Minecraft Version
+### 包含 Minecraft 版本 {#including-the-minecraft-version}
 
-It is common to include the Minecraft version a mod is for in the filename. This makes it easier for end users to easily find out what Minecraft version a mod is for. A common place for this is either before or after the mod version, with the former being more widespread than the latter. For example, JEI version `16.0.0.28` (latest at the time of writing) for 1.20.2 would become `jei-1.20.2-16.0.0.28` or `jei-16.0.0.28-1.20.2`.
+在文件名中包含 Mod 所针对的 Minecraft 版本是很常见的做法。这让最终用户能够更容易地弄清一个 Mod 是给哪个 Minecraft 版本用的。常见的位置是放在 Mod 版本之前或之后，其中放在前面的做法比放在后面更为普遍。例如，针对 1.20.2 的 JEI 版本 `16.0.0.28`（撰写本文时的最新版）会写成 `jei-1.20.2-16.0.0.28` 或 `jei-16.0.0.28-1.20.2`。
 
-### Including the Mod Loader
+### 包含 Mod 加载器 {#including-the-mod-loader}
 
-As you probably know, NeoForge is not the only mod loader out there, and many mod developers develop on multiple platforms. As a result, a way to distinguish between two files of the same mod of the same version, but for different mod loaders is needed.
+你大概知道，NeoForge 并不是唯一的 Mod 加载器，许多 Mod 开发者会在多个平台上开发。因此，需要一种方式来区分同一 Mod、同一版本、但面向不同 Mod 加载器的两个文件。
 
-Usually, this is done by including the mod loader somewhere in the name. `jei-neoforge-1.20.2-16.0.0.28`, `jei-1.20.2-neoforge-16.0.0.28` or `jei-1.20.2-16.0.0.28-neoforge` are all valid ways to do it. For other mod loaders, the `neoforge` bit would be replaced with `forge`, `fabric`, `quilt` or whatever different mod loader you might be developing on alongside NeoForge.
+通常，这是通过把 Mod 加载器写在名称的某处来实现的。 `jei-neoforge-1.20.2-16.0.0.28`、 `jei-1.20.2-neoforge-16.0.0.28` 或 `jei-1.20.2-16.0.0.28-neoforge` 都是有效的写法。对于其他 Mod 加载器，`neoforge` 这部分会替换为 `forge`、 `fabric`、 `quilt`，或你在 NeoForge 之外可能同时开发的其他 Mod 加载器。
 
-### A Note on Maven
+### 关于 Maven 的说明 {#a-note-on-maven}
 
-Maven, the system used for dependency hosting, uses a versioning system that differs from semver in some details (though the general `major.minor.patch` pattern remains the same). The related [Maven Versioning Range (MVR)][mvr] system is used in some places in NeoForge (see [above][neoforge]). When choosing your versioning scheme, you should make sure it is compatible with MVR, as otherwise, mods will not be able to depend on specific versions of your mod!
+Maven，即用于托管依赖的系统，采用的版本号系统在一些细节上与 semver 有所不同（尽管总体的 `major.minor.patch` 模式保持不变）。与之相关的 [Maven 版本范围（MVR）][mvr] 系统在 NeoForge 的一些地方被使用（见[上文][neoforge]）。在选择你的版本号方案时，你应当确保它与 MVR 兼容，否则其他 Mod 将无法依赖你 Mod 的特定版本！
 
 [create]: https://www.curseforge.com/minecraft/mc-mods/create
 [infinite]: https://minecraft.wiki/w/Java_Edition_20w14∞

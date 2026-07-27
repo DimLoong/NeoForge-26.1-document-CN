@@ -8,6 +8,9 @@ import {
 } from '@docusaurus/plugin-content-docs/client';
 import styles from './styles.module.css';
 
+// 已完成中文翻译的版本（按 version.name）。current 即 26.1。
+const TRANSLATED_VERSIONS = new Set(['current', '1.21.1']);
+
 function Chevron({open}: {open: boolean}) {
   return (
     <svg
@@ -80,6 +83,9 @@ export default function SidebarVersionSelector(): JSX.Element | null {
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}>
         <span className={styles.current}>{currentVersion.label}</span>
+        {TRANSLATED_VERSIONS.has(currentVersion.name) && (
+          <span className={styles.badge}>已翻译</span>
+        )}
         <Chevron open={open} />
       </button>
 
@@ -96,7 +102,12 @@ export default function SidebarVersionSelector(): JSX.Element | null {
                   className={styles.option}
                   data-active={activeItem ? 'true' : 'false'}
                   onClick={() => goToVersion(v.name)}>
-                  <span>{v.label}</span>
+                  <span className={styles.optionLabel}>
+                    {v.label}
+                    {TRANSLATED_VERSIONS.has(v.name) && (
+                      <span className={styles.badge}>已翻译</span>
+                    )}
+                  </span>
                   {activeItem && (
                     <svg
                       className={styles.check}

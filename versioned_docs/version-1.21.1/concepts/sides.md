@@ -1,61 +1,61 @@
 ---
 sidebar_position: 2
 ---
-# Sides
+# 侧面 {#sides}
 
-Like many other programs, Minecraft follows a client-server concept, where the client is responsible for displaying the data, while the server is responsible for updating them. When using these terms, we have a fairly intuitive understanding of what we mean... right?
+与许多其他程序一样，Minecraft 遵循客户端-服务器概念，其中客户端负责显示数据，而服务器负责更新数据。当使用这些术语时，我们对我们的意思有一个相当直观的理解......对吧？
 
-Turns out, not so much. A lot of the confusion stems from Minecraft having two different concepts of sides, depending on the context: the physical and the logical side.
+事实证明，并没有那么多。很多混乱源于《我的世界》有两种不同的侧面概念，具体取决于上下文：物理侧面和逻辑侧面。
 
-## Logical vs. Physical Side
+## 逻辑端与物理端 {#logical-vs-physical-side}
 
-### The Physical Side
+### 物理侧 {#the-physical-side}
 
-When you open your Minecraft launcher, select a Minecraft installation and press play, you boot up a **physical client**. The word "physical" is used here in the sense of "this is a client program". This especially means that client-side functionality, such as all the rendering stuff, is available here and can be used as needed. In contrast, the **physical server**, also known as dedicated server, is what opens when you launch a Minecraft server JAR. While the Minecraft server comes with a rudimentary GUI, it is missing all client-only functionality. Most notably, this means that various client classes are missing from the server JAR. Calling these classes on the physical server will lead to missing class errors, i.e. crashes, so we need to safeguard against this.
+当你打开 Minecraft 启动器，选择 Minecraft 安装并按播放键时，你将启动 **物理客户端**。这里使用的“物理”一词的意思是“这是一个客户端程序”。这尤其意味着客户端功能（例如所有渲染内容）都可以在此处使用，并且可以根据需要使用。相比之下，**物理服务器**（也称为专用服务器）是你启动 Minecraft 服务器 JAR 时打开的服务器。虽然 Minecraft 服务器附带了一个基本的 GUI，但它缺少所有客户端功能。最值得注意的是，这意味着服务器 JAR 中缺少各种客户端类。在物理服务器上调用这些类会导致丢失类错误，即崩溃，因此我们需要防范这种情况。
 
-### The Logical Side
+### 逻辑端 {#the-logical-side}
 
-The logical side is mainly focused on the internal program structure of Minecraft. The **logical server** is where the game logic runs. Things like time and weather changing, entity ticking, entity spawning, etc. all run on the server. All kinds of data, such as inventory contents, are the server's responsibility as well. The **logical client**, on the other hand, is responsible for displaying everything there is to display. Minecraft keeps all the client code in an isolated `net.minecraft.client` package, and runs it in a separate thread called the Render Thread, while everything else is considered common (i.e. client and server) code.
+逻辑方面主要关注 Minecraft 的内部程序结构。 **逻辑服务器**是游戏逻辑运行的地方。时间和天气变化、实体滴答、实体生成等都在服务器上运行。各种数据，例如库存内容，也是服务器的责任。另一方面，**逻辑客户端**负责显示要显示的所有内容。 Minecraft 将所有客户端代码保存在一个独立的 `net.minecraft.client` 包中，并在称为渲染线程的单独线程中运行它，而其他所有内容都被视为通用（即客户端和服务器）代码。
 
-### What's the Difference?
+### 有什么区别？ {#whats-the-difference}
 
-The difference between physical and logical sides is best exemplified by two scenarios:
+物理侧和逻辑侧之间的差异最好通过两种情况来说明：
 
-- The player joins a **multiplayer** world. This is fairly straightforward: The player's physical (and logical) client connects to a physical (and logical) server somewhere else - the player does not care where; so long as they can connect, that's all the client knows of, and all the client needs to know.
-- The player joins a **singleplayer** world. This is where things get interesting. The player's physical client spins up a logical server and then, now in the role of the logical client, connects to that logical server on the same machine. If you are familiar with networking, you can think of it as a connection to `localhost` (only conceptually; there are no actual sockets or similar involved).
+- 玩家加入**多人**世界。这相当简单：玩家的物理（和逻辑）客户端连接到其他地方的物理（和逻辑）服务器 - 玩家不关心在哪里；只要它们可以连接，这就是客户端所知道的，也是客户端需要知道的。
+- 玩家加入**单人**世界。这就是事情变得有趣的地方。玩家的物理客户端启动逻辑服务器，然后，现在以逻辑客户端的角色连接到同一台计算机上的该逻辑服务器。如果你熟悉网络，则可以将其视为与 `localhost` 的连接（仅在概念上；不涉及实际的套接字或类似内容）。
 
-These two scenarios also show the main problem with this: If a logical server can work with your code, that alone doesn't guarantee that a physical server will be able to work with as well. This is why you should always test with dedicated servers to check for unexpected behavior. `NoClassDefFoundError`s and `ClassNotFoundException`s due to incorrect client and server separation are among the most common errors there are in modding. Another common mistake is working with static fields and accessing them from both logical sides; this is particularly tricky because there's usually no indication that something is wrong.
+这两个场景也显示了主要问题：如果逻辑服务器可以使用你的代码，那么仅此并不能保证物理服务器也能够使用。这就是为什么你应该始终使用专用服务器进行测试以检查意外行为的原因。由于客户端和服务器分离不正确而导致的 `NoClassDefFoundError` 和 `ClassNotFoundException` 是改装中最常见的错误之一。另一个常见的错误是使用静态字段并从逻辑两侧访问它们。这特别棘手，因为通常没有迹象表明出现问题。
 
 :::tip
-If you need to transfer data from one side to another, you must [send a packet][networking].
+如果需要从一侧传输数据到另一侧，则必须[发送数据包][networking]。
 :::
 
-In the NeoForge codebase, the physical side is represented by an enum called `Dist`, while the logical side is represented by an enum called `LogicalSide`.
+在 NeoForge 代码库中，物理端由名为 `Dist` 的枚举表示，而逻辑端由名为 `LogicalSide` 的枚举表示。
 
 :::info
-Historically, server JARs have had classes the client did not. This is not the case anymore in modern versions; physical servers are a subset of physical clients, if you will.
+从历史上看，服务器 JAR 具有客户端没有的类。在现代版本中，情况已不再如此。如果你愿意的话，物理服务器是物理客户端的子集。
 :::
 
-## Performing Side-Specific Operations
+## 执行特定于侧面的操作 {#performing-side-specific-operations}
 
-### `Level#isClientSide()`
+### `Level#isClientSide()` {#levelisclientside}
 
-This boolean check will be your most used way to check sides. Querying this field on a `Level` object establishes the  **logical** side the level belongs to: If this field is `true`, the level is running on the logical client. If the field is `false`, the level is running on the logical server. It follows that the physical server will always contain `false` in this field, but we cannot assume that `false` implies a physical server, since this field can also be `false` for the logical server inside a physical client (i.e. a singleplayer world).
+这种布尔检查将是你最常用的检查侧面的方法。在 `Level` 对象上查询此字段可确定该级别所属的**逻辑**端：如果该字段是 `true`，则该级别正在逻辑客户端上运行。如果字段为 `false`，则该级别在逻辑服务器上运行。因此，物理服务器将始终在此字段中包含 `false`，但我们不能假设 `false` 暗示物理服务器，因为对于物理客户端（即单人游戏世界）内的逻辑服务器，该字段也可以是 `false`。
 
-Use this check whenever you need to determine if game logic and other mechanics should be run. For example, if you want to damage the player every time they click your block, or have your machine process dirt into diamonds, you should only do so after ensuring `#isClientSide` is `false`. Applying game logic to the logical client can cause desynchronization (ghost entities, desynchronized stats, etc.) in the best case, and crashes in the worst case.
+每当你需要确定是否应该运行游戏逻辑和其他机制时，请使用此检查。例如，如果你想在玩家每次点击你的方块时对其造成伤害，或者让你的机器将污垢加工成钻石，那么你应该仅在确保 `#isClientSide` 为 `false` 后才执行此操作。将游戏逻辑应用于逻辑客户端在最好的情况下可能会导致不同步（幽灵实体、不同步的统计数据等），而在最坏的情况下会导致崩溃。
 
 :::tip
-This check should be used as your go-to default. Whenever you have a `Level` available, use this check.
+此检查应用作你的默认设置。每当你有可用的 `Level` 时，请使用此检查。
 :::
 
-### `FMLEnvironment.dist`
+### `FMLEnvironment.dist` {#fmlenvironmentdist}
 
-`FMLEnvironment.dist` is the **physical** counterpart to a `Level#isClientSide()` check. If this field is `Dist.CLIENT`, you are on a physical client. If the field is `Dist.DEDICATED_SERVER`, you are on a physical server.
+`FMLEnvironment.dist` 是 `Level#isClientSide()` 支票的**物理**对应项。如果此字段为 `Dist.CLIENT`，则你使用的是物理客户端。如果该字段为 `Dist.DEDICATED_SERVER`，则你位于物理服务器上。
 
 
-#### `@Mod`
+#### `@Mod` {#mod}
 
-Checking the physical environment is important when dealing with client-only classes. The recommended way to separate code that should only be executed on one physical client is by specifying a separate [`@Mod` annotation][mod], setting the `dist` parameter to the physical side the mod class should be loaded on:
+在处理仅限客户端的课程时，检查物理环境非常重要。分离仅应在一个物理客户端上执行的代码的推荐方法是指定单独的 [`@Mod` 注释][mod]，将 `dist` 参数设置为应该加载 mod 类的物理端：
 
 ```java
 @Mod("examplemod")
@@ -82,7 +82,7 @@ public class ExampleModDedicatedServer {
 ```
 
 :::tip
-Mods are generally expected to work on either side. This especially means that if you are developing a client-only mod, you should verify that the mod actually runs on a physical client, and no-op in the event that it does not.
+通常预计 Mod 在任何一侧都可以工作。这尤其意味着，如果你正在开发仅限客户端的 mod，你应该验证该 mod 是否确实在物理客户端上运行，如果没有，则不执行任何操作。
 :::
 
 [networking]: ../networking/index.md

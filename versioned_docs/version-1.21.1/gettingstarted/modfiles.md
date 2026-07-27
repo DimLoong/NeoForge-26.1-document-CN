@@ -1,53 +1,53 @@
-# Mod Files
+# Mod 文件 {#mod-files}
 
-The mod files are responsible for determining what mods are packaged into your JAR, what information to display within the 'Mods' menu, and how your mod should be loaded in the game.
+Mod 文件负责决定哪些 Mod 被打包进你的 JAR、在“Mods”菜单中显示哪些信息，以及你的 Mod 应当如何在游戏中加载。
 
-## `gradle.properties`
+## `gradle.properties` {#gradleproperties}
 
-The `gradle.properties` file holds various common properties of your mod, such as the mod id or mod version. During building, Gradle reads the values in these files and inlines them in various places, such as the [neoforge.mods.toml][neoforgemodstoml] file. This way, you only need to change values in one place, and they are then applied everywhere for you.
+`gradle.properties` 文件保存你 Mod 的各种常用属性，例如 mod id 或 Mod 版本。在构建过程中，Gradle 会读取这些文件中的值，并把它们内联到各处，例如 [neoforge.mods.toml][neoforgemodstoml] 文件。这样一来，你只需在一个地方修改值，它们就会被自动应用到所有地方。
 
-Most values are also explained as comments in [the MDK's `gradle.properties` file][mdkgradleproperties].
+大多数值也在 [MDK 的 `gradle.properties` 文件][mdkgradleproperties]中以注释形式作了说明。
 
-| Property                  | Description                                                                                                                                                                                                                             | Example                                    |
-|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
-| `org.gradle.jvmargs`      | Allows you to pass extra JVM arguments to Gradle. Most commonly, this is used to assign more/less memory to Gradle. Note that this is for Gradle itself, not Minecraft.                                                                 | `org.gradle.jvmargs=-Xmx3G`                |
-| `org.gradle.daemon`       | Whether Gradle should use the daemon when building.                                                                                                                                                                                     | `org.gradle.daemon=false`                  |
-| `org.gradle.debug`        | Whether Gradle is set to debug mode. Debug mode mainly means more Gradle log output. Note that this is for Gradle itself, not Minecraft.                                                                                                | `org.gradle.debug=false`                   |
-| `minecraft_version`       | The Minecraft version you are modding on. Must match with `neo_version`.                                                                                                                                                                | `minecraft_version=1.20.6`                 |
-| `minecraft_version_range` | The Minecraft version range this mod can use, as a [Maven Version Range][mvr]. Note that [snapshots, pre-releases and release candidates][mcversioning] are not guaranteed to sort properly, as they do not follow maven versioning.    | `minecraft_version_range=[1.20.6,1.21)`    |
-| `neo_version`             | The NeoForge version you are modding on. Must match with `minecraft_version`. See [NeoForge Versioning][neoversioning] for more information on how NeoForge versioning works.                                                           | `neo_version=20.6.62`                      |
-| `neo_version_range`       | The NeoForge version range this mod can use, as a [Maven Version Range][mvr].                                                                                                                                                           | `neo_version_range=[20.6.62,20.7)`         |
-| `loader_version_range`    | The version range of the mod loader this mod can use, as a [Maven Version Range][mvr]. Note that the loader versioning is decoupled from NeoForge versioning.                                                                           | `loader_version_range=[1,)`                |
-| `mod_id`                  | See [The Mod ID][modid].                                                                                                                                                                                                                | `mod_id=examplemod`                        |
-| `mod_name`                | The human-readable display name of your mod. By default, this can only be seen in the mod list, however, mods such as [JEI][jei] prominently display mod names in item tooltips as well.                                                | `mod_name=Example Mod`                     |
-| `mod_license`             | The license your mod is provided under. It is suggested that this is set to the [SPDX identifier][spdx] you are using and/or a link to the license. You can visit https://choosealicense.com/ to help pick the license you want to use. | `mod_license=MIT`                          |
-| `mod_version`             | The version of your mod, shown in the mod list. See [the page on Versioning][versioning] for more information.                                                                                                                          | `mod_version=1.0`                          |
-| `mod_group_id`            | See [The Group ID][group].                                                                                                                                                                                                              | `mod_group_id=com.example.examplemod`      |
-| `mod_authors`             | The authors of the mod, shown in the mod list.                                                                                                                                                                                          | `mod_authors=ExampleModder`                |
-| `mod_description`         | The description of the mod, as a multiline string, shown in the mod list. Newline characters (`\n`) can be used and will be replaced properly.                                                                                          | `mod_description=Example mod description.` |
+| 属性                      | 说明                                                                                                                                                                                                                                     | 示例                                       |
+|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| `org.gradle.jvmargs`      | 允许你向 Gradle 传递额外的 JVM 参数。最常见的用途是为 Gradle 分配更多/更少的内存。请注意，这针对的是 Gradle 本身，而非 Minecraft。                                                                                                       | `org.gradle.jvmargs=-Xmx3G`                |
+| `org.gradle.daemon`       | Gradle 在构建时是否应使用守护进程（daemon）。                                                                                                                                                                                            | `org.gradle.daemon=false`                  |
+| `org.gradle.debug`        | Gradle 是否设置为调试模式。调试模式主要意味着更多的 Gradle 日志输出。请注意，这针对的是 Gradle 本身，而非 Minecraft。                                                                                                                    | `org.gradle.debug=false`                   |
+| `minecraft_version`       | 你所开发针对的 Minecraft 版本。必须与 `neo_version` 匹配。                                                                                                                                                                               | `minecraft_version=1.20.6`                 |
+| `minecraft_version_range` | 本 Mod 可使用的 Minecraft 版本范围，以 [Maven 版本范围][mvr] 表示。请注意，[快照、预发布版和候选发布版][mcversioning]不保证能正确排序，因为它们并不遵循 Maven 版本号规则。                                                               | `minecraft_version_range=[1.20.6,1.21)`    |
+| `neo_version`             | 你所开发针对的 NeoForge 版本。必须与 `minecraft_version` 匹配。关于 NeoForge 版本号的工作方式，更多信息参见 [NeoForge 版本号][neoversioning]。                                                                                          | `neo_version=20.6.62`                      |
+| `neo_version_range`       | 本 Mod 可使用的 NeoForge 版本范围，以 [Maven 版本范围][mvr] 表示。                                                                                                                                                                       | `neo_version_range=[20.6.62,20.7)`         |
+| `loader_version_range`    | 本 Mod 可使用的 Mod 加载器版本范围，以 [Maven 版本范围][mvr] 表示。请注意，加载器版本号与 NeoForge 版本号是解耦的。                                                                                                                       | `loader_version_range=[1,)`                |
+| `mod_id`                  | 参见 [Mod ID][modid]。                                                                                                                                                                                                                   | `mod_id=examplemod`                        |
+| `mod_name`                | 你 Mod 的人类可读显示名称。默认情况下只能在 Mod 列表中看到它，不过像 [JEI][jei] 这样的 Mod 还会在物品提示框中显著地显示 Mod 名称。                                                                                                       | `mod_name=Example Mod`                     |
+| `mod_license`             | 你 Mod 采用的许可证。建议将其设为你所使用的 [SPDX 标识符][spdx] 和/或指向该许可证的链接。你可以访问 https://choosealicense.com/ 来帮助挑选你想使用的许可证。                                                                             | `mod_license=MIT`                          |
+| `mod_version`             | 你 Mod 的版本，显示在 Mod 列表中。更多信息参见[版本号页面][versioning]。                                                                                                                                                                 | `mod_version=1.0`                          |
+| `mod_group_id`            | 参见 [Group ID][group]。                                                                                                                                                                                                                 | `mod_group_id=com.example.examplemod`      |
+| `mod_authors`             | Mod 的作者，显示在 Mod 列表中。                                                                                                                                                                                                          | `mod_authors=ExampleModder`                |
+| `mod_description`         | Mod 的描述，作为一个多行字符串，显示在 Mod 列表中。可以使用换行符（`\n`），它们会被正确替换。                                                                                                                                             | `mod_description=Example mod description.` |
 
-### The Mod ID
+### Mod ID {#the-mod-id}
 
-The mod ID is the main way your mod is distinguished from others. It is used in a wide variety of places, including as the namespace for your mod's [registries][registration], and as your [resource and data pack][resource] namespaces. Having two mods with the same id will prevent the game from loading.
+Mod ID 是你的 Mod 区别于其他 Mod 的主要方式。它被用于各种各样的地方，包括作为你 Mod [注册表][registration]的命名空间，以及作为你的[资源包与数据包][resource]命名空间。存在两个 id 相同的 Mod 会导致游戏无法加载。
 
-As such, your mod ID should be something unique and memorable. Usually, it will be your mod's display name (but lower case), or some variation thereof. Mod IDs may only contain lowercase letters, digits and underscores, and must be between 2 and 64 characters long (both inclusive).
+因此，你的 Mod ID 应当是独特而易记的。通常它会是你 Mod 的显示名称（但为小写），或其某种变体。 Mod ID 只能包含小写字母、数字和下划线，长度必须在 2 到 64 个字符之间（含两端）。
 
 :::info
-Changing this property in the `gradle.properties` file will automatically apply the change everywhere, except for the [`@Mod` annotation][javafml] in your main mod class. There, you need to change it manually to match the value in the `gradle.properties` file.
+在 `gradle.properties` 文件中修改此属性会自动把变更应用到所有地方，唯独你主 Mod 类中的 [`@Mod` 注解][javafml]除外。在那里，你需要手动修改它，使其与 `gradle.properties` 文件中的值匹配。
 :::
 
-### The Group ID
+### 群组 ID {#the-group-id}
 
-While the `group` property in the `build.gradle` is only necessary if you plan to publish your mod to a maven, it is considered good practice to always properly set this. This is done for you through the `gradle.properties`'s `mod_group_id` property.
+虽然 `build.gradle` 中的 `group` 属性只有在你打算把 Mod 发布到某个 Maven 仓库时才是必需的，但始终正确设置它被视为良好实践。这一步通过 `gradle.properties` 的 `mod_group_id` 属性为你完成。
 
-The group id should be set to your top-level package. See [Packaging][packaging] for more information.
+group id 应当设为你的顶层包名。更多信息参见[分包][packaging]。
 
 ```properties
 # In your gradle.properties file
 mod_group_id=com.example
 ```
 
-The packages within your java source (`src/main/java`) should also now conform to this structure, with an inner package representing the mod id:
+你 Java 源码（`src/main/java`）中的包现在也应当符合这一结构，其中用一个内层包来表示 mod id：
 
 ```text
 com
@@ -56,40 +56,40 @@ com
         - MyMod.java (renamed ExampleMod.java)
 ```
 
-## `neoforge.mods.toml`
+## `neoforge.mods.toml` {#neoforgemodstoml}
 
-The `neoforge.mods.toml` file, located at `src/main/resources/META-INF/neoforge.mods.toml`, is a file in [TOML][toml] format that defines the metadata of your mod(s). It also contains additional information on how your mod(s) should be loaded into the game, as well as display information that is displayed within the 'Mods' menu. The [`neoforge.mods.toml` file provided by the MDK][mdkneoforgemodstoml] contains comments explaining every entry, they will be explained here in more detail.
+`neoforge.mods.toml` 文件位于 `src/main/resources/META-INF/neoforge.mods.toml`，是一个 [TOML][toml] 格式的文件，定义了你 Mod 的元数据。它还包含关于你的 Mod 应当如何加载到游戏中的附加信息，以及在“Mods”菜单中显示的展示信息。[MDK 提供的 `neoforge.mods.toml` 文件][mdkneoforgemodstoml]包含解释每一条目的注释，此处将更详细地加以说明。
 
-The `neoforge.mods.toml` can be separated into three parts: the non-mod-specific properties, which are linked to the mod file; the mod properties, with a section for each mod; and the dependency configurations, with a section for each mod's or mods' dependencies. Some of the properties associated with the `neoforge.mods.toml` file are mandatory; mandatory properties require a value to be specified, otherwise an exception will be thrown.
+`neoforge.mods.toml` 可以分为三个部分：非 Mod 专属属性，它们关联到 Mod 文件；Mod 属性，每个 Mod 各占一节；以及依赖配置，每个或每组 Mod 的依赖各占一节。与 `neoforge.mods.toml` 文件相关联的某些属性是强制的；强制属性必须指定一个值，否则将抛出异常。
 
 :::note
-In the default MDK, Gradle replaces various properties in this file with the values specified in the `gradle.properties` file. For example, the line `license="${mod_license}"` means that the `license` field is replaced by the `mod_license` property from `gradle.properties`. Values that are replaced like this should be changed in the `gradle.properties` instead of changing them here.
+在默认的 MDK 中，Gradle 会用 `gradle.properties` 文件中指定的值替换本文件里的各种属性。例如，`license="${mod_license}"` 这一行意味着 `license` 字段会被 `gradle.properties` 中的 `mod_license` 属性替换。像这样被替换的值应当在 `gradle.properties` 中修改，而不是在此处修改。
 :::
 
-### Non-Mod-Specific Properties
+### 非 Mod 专属属性 {#non-mod-specific-properties}
 
-Non-mod-specific properties are properties associated with the JAR itself, indicating how to load the mod(s) and any additional global metadata.
+非 Mod 专属属性是与 JAR 本身相关联的属性，指明如何加载 Mod 以及任何额外的全局元数据。
 
-| Property             | Type     | Default        | Description                                                                                                                                                                                                                                                                                                                                         | Example                                                                        |
+| 属性                 | 类型     | 默认值         | 说明                                                                                                                                                                                                                                                                                                                                                | 示例                                                                           |
 |----------------------|----------|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| `modLoader`          | string   | **mandatory**  | The language loader used by the mod(s). Can be used to support alternative language structures, such as Kotlin objects for the main file, or different methods of determining the entrypoint, such as an interface or method. NeoForge provides the Java loader [`"javafml"`][javafml] and the lowcode/nocode loader [`"lowcodefml"`][lowcodefml].  | `modLoader="javafml"`                                                          |
-| `loaderVersion`      | string   | **mandatory**  | The acceptable version range of the language loader, expressed as a [Maven Version Range][mvr]. For `javafml` and `lowcodefml`, this is currently version `1`.                                                                                                                                                                                      | `loaderVersion="[1,)"`                                                         |
-| `license`            | string   | **mandatory**  | The license the mod(s) in this JAR are provided under. It is suggested that this is set to the [SPDX identifier][spdx] you are using and/or a link to the license. You can visit https://choosealicense.com/ to help pick the license you want to use.                                                                                              | `license="MIT"`                                                                |
-| `showAsResourcePack` | boolean  | `false`        | When `true`, the mod(s)'s resources will be displayed as a separate resource pack on the 'Resource Packs' menu, rather than being combined with the 'Mod Resources' pack.                                                                                                                                                                           | `showAsResourcePack=true`                                                      |
-| `showAsDataPack`     | boolean  | `false`        | When `true`, the mod(s)'s data files will be displayed as a separate data pack on the 'Data Packs' menu, rather than being combined with the 'Mod Data' pack.                                                                                                                                                                           | `showAsDataPack=true`                                                          |
-| `services`           | array    | `[]`           | An array of services your mod uses. This is consumed as part of the created module for the mod from NeoForge's implementation of the Java Platform Module System.                                                                                                                                                                                   | `services=["net.neoforged.neoforgespi.language.IModLanguageProvider"]`         |
-| `properties`         | table    | `{}`           | A table of substitution properties. This is used by `StringSubstitutor` to replace `${file.<key>}` with its corresponding value.                                                                                                                                                                                                                    | `properties={"example"="1.2.3"}` (can then be referenced by `${file.example}`) |
-| `issueTrackerURL`    | string   | _nothing_      | A URL representing the place to report and track issues with the mod(s).                                                                                                                                                                                                                                                                            | `"https://github.com/neoforged/NeoForge/issues"`                               |
+| `modLoader`          | string   | **强制**       | Mod 所使用的语言加载器。可用于支持其他语言结构，例如以 Kotlin object 作为主文件，或以不同方式确定入口点，例如接口或方法。 NeoForge 提供了 Java 加载器 [`"javafml"`][javafml] 和低代码/无代码加载器 [`"lowcodefml"`][lowcodefml]。 | `modLoader="javafml"`                                                          |
+| `loaderVersion`      | string   | **强制**       | 语言加载器可接受的版本范围，以 [Maven 版本范围][mvr] 表示。对于 `javafml` 和 `lowcodefml`，当前为版本 `1`。                                                                                                                                                                                                                                          | `loaderVersion="[1,)"`                                                         |
+| `license`            | string   | **强制**       | 本 JAR 中的 Mod 所采用的许可证。建议将其设为你所使用的 [SPDX 标识符][spdx] 和/或指向该许可证的链接。你可以访问 https://choosealicense.com/ 来帮助挑选你想使用的许可证。                                                                                                                                                                              | `license="MIT"`                                                                |
+| `showAsResourcePack` | boolean  | `false`        | 为 `true` 时，该 Mod 的资源将在“Resource Packs”菜单上作为独立的资源包显示，而不是与“Mod Resources”包合并。                                                                                                                                                                                                                                            | `showAsResourcePack=true`                                                      |
+| `showAsDataPack`     | boolean  | `false`        | 为 `true` 时，该 Mod 的数据文件将在“Data Packs”菜单上作为独立的数据包显示，而不是与“Mod Data”包合并。                                                                                                                                                                                                                                                 | `showAsDataPack=true`                                                          |
+| `services`           | array    | `[]`           | 你 Mod 使用的服务数组。它作为 NeoForge 对 Java 平台模块系统（JPMS）实现的一部分，被该 Mod 所创建的模块所消费。                                                                                                                                                                                                                                        | `services=["net.neoforged.neoforgespi.language.IModLanguageProvider"]`         |
+| `properties`         | table    | `{}`           | 一个替换属性表。 `StringSubstitutor` 会用它来把 `${file.<key>}` 替换为对应的值。                                                                                                                                                                                                                                                                      | `properties={"example"="1.2.3"}`（随后可通过 `${file.example}` 引用） |
+| `issueTrackerURL`    | string   | _无_           | 一个 URL，表示报告和跟踪该 Mod 问题的地方。                                                                                                                                                                                                                                                                                                          | `"https://github.com/neoforged/NeoForge/issues"`                               |
 
 :::note
-The `services` property is functionally equivalent to specifying the [`uses` directive in a module][uses], which allows [loading a service of a given type][serviceload].
+`services` 属性在功能上等同于指定[模块中的 `uses` 指令][uses]，后者允许[加载给定类型的服务][serviceload]。
 
-Alternatively, it can be defined in a service file inside the `src/main/resources/META-INF/services` folder, where the file name is the fully-qualified name of the service, and the file content is the name of the service to load (see also [this example from the AtlasViewer mod][atlasviewer]).
+或者，也可以在 `src/main/resources/META-INF/services` 文件夹内的一个服务文件中定义它，文件名为服务的全限定名，文件内容为要加载的服务名称（另见 [AtlasViewer Mod 中的这个示例][atlasviewer]）。
 :::
 
-### Mod-Specific Properties
+### Mod 专属属性 {#mod-specific-properties}
 
-Mod-specific properties are tied to the specified mod using the `[[mods]]` header. This is an [array of tables][array]; all key/value properties will be attached to that mod until the next header.
+Mod 专属属性通过 `[[mods]]` 头绑定到指定的 Mod。这是一个[表数组][array]；在下一个头出现之前，所有键/值属性都会附加到该 Mod 上。
 
 ```toml
 # Properties for examplemod1
@@ -101,34 +101,34 @@ modId = "examplemod1"
 modId = "examplemod2"
 ```
 
-| Property         | Type     | Default                      | Description                                                                                                                                                                                                                                                                    | Example                                                         |
+| 属性             | 类型     | 默认值                       | 说明                                                                                                                                                                                                                                                                          | 示例                                                            |
 |------------------|----------|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
-| `modId`          | string   | **mandatory**                | See [The Mod ID][modid].                                                                                                                                                                                                                                                       | `modId="examplemod"`                                            |
-| `namespace`      | string   | value of `modId`             | An override namespace for the mod. Must also be a valid [mod ID][modid], but may additionally include dots or dashes. Currently unused.                                                                                                                                        | `namespace="example"`                                           |
-| `version`        | string   | `"1"`                        | The version of the mod, preferably in a [variation of Maven versioning][versioning]. When set to `${file.jarVersion}`, it will be replaced with the value of the `Implementation-Version` property in the JAR's manifest (displays as `0.0NONE` in a development environment). | `version="1.20.2-1.0.0"`                                        |
-| `displayName`    | string   | value of `modId`             | The display name of the mod. Used when representing the mod on a screen (e.g., mod list, mod mismatch).                                                                                                                                                                        | `displayName="Example Mod"`                                     |
-| `description`    | string   | `'''MISSING DESCRIPTION'''`  | The description of the mod shown in the mod list screen. It is recommended to use a [multiline literal string][multiline]. This value is also translatable, see [Translating Mod Metadata][i18n] for more info.                                                                | `description='''This is an example.'''`                         |
-| `logoFile`       | string   | _nothing_                    | The name and extension of an image file used on the mods list screen. The logo must be in the root of the JAR or directly in the root of the source set (e.g. `src/main/resources` for the main source set).                                                                   | `logoFile="example_logo.png"`                                   |
-| `logoBlur`       | boolean  | `true`                       | Whether to use `GL_LINEAR*` (true) or `GL_NEAREST*` (false) to render the `logoFile`. In simpler terms, this means whether the logo should be blurred or not when trying to scale the logo.                                                                                    | `logoBlur=false`                                                |
-| `updateJSONURL`  | string   | _nothing_                    | A URL to a JSON used by the [update checker][update] to make sure the mod you are playing is the latest version.                                                                                                                                                               | `updateJSONURL="https://example.github.io/update_checker.json"` |
-| `modUrl`         | string   | _nothing_                    | A URL to the download page of the mod. Currently unused.                                                                                                                                                                                                                       | `modUrl="https://neoforged.net/"`                               |
-| `credits`        | string   | _nothing_                    | Credits and acknowledges for the mod shown on the mod list screen.                                                                                                                                                                                                             | `credits="The person over here and there."`                     |
-| `authors`        | string   | _nothing_                    | The authors of the mod shown on the mod list screen.                                                                                                                                                                                                                           | `authors="Example Person"`                                      |
-| `displayURL`     | string   | _nothing_                    | A URL to the display page of the mod shown on the mod list screen.                                                                                                                                                                                                             | `displayURL="https://neoforged.net/"`                           |
-| `enumExtensions` | string   | _nothing_                    | The file path of a JSON file used for [enum extension][enumextension]                                                                                                                                                                                                          | `enumExtensions="META_INF/enumextensions.json"`                 |
+| `modId`          | string   | **强制**                     | 参见 [Mod ID][modid]。                                                                                                                                                                                                                                                          | `modId="examplemod"`                                            |
+| `namespace`      | string   | `modId` 的值                 | Mod 的命名空间覆盖值。它同样必须是一个有效的 [mod ID][modid]，但额外允许包含点或短横线。目前未被使用。                                                                                                                                                                            | `namespace="example"`                                           |
+| `version`        | string   | `"1"`                        | Mod 的版本，最好采用 [Maven 版本号的某种变体][versioning]。当设为 `${file.jarVersion}` 时，它会被替换为 JAR 清单中 `Implementation-Version` 属性的值（在开发环境中显示为 `0.0NONE`）。                                                                                            | `version="1.20.2-1.0.0"`                                        |
+| `displayName`    | string   | `modId` 的值                 | Mod 的显示名称。在界面上表示该 Mod 时使用（例如 Mod 列表、 Mod 版本不匹配提示）。                                                                                                                                                                                                  | `displayName="Example Mod"`                                     |
+| `description`    | string   | `'''MISSING DESCRIPTION'''`  | 在 Mod 列表界面显示的 Mod 描述。建议使用[多行字面量字符串][multiline]。此值也是可翻译的，更多信息参见[翻译 Mod 元数据][i18n]。                                                                                                                                                    | `description='''This is an example.'''`                         |
+| `logoFile`       | string   | _无_                         | 在 Mod 列表界面上使用的图片文件的名称和扩展名。该 Logo 必须位于 JAR 的根目录，或直接位于源集根目录（例如 main 源集的 `src/main/resources`）。                                                                                                                                     | `logoFile="example_logo.png"`                                   |
+| `logoBlur`       | boolean  | `true`                       | 渲染 `logoFile` 时使用 `GL_LINEAR*`（true）还是 `GL_NEAREST*`（false）。简单来说，这决定在缩放 Logo 时是否对其进行模糊处理。                                                                                                                                                       | `logoBlur=false`                                                |
+| `updateJSONURL`  | string   | _无_                         | 指向一个 JSON 的 URL，[更新检查器][update]用它来确认你正在游玩的 Mod 是否为最新版本。                                                                                                                                                                                             | `updateJSONURL="https://example.github.io/update_checker.json"` |
+| `modUrl`         | string   | _无_                         | 指向 Mod 下载页面的 URL。目前未被使用。                                                                                                                                                                                                                                          | `modUrl="https://neoforged.net/"`                               |
+| `credits`        | string   | _无_                         | 在 Mod 列表界面显示的 Mod 鸣谢与致谢。                                                                                                                                                                                                                                           | `credits="The person over here and there."`                     |
+| `authors`        | string   | _无_                         | 在 Mod 列表界面显示的 Mod 开发者。                                                                                                                                                                                                                                                 | `authors="Example Person"`                                      |
+| `displayURL`     | string   | _无_                         | 在 Mod 列表界面显示的、指向 Mod 展示页面的 URL。                                                                                                                                                                                                                                 | `displayURL="https://neoforged.net/"`                           |
+| `enumExtensions` | string   | _无_                         | 用于[枚举扩展][enumextension]的 JSON 文件的文件路径。                                                                                                                                                                                                                            | `enumExtensions="META_INF/enumextensions.json"`                 |
 
-#### Features
+#### 特性 {#features}
 
-The features system allows mods to demand that certain settings, software, or hardware are available when loading the system. When a feature is not satisfied, mod loading will fail, informing the user about the requirement. These configurations are created using the [array of tables][array] `[[features.<modid>]]`, where `modid` is the identifier of the mod that consumes the feature. Currently, NeoForge provides the following features:
+特性系统允许 Mod 要求在加载系统时具备某些设置、软件或硬件。当某个特性未被满足时，Mod 加载将会失败，并告知用户该要求。这些配置使用[表数组][array] `[[features.<modid>]]` 创建，其中 `modid` 是消费该特性的 Mod 的标识符。目前，NeoForge 提供以下特性：
 
-| Feature          | Description                                                                                                                                                                                                | Example                             |
-|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------|
-| `javaVersion`   | The acceptable version range of the Java version, expressed as a [Maven Version Range][mvr]. This should be the supported version used by Minecraft.                                                       | `javaVersion="[17,)"`  |
-| `openGLVersion` | The acceptable version range of the OpenGL version, expressed as a [Maven Version Range][mvr]. Minecraft requires OpenGL 3.2 or newer. If you want to require a newer OpenGL version, you can do so here.  | `openGLVersion="[4.6,)"` |
+| 特性             | 说明                                                                                                                                                                        | 示例                                |
+|------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------|
+| `javaVersion`   | Java 版本可接受的版本范围，以 [Maven 版本范围][mvr] 表示。这应当是 Minecraft 所使用的受支持版本。                                                                            | `javaVersion="[17,)"`  |
+| `openGLVersion` | OpenGL 版本可接受的版本范围，以 [Maven 版本范围][mvr] 表示。 Minecraft 需要 OpenGL 3.2 或更新版本。如果你想要求更新的 OpenGL 版本，可以在此处设置。                            | `openGLVersion="[4.6,)"` |
 
-#### Mod Properties
+#### Mod 属性 {#mod-properties}
 
-The mod properties system is a map of arbitrary keys to values that are associated with a particular mod. These can be useful when a mod file defines multiple mods that provide different metadata. From there, the specific property value for some key can be obtained by getting the object value from the map via `IModInfo#getModProperties`. These configurations are created using the [array of tables][array] `[[modproperties.<modid>]]`, where `modid` is the identifier of the mod that consumes the defined properties.
+Mod 属性系统是一个把任意键映射到值、并与某个特定 Mod 相关联的映射表。当一个 Mod 文件定义了多个提供不同元数据的 Mod 时，这会很有用。此后，可以通过 `IModInfo#getModProperties` 从该映射中获取对象值，来取得某个键对应的具体属性值。这些配置使用[表数组][array] `[[modproperties.<modid>]]` 创建，其中 `modid` 是消费所定义属性的 Mod 的标识符。
 
 ```java
 // Assume we have two mods `mod1` and `mod2` with the following property configuration
@@ -160,56 +160,56 @@ public class ModTwo {
 }
 ```
 
-### Access Transformer-Specific Properties
+### 访问转换器专属属性 {#access-transformer-specific-properties}
 
-[Access Transformer-specific properties][accesstransformer] are tied to the specified access transformer using the `[[accessTransformers]]` header. This is an [array of tables][array]; all key/value properties will be attached to that access transformer until the next header. The access transformer header is optional; however, when specified, all elements are mandatory.
+[访问转换器专属属性][accesstransformer]通过 `[[accessTransformers]]` 头绑定到指定的访问转换器。这是一个[表数组][array]；在下一个头出现之前，所有键/值属性都会附加到该访问转换器上。访问转换器头是可选的；但一旦指定，其所有元素都是强制的。
 
-| Property |  Type  |    Default    |             Description              |     Example     |
+| 属性     |  类型  |    默认值     |             说明                     |     示例        |
 |:--------:|:------:|:-------------:|:------------------------------------:|:----------------|
-| `file`   | string | **mandatory** | See [Adding ATs][accesstransformer]. | `file="at.cfg"` |
+| `file`   | string | **强制**      | 参见[添加 AT][accesstransformer]。   | `file="at.cfg"` |
 
-### Mixin Configuration Properties
+### Mixin 配置属性 {#mixin-configuration-properties}
 
-[Mixin Configuration Properties][mixinconfig] are tied to the specified mixin config using the `[[mixins]]` header. This is an [array of tables][array]; all key/value properties will be attached to that mixin block until the next header. The mixin header is optional; however, when specified, all elements are mandatory.
+[Mixin 配置属性][mixinconfig]通过 `[[mixins]]` 头绑定到指定的 mixin 配置。这是一个[表数组][array]；在下一个头出现之前，所有键/值属性都会附加到该 mixin 块上。 mixin 头是可选的；但一旦指定，其所有元素都是强制的。
 
-| Property |  Type  |    Default    |             Description                       |     Example                       |
+| 属性     |  类型  |    默认值     |             说明                              |     示例                          |
 |:--------:|:------:|:-------------:|:---------------------------------------------:|:----------------------------------|
-| `config` | string | **mandatory** | The location of the mixin configuration file. | `config="examplemod.mixins.json"` |
+| `config` | string | **强制**      | mixin 配置文件的位置。                        | `config="examplemod.mixins.json"` |
 
-### Dependency Configurations
+### 依赖配置 {#dependency-configurations}
 
-Mods can specify their dependencies, which are checked by NeoForge before loading the mods. These configurations are created using the [array of tables][array] `[[dependencies.<modid>]]`, where `modid` is the identifier of the mod that consumes the dependency.
+Mod 可以指定它们的依赖，NeoForge 会在加载这些 Mod 之前对其进行检查。这些配置使用[表数组][array] `[[dependencies.<modid>]]` 创建，其中 `modid` 是消费该依赖的 Mod 的标识符。
 
-| Property       | Type    | Default        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Example                                      |
-|----------------|---------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
-| `modId`        | string  | **mandatory**  | The identifier of the mod added as a dependency.                                                                                                                                                                                                                                                                                                                                                                                                                           | `modId="jei"`                                |
-| `type`         | string  | `"required"`   | Specifies the nature of this dependency: `"required"` is the default and prevents the mod from loading if this dependency is missing; `"optional"` will not prevent the mod from loading if the dependency is missing, but still validates that the dependency is compatible; `"incompatible"` prevents the mod from loading if this dependency is present; `"discouraged"` still allows the mod to load if the dependency is present, but presents a warning to the user. | `type="incompatible"`                        |
-| `reason`       | string  | _nothing_      | An optional user-facing message to describe why this dependency is required, or why it is incompatible.                                                                                                                                                                                                                                                                                                                                                                    | `reason="integration"`                       |
-| `versionRange` | string  | `""`           | The acceptable version range of the language loader, expressed as a [Maven Version Range][mvr]. An empty string matches any version.                                                                                                                                                                                                                                                                                                                                       | `versionRange="[1, 2)"`                      |
-| `ordering`     | string  | `"NONE"`       | Defines if the mod must load before (`"BEFORE"`) or after (`"AFTER"`) this dependency. If the ordering does not matter, return `"NONE"`                                                                                                                                                                                                                                                                                                                                    | `ordering="AFTER"`                           |
-| `side`         | string  | `"BOTH"`       | The [physical side][sides] the dependency must be present on: `"CLIENT"`, `"SERVER"`, or `"BOTH"`.                                                                                                                                                                                                                                                                                                                                                                         | `side="CLIENT"`                              |
-| `referralUrl`  | string  | _nothing_      | A URL to the download page of the dependency. Currently unused.                                                                                                                                                                                                                                                                                                                                                                                                            | `referralUrl="https://library.example.com/"` |
+| 属性           | 类型    | 默认值         | 说明                                                                                                                                                                                                                                                                                                                                                                          | 示例                                         |
+|----------------|---------|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
+| `modId`        | string  | **强制**       | 作为依赖添加的 Mod 的标识符。                                                                                                                                                                                                                                                                                                                                                | `modId="jei"`                                |
+| `type`         | string  | `"required"`   | 指定此依赖的性质：`"required"` 为默认值，若缺少此依赖则阻止 Mod 加载；`"optional"` 在缺少依赖时不会阻止 Mod 加载，但仍会校验该依赖是否兼容；`"incompatible"` 在此依赖存在时阻止 Mod 加载；`"discouraged"` 在依赖存在时仍允许 Mod 加载，但会向用户显示警告。                                                                                                                    | `type="incompatible"`                        |
+| `reason`       | string  | _无_           | 一条可选的、面向用户的消息，用于说明为何需要此依赖，或为何与之不兼容。                                                                                                                                                                                                                                                                                                        | `reason="integration"`                       |
+| `versionRange` | string  | `""`           | 语言加载器可接受的版本范围，以 [Maven 版本范围][mvr] 表示。空字符串匹配任意版本。                                                                                                                                                                                                                                                                                            | `versionRange="[1, 2)"`                      |
+| `ordering`     | string  | `"NONE"`       | 定义本 Mod 必须在此依赖之前（`"BEFORE"`）还是之后（`"AFTER"`）加载。如果加载顺序无关紧要，则返回 `"NONE"`。                                                                                                                                                                                                                                                                   | `ordering="AFTER"`                           |
+| `side`         | string  | `"BOTH"`       | 该依赖必须存在于的[物理端][sides]：`"CLIENT"`、 `"SERVER"` 或 `"BOTH"`。                                                                                                                                                                                                                                                                                                      | `side="CLIENT"`                              |
+| `referralUrl`  | string  | _无_           | 指向该依赖下载页面的 URL。目前未被使用。                                                                                                                                                                                                                                                                                                                                     | `referralUrl="https://library.example.com/"` |
 
 :::danger
-The `ordering` of two mods may cause a crash due to a cyclic dependency, for example if mod A must load `"BEFORE"` mod B and at the same time, mod B must load `"BEFORE"` mod A.
+两个 Mod 的 `ordering` 可能会因循环依赖而导致崩溃，例如 Mod A 必须在 Mod B `"BEFORE"` 加载，而同时 Mod B 又必须在 Mod A `"BEFORE"` 加载。
 :::
 
-## Mod Entrypoints
+## Mod 入口点 {#mod-entrypoints}
 
-Now that the `neoforge.mods.toml` is filled out, we need to provide an entrypoint for the mod. Entrypoints are essentially the starting point for executing the mod. The entrypoint itself is determined by the language loader used in the `neoforge.mods.toml`.
+现在 `neoforge.mods.toml` 已经填写完毕，我们需要为 Mod 提供一个入口点。入口点本质上是执行 Mod 的起点。入口点本身由 `neoforge.mods.toml` 中所使用的语言加载器决定。
 
-### `javafml` and `@Mod`
+### `javafml` 与 `@Mod` {#javafml-and-mod}
 
-`javafml` is a language loader provided by NeoForge for the Java programming language. The entrypoint is defined using a public class with the `@Mod` annotation. The value of `@Mod` must contain one of the mod ids specified within the `neoforge.mods.toml`. From there, all initialization logic (e.g. [registering events][events] or [adding `DeferredRegister`s][registration]) can be specified within the constructor of the class.
+`javafml` 是 NeoForge 为 Java 编程语言提供的语言加载器。入口点通过一个带有 `@Mod` 注解的公共类来定义。 `@Mod` 的值必须包含 `neoforge.mods.toml` 中指定的某个 mod id。此后，所有初始化逻辑（例如[注册事件][events]或[添加 `DeferredRegister`][registration]）都可以在该类的构造函数中指定。
 
-The main mod class must only have one public constructor; otherwise a `RuntimeException` will be thrown. The constructor may have **any** of the following arguments in **any** order; none of them are explicitly required. However, no duplicate parameters are allowed.
+主 Mod 类必须只有一个公共构造函数；否则将抛出 `RuntimeException`。该构造函数可以**以任意顺序**接收下列参数中的**任意几个**；它们都不是显式必需的。不过，不允许出现重复参数。
 
-Argument Type     | Description                                                                                              |
+参数类型          | 说明                                                                                                     |
 ------------------|----------------------------------------------------------------------------------------------------------|
-`IEventBus`       | The [mod-specific event bus][modbus] (needed for registration, events, etc.)                             |
-`ModContainer`    | The abstract container holding this mod's metadata                                                       |
-`FMLModContainer` | The actual container as defined by `javafml` holding this mod's metadata; an extension of `ModContainer` |
-`Dist`            | The [physical side][sides] this mod is loading on                                                        |
+`IEventBus`       | [Mod 专属事件总线][modbus]（注册、事件等所需）                                                            |
+`ModContainer`    | 持有此 Mod 元数据的抽象容器                                                                               |
+`FMLModContainer` | 由 `javafml` 定义的、持有此 Mod 元数据的实际容器；它是 `ModContainer` 的扩展                              |
+`Dist`            | 此 Mod 正在其上加载的[物理端][sides]                                                                      |
 
 ```java
 @Mod("examplemod") // Must match a mod id in the neoforge.mods.toml
@@ -221,7 +221,7 @@ public class ExampleMod {
 }
 ```
 
-By default, a `@Mod` annotation is loaded on both [sides]. This can be changed by specifying the `dist` parameter:
+默认情况下，`@Mod` 注解会在[两端][sides]加载。可以通过指定 `dist` 参数来改变这一点：
 
 ```java
 // Must match a mod id in the neoforge.mods.toml
@@ -236,12 +236,12 @@ public class ExampleModClient {
 ```
 
 :::note
-An entry in `neoforge.mods.toml` does not need a corresponding `@Mod` annotation. Likewise, an entry in the `neoforge.mods.toml` can have multiple `@Mod` annotations, for example if you want to separate common logic and client only logic.
+`neoforge.mods.toml` 中的条目并不需要有对应的 `@Mod` 注解。同样地，`neoforge.mods.toml` 中的一个条目也可以有多个 `@Mod` 注解，例如当你想把通用逻辑和仅客户端逻辑分开时。
 :::
 
-### `lowcodefml`
+### `lowcodefml` {#lowcodefml}
 
-`lowcodefml` is a language loader used as a way to distribute datapacks and resource packs as mods without the need of an in-code entrypoint. It is specified as `lowcodefml` rather than `nocodefml` for minor additions in the future that might require minimal coding.
+`lowcodefml` 是一种语言加载器，用于把数据包和资源包作为 Mod 分发，而无需代码中的入口点。它之所以被命名为 `lowcodefml` 而非 `nocodefml`，是为了应对未来可能需要极少量编码的细微补充。
 
 [accesstransformer]: ../advanced/accesstransformers.md#adding-ats
 [array]: https://toml.io/en/v1.0.0#array-of-tables

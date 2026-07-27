@@ -1,42 +1,42 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Biome Modifiers
+# 生物群系修饰符 {#biome-modifiers}
 
-Biome Modifiers are a data-driven system that allows for changing many aspects of a biome, including the ability to inject or remove PlacedFeatures, add or remove mob spawns, change the climate, and adjust foliage and water color. NeoForge provides several default biome modifiers that cover the majority of use cases for both players and modders.
+生物群落修改器是一个数据驱动的系统，可以改变生物群落的许多方面，包括注入或删除 PlacedFeatures、添加或删除生物生成、改变气候以及调整树叶和水的颜色的能力。 NeoForge 提供了几种默认的生物群系修改器，涵盖了玩家和 Mod 开发者的大多数用例。
 
-### Recommended Section To Read:
+### 推荐阅读部分： {#recommended-section-to-read}
 
-- Players or pack developers:
-    - [Applying Biome Modifiers](#applying-biome-modifiers)
-    - [Built-in Neoforge Biome Modifiers](#built-in-biome-modifiers)
-
-
-- Modders doing simple additions or removal biome modifications:
-    - [Applying Biome Modifiers](#applying-biome-modifiers)
-    - [Built-in Neoforge Biome Modifiers](#built-in-biome-modifiers)
-    - [Datagenning Biome Modifiers](#datagenning-biome-modifiers)
+- 玩家或包开发者：
+    - [应用生物群系修改器](#applying-biome-modifiers)
+    - [内置 Neoforge 生物群系修改器](#built-in-biome-modifiers)
 
 
-- Modders who want to do custom or complex biome modifications:
-    - [Applying Biome Modifiers](#applying-biome-modifiers)
-    - [Creating Custom Biome Modifiers](#creating-custom-biome-modifiers)
-    - [Datagenning Biome Modifiers](#datagenning-biome-modifiers)
+- Mod 开发者进行简单的添加或删除生物群落修改：
+    - [应用生物群系修改器](#applying-biome-modifiers)
+    - [内置 Neoforge 生物群系修改器](#built-in-biome-modifiers)
+    - [数据生成生物群系修改器](#datagenning-biome-modifiers)
 
 
-## Applying Biome Modifiers
+- 想要进行自定义或复杂的生物群落修改的 Mod 开发者：
+    - [应用生物群系修改器](#applying-biome-modifiers)
+    - [创建自定义生物群落修改器](#creating-custom-biome-modifiers)
+    - [数据生成生物群系修改器](#datagenning-biome-modifiers)
 
-To have NeoForge load a biome modifier JSON file into the game, the file will need to be under `data/<modid>/neoforge/biome_modifier/<path>.json` folder in the mod's resources, or in a [Datapack][datapacks]. Then, once NeoForge loads the biome modifier, it will read its instructions and apply the described modifications to all target biomes when the world is loaded up. Pre-existing biome modifiers from mods can be overridden by datapacks having a new JSON file at the exact same location and name.
 
-The JSON file can be created by hand following the examples in the '[Built-in NeoForge Biome Modifiers](#built-in-biome-modifiers)' section or be datagenned as shown in the '[Datagenning Biome Modifiers](#datagenning-biome-modifiers)' section.
+## 应用生物群系修改器 {#applying-biome-modifiers}
 
-## Built-in Biome Modifiers
+要让 NeoForge 将生物群落修改器 JSON 文件加载到游戏中，该文件需要位于 mod 资源中的 `data/<modid>/neoforge/biome_modifier/<path>.json` 文件夹下，或位于 [Datapack][datapacks] 中。然后，一旦 NeoForge 加载生物群落修改器，它将读取其指令，并在加载世界时将所描述的修改应用于所有目标生物群落。 Mod 中预先存在的生物群落修饰符可以被具有完全相同位置和名称的新 JSON 文件的数据包覆盖。
 
-These biome modifiers are registered by NeoForge for anyone to use.
+JSON 文件可以按照“[内置 NeoForge 生物群落修改器](#built-in-biome-modifiers)”部分中的示例手动创建，也可以按照“[数据生成生物群落修改器](#datagenning-biome-modifiers)”部分中所示的方式进行数据生成。
 
-### None
+## 内置生物群系修改器 {#built-in-biome-modifiers}
 
-This biome modifier has no operation and will do no modification. Pack makers and players can use this in a datapack to disable mods' biome modifiers by overriding their biome modifier JSONs with the JSON below.
+这些生物群系修改器由 NeoForge 注册，供任何人使用。
+
+### 无 {#none}
+
+该生物群落修改器没有任何操作，也不会进行任何修改。包制作者和玩家可以在数据包中使用此功能，通过使用下面的 JSON 覆盖其生物群系修改器 JSON 来禁用 Mod 的生物群系修改器。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -68,9 +68,9 @@ BUILDER.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, bootstrap -> {
 </TabItem>
 </Tabs>
 
-### Add Features
+### 添加功能 {#add-features}
 
-This biome modifier type adds `PlacedFeature`s (such as trees or ores) to biomes so that they can spawn during world generation. The modifier takes in the biome id or tag of the biomes the features are added to, a `PlacedFeature` id or tag to add to the selected biomes, and the [`GenerationStep.Decoration`](#Available-Values-for-Decoration-Steps) the features will be generated within.
+此生物群落修改器类型将 `PlacedFeature`（例如树木或矿石）添加到生物群落中，以便它们可以在世界生成期间生成。修改器接受要添加到的生物群落的生物群落 ID 或标签、要添加到所选生物群落的 `PlacedFeature`ID 或标签，以及将在其中生成的特征的 [`GenerationStep.Decoration`](#Available-Values-for-Decoration-Steps)。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -130,14 +130,14 @@ BUILDER.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, bootstrap -> {
 
 
 :::warning
-Care should be taken when adding vanilla `PlacedFeature`s to biomes, as doing so may cause what is known as a feature cycle violation (two biomes having the same two features in their feature lists, but in different orders within the same `GenerationStep`), leading to a crash. For similar reasons, you should not use the same `PlacedFeature` in more than one biome modifier.
+将普通 `PlacedFeature` 添加到生物群落时应小心，因为这样做可能会导致所谓的功能循环违规（两个生物群落在其功能列表中具有相同的两个功能，但在同一 `GenerationStep` 中顺序不同），从而导致崩溃。出于类似的原因，你不应在多个生物群系修改器中使用相同的 `PlacedFeature`。
 
-Vanilla `PlacedFeature`s can be referenced in biome JSONs or added via biome modifiers, but should not be used in both. If you still need to add them this way, making a copy of the vanilla `PlacedFeature` under your own namespace is the easiest solution to avoid these problems.
+原版`PlacedFeature` 可以在生物群落 JSON 中引用或通过生物群落修饰符添加，但不应在两者中使用。如果你仍然需要以这种方式添加它们，那么在你自己的命名空间下制作普通 `PlacedFeature` 的副本是避免这些问题的最简单的解决方案。
 :::
 
-### Remove Features
+### 删除功能 {#remove-features}
 
-This biome modifier type removes features (such as trees or ores) from biomes so that they will no longer spawn during world generation. The modifier takes in the biome id or tag of the biomes the features are removed from, a `PlacedFeature` id or tag to remove from the selected biomes, and the [`GenerationStep.Decoration`](#Available-Values-for-Decoration-Steps)s that the features will be removed from.
+这种生物群落修改器类型会从生物群落中删除特征（例如树木或矿石），以便它们在世界生成期间不再生成。修改器接受要从中删除要素的生物群落的生物群落 ID 或标签、要从所选生物群落中删除的 `PlacedFeature`ID 或标签，以及要从中删除要素的 [`GenerationStep.Decoration`](#Available-Values-for-Decoration-Steps)。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -200,12 +200,12 @@ BUILDER.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, bootstrap -> {
 </Tabs>
 
 
-### Add Spawns 
+### 添加生成点 {#add-spawns}
 
-This biome modifier type adds entity spawns to biomes. The modifier takes in the biome id or tag of the biomes the entity spawns are added to, and the `SpawnerData` of the entities to add. Each `SpawnerData` contains the entity id, the spawn weight, and the minimum/maximum number of entities to spawn at a given time.
+此生物群落修改器类型将实体生成添加到生物群落。修改器接受实体生成的生物群落的生物群落 ID 或标签，以及要添加的实体的 `SpawnerData`。每个 `SpawnerData` 包含实体 ID、生成重量以及给定时间生成的实体的最小/最大数量。
 
 :::note
-If you are a modder adding a new entity, make sure the entity has a spawn restriction registered to `RegisterSpawnPlacementsEvent`. Spawn restrictions are used to make entities spawn on surfaces or in water safely. If you do not register a spawn restriction, your entity could spawn in mid-air, fall and die.
+如果你是添加新实体的 Mod 开发者，请确保该实体已注册到 `RegisterSpawnPlacementsEvent` 的生成限制。生成限制用于使实体在表面或水中安全地生成。如果你没有注册生成限制，你的实体可能会在半空中生成、坠落并死亡。
 :::
 
 <Tabs>
@@ -273,9 +273,9 @@ BUILDER.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, bootstrap -> {
 </Tabs>
 
 
-### Remove Spawns
+### 删除生成点 {#remove-spawns}
 
-This biome modifier type removes entity spawns from biomes. The modifier takes in the biome id or tag of the biomes the entity spawns are removed from, and the `EntityType` id or tag of the entities to remove.
+此生物群落修改器类型会从生物群落中移除实体生成。修改器接受从中删除实体生成的生物群落的生物群落 ID 或标签，以及要删除的实体的 `EntityType`ID 或标签。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -328,14 +328,14 @@ BUILDER.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, bootstrap -> {
 </Tabs>
 
 
-### Add Spawn Costs
+### 添加生成成本 {#add-spawn-costs}
 
-Allows for adding new spawn costs to biomes. Spawn costs are a newer way of making mobs spawn spread out in a biome to reduce clustering. It works by having the entities give off a `charge` that surrounds them and adds up with other entities' `charge`. When spawning a new entity, the spawning algorithm looks for a spot where the total `charge` field at the location multiplied by the spawning entity's `charge` value is less than the spawning entity's `energy_budget`. This is an advanced way of spawning mobs, so it is a good idea to reference the Soul Sand Valley biome (which is the most prominent user of this system) for existing values to borrow.
+允许为生物群系添加新的生成成本。生成成本是一种使生物在生物群系中分散生成以减少集群的新方法。它的工作原理是让实体发出围绕它们的 `charge` 并与其他实体的 `charge` 相加。当生成新实体时，生成算法会查找该位置处的总 `charge` 字段乘以生成实体的 `charge` 值小于生成实体的 `energy_budget` 的点。这是一种生成小怪的高级方法，因此最好参考灵魂沙谷生物群系（这是该系统最著名的用户）来借用现有值。
 
-The modifier takes in the biome id or tag of the biomes the spawn costs are added to, the `EntityType` id or tag of the entity types to add spawn costs for, and the `MobSpawnSettings.MobSpawnCost` of the entity. The `MobSpawnCost` contains the energy budget, which indicates the maximum number of entities that can spawn in a location based on the charge provided for each entity spawned.
+该修改器接受添加生成成本的生物群落的生物群落 ID 或标签、要为其添加生成成本的实体类型的 `EntityType`ID 或标签，以及实体的 `MobSpawnSettings.MobSpawnCost`。 `MobSpawnCost` 包含能量预算，它指示根据为生成的每个实体提供的费用，可以在某个位置生成的实体的最大数量。
 
 :::note
-If you are a modder adding a new entity, make sure the entity has a spawn restriction registered to `RegisterSpawnPlacementsEvent`.
+如果你是添加新实体的 Mod 开发者，请确保该实体已注册到 `RegisterSpawnPlacementsEvent` 的生成限制。
 :::
 
 <Tabs>
@@ -399,9 +399,9 @@ BUILDER.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, bootstrap -> {
 </Tabs>
 
 
-### Remove Spawn Costs
+### 删除生成成本 {#remove-spawn-costs}
 
-Allows for removing a spawn cost from a biome. Spawn costs are a newer way of making mobs spawn spread out in a biome to reduce clustering. The modifier takes in the biome id or tag of the biomes the spawn costs are removed from, and the `EntityType` id or tag of the entities to remove the spawn cost for.
+允许从生物群落中消除生成成本。生成成本是一种使生物在生物群系中分散生成以减少集群的新方法。修改器接受从中删除生成成本的生物群落的生物群系 ID 或标签，以及要删除其生成成本的实体的 `EntityType`ID 或标签。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -454,9 +454,9 @@ BUILDER.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, bootstrap -> {
 </Tabs>
 
 
-### Add Legacy Carvers
+### 添加旧雕刻师 {#add-legacy-carvers}
 
-This biome modifier type allows adding carver caves and ravines to biomes. These are what was used for cave generation before the Caves and Cliffs update. It CANNOT add noise caves to biomes, because noise caves are a part of certain noise-based chunk generator systems and not actually tied to biomes.
+这种生物群系修改器类型允许向生物群系添加雕刻洞穴和峡谷。这些是在洞穴和悬崖更新之前用于洞穴生成的内容。它不能将噪声洞穴添加到生物群落中，因为噪声洞穴是某些基于噪声的块生成器系统的一部分，并且实际上与生物群落无关。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -514,9 +514,9 @@ BUILDER.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, bootstrap -> {
 </TabItem>
 </Tabs>
 
-### Removing Legacy Carvers
+### 删除旧版雕刻机 {#removing-legacy-carvers}
 
-This biome modifier type allows removing carver caves and ravines from biomes. These are what was used for cave generation before the Caves and Cliffs update. It CANNOT remove noise caves from biomes, because noise caves are baked into the dimension's noise settings system and not actually tied to biomes.
+这种生物群落修改器类型允许从生物群落中移除雕刻洞穴和峡谷。这些是在洞穴和悬崖更新之前用于洞穴生成的内容。它无法从生物群落中移除噪音洞穴，因为噪音洞穴被烘焙到维度的噪音设置系统中，并且实际上并不与生物群系相关联。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -581,46 +581,46 @@ BUILDER.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, bootstrap -> {
 </TabItem>
 </Tabs>
 
-### Available Values for Decoration Steps
+### 装饰步骤的可用值 {#available-values-for-decoration-steps}
 
-The `step` or `steps` fields in many of the aforementioned JSONs are referring to the `GenerationStep.Decoration` enum. This enum has the steps listed out in the following order, which is the same order that the game uses for generating during worldgen. Try to put features in the step that makes the most sense for them.
+上述许多 JSON 中的 `step` 或 `steps` 字段均引用 `GenerationStep.Decoration` 枚举。该枚举具有按以下顺序列出的步骤，该顺序与游戏在世界生成期间生成的顺序相同。尝试将功能放入对他们最有意义的步骤中。
 
-|           Step           | Description                                                                             |
+|           步骤|描述 |
 |:------------------------:|:----------------------------------------------------------------------------------------|
-|     `raw_generation`     | First to run. This is used for special terrain-like features such as Small End Islands. |
-|         `lakes`          | Dedicated to spawning pond-like feature such as Lava Lakes.                             |
-|  `local_modifications`   | For modifications to terrain such as Geodes, Icebergs, Boulders, or Dripstone.          |
-| `underground_structures` | Used for small underground structure-like features such as Dungeons or Fossils.         |
-|   `surface_structures`   | For small surface only structure-like features such as Desert Wells.                    |
-|      `strongholds`       | Dedicated for Stronghold structures. No feature is added here in unmodified Minecraft.  |
-|    `underground_ores`    | The step for all Ores and Veins to be added to. This includes Gold, Dirt, Granite, etc. |
-| `underground_decoration` | Used typically for decorating caves. Dripstone Cluster and Sculk Vein are here.         |
-|     `fluid_springs`      | The small Lavafalls and Waterfalls come from features in this stage.                    |
-|   `vegetal_decoration`   | Nearly all plants (flowers, trees, vines, and more) are added to this stage.            |
-| `top_layer_modification` | Last to run. Used for placing Snow and Ice on the surface of cold biomes.               |
+|`raw_generation`|第一个跑。这用于特殊的地形特征，例如小恩德群岛。 |
+|`lakes`|专用于熔岩湖等类似产卵池的特征。                             |
+|`local_modifications`|用于修改地形，例如晶洞、冰山、巨石或滴水石。          |
+|`underground_structures`|用于类似地下结构的小型特征，例如地下城或化石。         |
+|`surface_structures`|对于小表面，仅类似结构的特征，例如沙漠井。                    |
+|`strongholds`|专用于要塞结构。未修改的 Minecraft 中未添加任何功能。  |
+|`underground_ores`|添加所有矿石和矿脉的步骤。这包括黄金、泥土、花岗岩等。
+|`underground_decoration`|通常用于装饰洞穴。滴石簇和斯库克矿脉就在这里。         |
+|`fluid_springs`|小熔岩瀑布和瀑布就来自这个阶段的特征。                    |
+|`vegetal_decoration`|几乎所有植物（花卉、树木、藤蔓等）都会添加到此阶段。            |
+|`top_layer_modification`|最后跑。用于将雪和冰放置在寒冷生物群系的表面。               |
 
 
-## Creating Custom Biome Modifiers
+## 创建自定义生物群系修改器 {#creating-custom-biome-modifiers}
 
-### The `BiomeModifier` Implementation
+### `BiomeModifier` 实施 {#the-biomemodifier-implementation}
 
-Under the hood, Biome Modifiers are made up of three parts:
+在底层，生物群落修改器由三部分组成：
 
-- The [datapack registered][datareg] `BiomeModifier` used to modify the biome builder.
-- The [statically registered][staticreg] `MapCodec` that encodes and decodes the modifiers.
-- The JSON that constructs the `BiomeModifier`, using the registered id of the `MapCodec` as the indexable type.
+- [数据包已注册][datareg]`BiomeModifier` 用于修改生物群系构建器。
+- [静态注册][staticreg]`MapCodec` 对修饰符进行编码和解码。
+- 构造 `BiomeModifier` 的 JSON，使用 `MapCodec` 的注册 id 作为可索引类型。
 
-A `BiomeModifier` contains two methods: `#modify` and `#codec`. `modify` takes in a `Holder` of the current `Biome`, the current `BiomeModifier.Phase`, and the builder of the biome to modify. Every `BiomeModifier` is called once per `Phase` to organize when certain modifications to the biome should occur:
+`BiomeModifier` 包含两个方法：`#modify` 和 `#codec`。 `modify` 接收当前 `Biome`、当前 `BiomeModifier.Phase` 的 `Holder` 以及要修改的生物群系构建器。每个 `BiomeModifier` 都会被调用一次，以组织何时对生物群落进行某些修改：
 
-| Phase               | Description                                                              |
+|相|描述 |
 |:-------------------:|:-------------------------------------------------------------------------|
-| `BEFORE_EVERYTHING` | A catch-all for everything that needs to run before the standard phases. |
-| `ADD`               | Adding features, mob spawns, etc.                                        |
-| `REMOVE`            | Removing features, mob spawns, etc.                                      |
-| `MODIFY`            | Modifying single values (e.g., climate, colors).                         |
-| `AFTER_EVERYTHING`  | A catch-all for everything that needs to run after the standard phases.  |
+|`BEFORE_EVERYTHING`|涵盖了标准阶段之前需要运行的所有内容。 |
+|`ADD`|添加功能、生物生成等。
+|`REMOVE`|删除功能、生物生成等。
+|`MODIFY`|修改单个值（例如气候、颜色）。                         |
+|`AFTER_EVERYTHING`|标准阶段之后需要运行的所有内容的包罗万象。  |
 
-All `BiomeModifier`s contain a `type` key that references the id of the `MapCodec` used for the `BiomeModifier`. The `codec` takes in the `MapCodec` that encodes and decodes the modifiers. This `MapCodec` is [statically registered][staticreg], with its id used as the `type` of the `BiomeModifier`.
+所有 `BiomeModifier` 都包含一个 `type` 密钥，该密钥引用用于 `BiomeModifier` 的 `MapCodec` 的 id。 `codec` 接收对修饰符进行编码和解码的 `MapCodec`。这个 `MapCodec` 是[静态注册的][staticreg]，它的 id 就是 `BiomeModifier` 的 `type`。
 
 ```java
 public record ExampleBiomeModifier(HolderSet<Biome> biomes, int value) implements BiomeModifier {
@@ -652,11 +652,11 @@ public static final Supplier<MapCodec<ExampleBiomeModifier>> EXAMPLE_BIOME_MODIF
 ```
 
 
-## Datagenning Biome Modifiers
+## 数据生成生物群系修改器 {#datagenning-biome-modifiers}
 
-A `BiomeModifier` JSON can be created through [data generation][datagen] by passing a `RegistrySetBuilder` to `DatapackBuiltinEntriesProvider`. The JSON will be placed at `data/<modid>/neoforge/biome_modifier/<path>.json`.
+通过将 `RegistrySetBuilder` 传递给 `DatapackBuiltinEntriesProvider`，可以通过[数据生成][datagen] 创建 `BiomeModifier`JSON。 JSON 将放置在 `data/<modid>/neoforge/biome_modifier/<path>.json` 处。
 
-For more information on how `RegistrySetBuilder` and `DatapackBuiltinEntriesProvider` work, please see the article on [Data Generation for Datapack Registries][datapackdatagen].
+有关 `RegistrySetBuilder` 和 `DatapackBuiltinEntriesProvider` 工作原理的更多信息，请参阅有关 [Datapack Registries 的数据生成][datapackdatagen] 的文章。
 
 ```java
 // Define the ResourceKey for our BiomeModifier.
@@ -682,7 +682,7 @@ BUILDER.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, bootstrap -> {
 });
 ```
 
-This will then result in the following JSON being created:
+这将导致创建以下 JSON：
 
 ```json5
 // In data/examplemod/neoforge/biome_modifier/example_modifier.json

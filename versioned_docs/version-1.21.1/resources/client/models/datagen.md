@@ -1,40 +1,40 @@
-# Model Datagen
+# 模型 Datagen {#model-datagen}
 
-Like most JSON data, block and item models can be [datagenned][datagen]. Since some things are common between item and block models, so is some of the datagen code.
+与大多数 JSON 数据一样，块和物品模型可以 [datagenned][datagen]。由于物品模型和方块模型之间有些东西是通用的，因此一些数据生成代码也是如此。
 
-## Model Datagen Classes
+## 模型数据生成类 {#model-datagen-classes}
 
-### `ModelBuilder`
+### `ModelBuilder` {#modelbuilder}
 
-Every model starts out as a `ModelBuilder` of some sort - usually a `BlockModelBuilder` or an `ItemModelBuilder`, depending on what you are generating. It contains all the properties of the model: its parent, its textures, its elements, its transforms, its loader, etc. Each of the properties can be set by a method:
+每个模型都以某种形式的 `ModelBuilder` 开始 - 通常是 `BlockModelBuilder` 或 `ItemModelBuilder`，具体取决于你生成的内容。它包含模型的所有属性：其父模型、纹理、元素、变换、加载器等。每个属性都可以通过方法设置：
 
-| Method                                           | Effect                                                                                                                                                                                                                                                                                                                                                  |
+|方法|效果|
 |--------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `#texture(String key, ResourceLocation texture)` | Adds a texture variable with the given key and the given texture location. Has an overload where the second parameter is a `String`.                                                                                                                                                                                                                    |
-| `#renderType(ResourceLocation renderType)`       | Sets the render type. Has an overload where the parameter is a `String`. For a list of valid values, see the `RenderType` class.                                                                                                                                                                                                                        |
-| `#ao(boolean ao)`                                | Sets whether to use [ambient occlusion][ao] or not.                                                                                                                                                                                                                                                                                                     |
-| `#guiLight(GuiLight light)`                      | Sets the GUI light. May be `GuiLight.FRONT` or `GuiLight.SIDE`.                                                                                                                                                                                                                                                                                         |
-| `#element()`                                     | Adds a new `ElementBuilder` (equivalent to adding a new [element][elements] to the model). Returns said `ElementBuilder` for further modification.                                                                                                                                                                                                      |
-| `#transforms()`                                  | Returns the builder's `TransformVecBuilder`, used for setting the `display` on a model.                                                                                                                                                                                                                                                                 |
-| `#customLoader(BiFunction customLoaderFactory)`  | Using the given factory, makes this model use a [custom loader][custommodelloader], and thus, a custom loader builder. This changes the builder type, and as such may use different methods, depending on the loader's implementation. NeoForge provides a few custom loaders out of the box, see the linked article for more info (including datagen). |
+|`#texture(String key, ResourceLocation texture)`|添加具有给定键和给定纹理位置的纹理变量。具有重载，其中第二个参数是 `String`。                                                                                                                                                                                                                    |
+|`#renderType(ResourceLocation renderType)`|设置渲染类型。具有参数为 `String` 的重载。有关有效值的列表，请参阅 `RenderType` 类。                                                                                                                                                                                                                        |
+|`#ao(boolean ao)`|设置是否使用[环境光遮挡][ao]。                                                                                                                                                                                                                                                                                                     |
+|`#guiLight(GuiLight light)`|设置 GUI 灯。可能是 `GuiLight.FRONT` 或 `GuiLight.SIDE`。                                                                                                                                                                                                                                                                                         |
+|`#element()`|添加新的 `ElementBuilder`（相当于向模型添加新的[元素][elements]）。返回 `ElementBuilder` 以供进一步修改。                                                                                                                                                                                                      |
+|`#transforms()`|返回构建器的 `TransformVecBuilder`，用于在模型上设置 `display`。                                                                                                                                                                                                                                                                 |
+|`#customLoader(BiFunction customLoaderFactory)`|使用给定的工厂，使该模型使用[自定义加载程序][custommodelloader]，从而使用自定义加载程序构建器。这会更改构建器类型，因此可能会使用不同的方法，具体取决于加载器的实现。 NeoForge 提供了一些开箱即用的自定义加载器，请参阅链接文章以获取更多信息（包括 datagen）。 |
 
 :::tip
-While elaborate and complex models can be created through datagen, it is recommended to instead use modeling software such as [Blockbench][blockbench] to create more complex models and then have the exported models be used, either directly or as parents for other models.
+虽然可以通过 datagen 创建复杂的模型，但建议使用 [Blockbench][blockbench] 等建模软件来创建更复杂的模型，然后直接使用导出的模型或作为其他模型的父模型。
 :::
 
-### `ModelProvider`
+### `ModelProvider` {#modelprovider}
 
-Both block and item model datagen utilize subclasses of `ModelProvider`, named `BlockModelProvider` and `ItemModelProvider`, respectively. While item model datagen directly extends `ItemModelProvider`, block model datagen uses the `BlockStateProvider` base class, which has an internal `BlockModelProvider` that can be accessed via `BlockStateProvider#models()`. Additionally, `BlockStateProvider` also has its own internal `ItemModelProvider`, accessible via `BlockStateProvider#itemModels()`. The most important part of `ModelProvider` is the `getBuilder(String path)` method, which returns a `BlockModelBuilder` (or `ItemModelBuilder`) at the given location.
+块和物品模型数据生成器都使用 `ModelProvider` 的子类，分别命名为 `BlockModelProvider` 和 `ItemModelProvider`。物品模型 datagen 直接扩展 `ItemModelProvider`，而方块模型 datagen 使用 `BlockStateProvider` 基类，该基类具有可通过 `BlockStateProvider#models()` 访问的内部 `BlockModelProvider`。此外，`BlockStateProvider` 还具有自己的内部 `ItemModelProvider`，可通过 `BlockStateProvider#itemModels()` 访问。 `ModelProvider` 最重要的部分是 `getBuilder(String path)` 方法，该方法在给定位置返回 `BlockModelBuilder`（或 `ItemModelBuilder`）。
 
-However, `ModelProvider` also contains various helper methods. The most important helper method is probably `withExistingParent(String name, ResourceLocation parent)`, which returns a new builder (via `getBuilder(name)`) and sets the given `ResourceLocation` as model parent. Two other very common helpers are `mcLoc(String name)`, which returns a `ResourceLocation` with the namespace `minecraft` and the given name as path, and `modLoc(String name)`, which does the same but with the provider's mod id (so usually your mod id) instead of `minecraft`. Furthermore, it provides various helper methods that are shortcuts for `#withExistingParent` for common things such as slabs, stairs, fences, doors, etc.
+但是，`ModelProvider` 还包含各种辅助方法。最重要的辅助方法可能是 `withExistingParent(String name, ResourceLocation parent)`，它返回一个新的构建器（通过 `getBuilder(name)`）并将给定的 `ResourceLocation` 设置为模型父级。另外两个非常常见的帮助器是 `mcLoc(String name)`，它返回一个 `ResourceLocation`，其名称空间为 `minecraft`，给定名称为路径；`modLoc(String name)`，它执行相同的操作，但使用提供者的 mod id（通常是你的 mod id）而不是 `minecraft`。此外，它还提供了各种辅助方法，这些方法是 `#withExistingParent` 对于常见事物（如楼板、楼梯、栅栏、门等）的快捷方式。
 
-### `ModelFile`
+### `ModelFile` {#modelfile}
 
-Finally, the last important class is `ModelFile`. A `ModelFile` is an in-code representation of a model JSON on disk. `ModelFile` is an abstract class and has two inner subclasses `ExistingModelFile` and `UncheckedModelFile`. An `ExistingModelFile`'s existence is verified using an `ExistingFileHelper`, while an `UncheckedModelFile` is assumed to be existent without further checking. In addition, a `ModelBuilder` is considered to be a `ModelFile` as well.
+最后，最后一个重要的类是 `ModelFile`。 `ModelFile` 是磁盘上模型 JSON 的代码内表示。 `ModelFile` 是一个抽象类，有两个内部子类 `ExistingModelFile` 和 `UncheckedModelFile`。使用 `ExistingFileHelper` 验证 `ExistingModelFile` 的存在，而无需进一步检查就假定 `UncheckedModelFile` 存在。此外，`ModelBuilder` 也被视为 `ModelFile`。
 
-## Block Model Datagen
+## 方块模型数据生成器 {#block-model-datagen}
 
-Now, to actually generate blockstate and block model files, extend `BlockStateProvider` and override the `registerStatesAndModels()` method. Note that block models will always be placed in the `models/block` subfolder, but references are relative to `models` (i.e. they must always be prefixed with `block/`). In most cases, it makes sense to choose from one of the many predefined helper methods:
+现在，要实际生成方块状态和方块模型文件，请扩展 `BlockStateProvider` 并覆盖 `registerStatesAndModels()` 方法。请注意，方块模型将始终放置在 `models/block` 子文件夹中，但引用是相对于 `models` 的（即它们必须始终以 `block/` 为前缀）。在大多数情况下，从许多预定义的帮助器方法中选择一种是有意义的：
 
 ```java
 public class MyBlockStateProvider extends BlockStateProvider {
@@ -73,7 +73,7 @@ public class MyBlockStateProvider extends BlockStateProvider {
         
         // Adds a log block model. Requires two textures at assets/<namespace>/textures/block/<path>.png and
         // assets/<namespace>/textures/block/<path>_top.png, referencing the side and top texture, respectively.
-        // Note that the block input here is limited to RotatedPillarBlock, which is the class vanilla logs use.
+        // Note that the block input here is limited to RotatedPillarBlock, which is the class 原版 logs use.
         logBlock(block);
         // Like #logBlock, but the textures are named <path>_side.png and <path>_end.png instead of
         // <path>.png and <path>_top.png, respectively. Used by quartz pillars and similar blocks.
@@ -106,41 +106,41 @@ public class MyBlockStateProvider extends BlockStateProvider {
 }
 ```
 
-Additionally, helpers for the following common block models exist in `BlockStateProvider`:
+此外，`BlockStateProvider` 中还存在以下常见模方块模型的帮助程序：
 
-- Stairs
-- Slabs
-- Buttons
-- Pressure Plates
-- Signs
-- Fences
-- Fence Gates
-- Walls
-- Panes
-- Doors
-- Trapdoors
+- 楼梯
+- 板坯
+- 按钮
+- 压力板
+- 标志
+- 栅栏
+- 栅栏门
+- 墙壁
+- 窗格
+- 门
+- 活板门
 
-In some cases, the blockstates don't need special casing, but the models do. For this case, the `BlockModelProvider`, accessible via `BlockStateProvider#models()`, provides a few additional helpers, all of which accept a name as the first parameter and most of which are in some way related to full cubes. They will typically be used as model file parameters for e.g. `simpleBlock`. The helpers include supporting methods for the ones in `BlockStateProvider`, as well as:
+在某些情况下，方块状态不需要特殊的外壳，但模型需要。对于这种情况，可通过 `BlockStateProvider#models()` 访问的 `BlockModelProvider` 提供了一些额外的帮助程序，所有这些都接受名称作为第一个参数，并且其中大多数在某种程度上与完整的多维数据集相关。它们通常用作模型文件参数，例如 `simpleBlock`。这些帮助程序包括 `BlockStateProvider` 中的支持方法，以及：
 
-- `withExistingParent`: Already mentioned before, this method returns a new model builder with the given parent. The parent must either already exist or be created before the model.
-- `getExistingFile`: Performs a lookup in the model provider's `ExistingFileHelper`, returning the corresponding `ModelFile` if present and throwing an `IllegalStateException` otherwise.
-- `singleTexture`: Accepts a parent and a single texture location, returning a model with the given parent, and with the texture variable `texture` set to the given texture location.
-- `sideBottomTop`: Accepts a parent and three texture locations, returning a model with the given parent and the side, bottom and top textures set to the three texture locations.
-- `cube`: Accepts six texture resource locations for the six sides, returning a full cube model with the six sides set to the six textures.
-- `cubeAll`: Accepts a texture location, returning a full cube model with the given texture applied to all six sides. A mix between `singleTexture` and `cube`, if you will.
-- `cubeTop`: Accepts two texture locations, returning a full cube model with the first texture applied to the sides and the bottom, and the second texture applied to the top.
-- `cubeBottomTop`: Accepts three texture locations, returning a full cube model with the side, bottom and top textures set to the three texture locations. A mix between `cube` and `sideBottomTop`, if you will.
-- `cubeColumn` and `cubeColumnHorizontal`: Accepts two texture locations, returning a "standing" or "laying" pillar cube model with the side and end textures set to the two texture locations. Used by `BlockStateProvider#logBlock`, `BlockStateProvider#axisBlock` and their variants.
-- `orientable`: Accepts three texture locations, returning a cube with a "front" texture. The three texture locations are the side, front and top texture, respectively.
-- `orientableVertical`: Variant of `orientable` that omits the top parameter, instead using the side parameter as well.
-- `orientableWithBottom`: Variant of `orientable` that has a fourth parameter for a bottom texture between the front and top parameter.
-- `crop`: Accepts a texture location, returning a crop-like model with the given texture, as used by the four vanilla crops.
-- `cross`: Accepts a texture location, returning a cross model with the given texture, as used by flowers, saplings and many other foliage blocks.
-- `torch`: Accepts a texture location, returning a torch model with the given texture.
-- `wall_torch`: Accepts a texture location, returning a wall torch model with the given texture (wall torches are separate blocks from standing torches).
-- `carpet`: Accepts a texture location, returning a carpet model with the given texture.
+- `withExistingParent`：前面已经提到过，此方法返回具有给定父级的新模型构建器。父级必须已存在或在模型之前创建。
+- `getExistingFile`：在模型提供者的 `ExistingFileHelper` 中执行查找，如果存在则返回相应的 `ModelFile`，否则抛出 `IllegalStateException`。
+- `singleTexture`：接受父级和单个纹理位置，返回具有给定父级的模型，并将纹理变量 `texture` 设置为给定纹理位置。
+- `sideBottomTop`：接受一个父级和三个纹理位置，返回一个模型，其中给定的父级以及设置为三个纹理位置的侧面、底部和顶部纹理。
+- `cube`：接受六个面的六个纹理资源位置，返回一个完整的立方体模型，其中六个面设置为六个纹理。
+- `cubeAll`：接受纹理位置，返回一个完整的立方体模型，并将给定的纹理应用于所有六个面。如果你愿意的话，可以将 `singleTexture` 和 `cube` 混合起来。
+- `cubeTop`：接受两个纹理位置，返回完整的立方体模型，其中第一个纹理应用于侧面和底部，第二个纹理应用于顶部。
+- `cubeBottomTop`：接受三个纹理位置，返回一个完整的立方体模型，其中侧面、底部和顶部纹理设置为三个纹理位置。如果你愿意的话，可以将 `cube` 和 `sideBottomTop` 混合起来。
+- `cubeColumn` 和 `cubeColumnHorizontal`：接受两个纹理位置，返回“站立”或“放置”的柱立方体模型，并将侧面和末端纹理设置为两个纹理位置。由 `BlockStateProvider#logBlock`、 `BlockStateProvider#axisBlock` 及其变体使用。
+- `orientable`：接受三个纹理位置，返回具有“前”纹理的立方体。三个纹理位置分别是侧面、正面和顶部纹理。
+- `orientableVertical`：`orientable` 的变体，省略顶部参数，而是也使用侧面参数。
+- `orientableWithBottom`：`orientable` 的变体，具有第四个参数，用于位于前面参数和顶部参数之间的底部纹理。
+- `crop`：接受纹理位置，返回具有给定纹理的类似作物的模型，如四种原版作物所使用的那样。
+- `cross`：接受纹理位置，返回具有给定纹理的交叉模型，如花朵、树苗和许多其他树叶块所使用的。
+- `torch`：接受纹理位置，返回具有给定纹理的火炬模型。
+- `wall_torch`：接受纹理位置，返回具有给定纹理的壁火炬模型（壁火炬是与立式火炬分开的块）。
+- `carpet`：接受纹理位置，返回具有给定纹理的地毯模型。
 
-Finally, don't forget to register your block state provider to the event:
+最后，不要忘记将你的方块状态提供程序注册到该事件：
 
 ```java
 @SubscribeEvent // on the mod event bus
@@ -157,9 +157,9 @@ public static void gatherData(GatherDataEvent event) {
 }
 ```
 
-### `ConfiguredModel.Builder`
+### `ConfiguredModel.Builder` {#configuredmodelbuilder}
 
-If the default helpers won't do it for you, you can also directly build model objects using a `ConfiguredModel.Builder` and then use them in a `VariantBlockStateBuilder` to build a `variants` blockstate file, or in a `MultiPartBlockStateBuilder` to build a `multipart` blockstate file:
+如果默认助手无法为你执行此操作，你还可以使用 `ConfiguredModel.Builder` 直接构建模型对象，然后在 `VariantBlockStateBuilder` 中使用它们来构建 `variants` 方块状态文件，或在 `MultiPartBlockStateBuilder` 中使用它们来构建 `multipart` 方块状态文件：
 
 ```java
 // Create a ConfiguredModel.Builder. Alternatively, you can use one of the ways demonstrated below
@@ -231,11 +231,11 @@ multipartBuilder.part()
     .end();
 ```
 
-## Item Model Datagen
+## 物品 模型 Datagen {#item-model-datagen}
 
-Generating item models is considerably simpler, which is mainly due to the fact that we operate directly on an `ItemModelProvider` instead of using an intermediate class like `BlockStateProvider`, which is of course because item models don't have an equivalent to blockstate files and are instead used directly.
+生成物品模型要简单得多，这主要是因为我们直接在 `ItemModelProvider` 上操作，而不是使用像 `BlockStateProvider` 这样的中间类，这当然是因为物品模型没有与方块状态文件等效的东西，而是直接使用。
 
-Similar to above, we create a class and have it extend the base provider, in this case `ItemModelProvider`. Since we are directly in a subclass of `ModelProvider`, all `models()` calls become `this` (or are omitted).
+与上面类似，我们创建一个类并让它扩展基本提供程序，在本例中为 `ItemModelProvider`。由于我们直接位于 `ModelProvider` 的子类中，因此所有 `models()` 调用都会变成 `this`（或被省略）。
 
 ```java
 public class MyItemModelProvider extends ItemModelProvider {
@@ -258,7 +258,7 @@ public class MyItemModelProvider extends ItemModelProvider {
 }
 ```
 
-And like all data providers, don't forget to register your provider to the event:
+与所有数据提供商一样，不要忘记将你的提供商注册到活动中：
 
 ```java
 @SubscribeEvent // on the mod event bus

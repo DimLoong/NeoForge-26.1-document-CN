@@ -1,19 +1,19 @@
-# Extensible Enums
+# 可扩展枚举 {#extensible-enums}
 
-Extensible Enums are an enhancement of specific Vanilla enums to allow new entries to be added. This is done by modifying the compiled bytecode of the enum at runtime to add the elements.
+可扩展枚举（Extensible Enum）是对特定原版枚举的增强，允许向其中添加新条目。它通过在运行时修改枚举的已编译字节码来添加元素。
 
-## `IExtensibleEnum`
+## `IExtensibleEnum` {#iextensibleenum}
 
-All enums that can have new entries implement the `IExtensibleEnum` interface. This interface acts as a marker to allow the `RuntimeEnumExtender` launch plugin service to know what enums should be transformed.
+所有可以添加新条目的枚举都实现了 `IExtensibleEnum` 接口。该接口充当标记，让 `RuntimeEnumExtender` 启动插件服务知道哪些枚举需要被转换。
 
 :::warning
-You should **not** be implementing this interface on your own enums. Use maps or registries instead depending on your usecase.  
-Enums which are not patched to implement the interface cannot have the interface added to them via mixins or coremods due to the order the transformers run in.
+你**不应**在自己的枚举上实现该接口。请根据用例改用映射（map）或注册表。
+未被补丁修改以实现该接口的枚举，由于转换器的运行顺序，无法通过 Mixin 或 coremod 为其添加该接口。
 :::
 
-### Creating an Enum Entry
+### 创建枚举条目 {#creating-an-enum-entry}
 
-To create new enum entries, a JSON file needs to be created and referenced in the `neoforge.mods.toml` with the `enumExtensions` entry of a `[[mods]]` block. The specified path must be relative to the `resources` directory:
+要创建新的枚举条目，需要创建一个 JSON 文件，并在 `neoforge.mods.toml` 中通过 `[[mods]]` 块的 `enumExtensions` 条目引用它。所指定的路径必须相对于 `resources` 目录：
 ```toml
 # In neoforge.mods.toml:
 [[mods]]
@@ -22,7 +22,7 @@ To create new enum entries, a JSON file needs to be created and referenced in th
 enumExtensions="META-INF/enumextensions.json"
 ```
 
-The definition of the entry consists of the target enum's class name, the new field's name (must be prefixed with the mod ID), the descriptor of the constructor to use for constructing the entry and the parameters to be passed to said constructor.
+条目的定义由以下内容组成：目标枚举的类名、新字段的名称（必须以 mod id 为前缀）、用于构造该条目的构造器描述符，以及要传给该构造器的参数。
 
 ```json5
 {
@@ -77,55 +77,55 @@ public class MyEnumParams {
 }
 ```
 
-#### Constructor
+#### 构造器 {#constructor}
 
-The constructor must be specified as a [method descriptor][jvmdescriptors] and must only contain the parameters visible in the source code, omitting the hidden constant name and ordinal parameters.  
-If a constructor is marked with the `@ReservedConstructor` annotation, then it cannot be used for modded enum constants.
+构造器必须以[方法描述符][jvmdescriptors]的形式指定，并且只能包含源代码中可见的参数，省略隐藏的常量名称参数和序号参数。
+如果某个构造器被标注了 `@ReservedConstructor` 注解，则它不能用于 Mod 添加的枚举常量。
 
-#### Parameters
+#### 参数 {#parameters}
 
-The parameters can be specified in three ways with limitations depending on the parameter types:
+参数可以通过三种方式指定，具体限制取决于参数类型：
 
-- Inline in the JSON file as an array of constants (only allowed for primitive values, Strings and for passing null to any reference type)
-- As a reference to a field of type `EnumProxy<TheEnum>` in a class from the mod (see `EnumProxy` example above)
-    - The first parameter specifies the target enum and the subsequent parameters are the ones to be passed to the enum constructor
-- As a reference to a method returning `Object`, where the return value is the parameter value to use. The method must have exactly two parameters of type `int` (index of the parameter) and `Class<?>` (expected type of the parameter)
-    - The `Class<?>` object should be used to cast (`Class#cast()`) the return value in order to keep `ClassCastException`s in mod code.
+- 以常量数组的形式内联写在 JSON 文件中（仅允许用于基本类型值、字符串，以及向任意引用类型传入 null）
+- 作为对 Mod 中某个类内 `EnumProxy<TheEnum>` 类型字段的引用（参见上文 `EnumProxy` 示例）
+    - 第一个参数指定目标枚举，其余参数则是要传给枚举构造器的参数
+- 作为对某个返回 `Object` 的方法的引用，其返回值即为要使用的参数值。该方法必须恰好有两个参数，类型分别为 `int`（参数的索引）和 `Class<?>`（参数的预期类型）
+    - 应使用该 `Class<?>` 对象对返回值进行强制转换（`Class#cast()`），以便把 `ClassCastException` 保留在 Mod 代码中。
 
 :::warning
-The fields and/or methods used as sources for parameter values should be in a separate class to avoid unintentionally loading mod classes too early.
+用作参数值来源的字段和/或方法应放在单独的类中，以避免过早地意外加载 Mod 的类。
 :::
 
-Certain parameters have additional rules:
+某些参数还有额外规则：
 
-- If the parameter is an int ID parameter related to a `@IndexedEnum` annotation on the enum, then it is ignored and replaced by the entry's ordinal. If said parameter is specified inline in the JSON, then it must be specified as `-1`, otherwise an exception is thrown.
-- If the parameter is a String name parameter related to a `@NamedEnum` annotation on the enum, then it must be prefixed by the mod ID in the `namespace:path` format known from `ResourceLocation`s, otherwise an exception is thrown.
+- 如果某参数是与枚举上 `@IndexedEnum` 注解相关的 int ID 参数，则该参数会被忽略并替换为该条目的序号。若该参数在 JSON 中以内联方式指定，则必须写成 `-1`，否则会抛出异常。
+- 如果某参数是与枚举上 `@NamedEnum` 注解相关的 String 名称参数，则它必须以 mod id 为前缀，采用 `ResourceLocation` 中熟知的 `namespace:path` 格式，否则会抛出异常。
 
-#### Retrieving the Generated Constant
+#### 获取生成的常量 {#retrieving-the-generated-constant}
 
-The generated enum constant can be retrieved via `TheEnum.valueOf(String)`. If a field reference is used to provide the parameters, then the constant can also be retrieved from the `EnumProxy` object via `EnumProxy#getValue()`.
+可以通过 `TheEnum.valueOf(String)` 获取生成的枚举常量。如果使用字段引用来提供参数，那么也可以通过 `EnumProxy` 对象的 `EnumProxy#getValue()` 获取该常量。
 
-## Contributing to NeoForge
+## 向 NeoForge 贡献 {#contributing-to-neoforge}
 
-To add a new extensible enum to NeoForge, there are at least two required things to do:
+要向 NeoForge 添加一个新的可扩展枚举，至少需要做以下两件事：
 
-- Make the enum implement `IExtensibleEnum` to mark that this enum should be transformed via the `RuntimeEnumExtender`.
-- Add a `getExtensionInfo` method that returns `ExtensionInfo.nonExtended(TheEnum.class)`.
+- 让该枚举实现 `IExtensibleEnum`，以标记该枚举应通过 `RuntimeEnumExtender` 进行转换。
+- 添加一个 `getExtensionInfo` 方法，返回 `ExtensionInfo.nonExtended(TheEnum.class)`。
 
-Further action is required depending on specific details about the enum:
+根据枚举的具体细节，可能还需要进一步操作：
 
-- If the enum has an int ID parameter which should match the entry's ordinal, then the enum should be annotated with `@NumberedEnum` with the ID's parameter index as the annotation's value if it's not the first parameter
-- If the enum has a String name parameter which is used for serialization and should therefore be namespaced, then the enum should be annotated with `@NamedEnum` with the name's parameter index as the annotation's value if it's not the first parameter
-- If the enum is sent over the network, then it should be annotated with `@NetworkedEnum` with the annotation's parameter specifying in which direction the values may be sent (clientbound, serverbound or bidirectional)
-    - Warning: networked enums will require additional steps once network checks for enums are implemented in NeoForge
-- If the enum has constructors which are not usable by mods (i.e. because they require registry objects on an enum that may be initialized before modded registration runs), then they should be annotated with `@ReservedConstructor`
+- 如果该枚举有一个应与条目序号匹配的 int ID 参数，则应为其标注 `@NumberedEnum`；若该 ID 参数不是第一个参数，则将其参数索引作为注解的值
+- 如果该枚举有一个用于序列化、因而应带命名空间的 String 名称参数，则应为其标注 `@NamedEnum`；若该名称参数不是第一个参数，则将其参数索引作为注解的值
+- 如果该枚举会通过网络发送，则应为其标注 `@NetworkedEnum`，并用注解的参数指定值可以在哪个方向上发送（发往客户端、发往服务端或双向）
+    - 警告：一旦 NeoForge 实现了针对枚举的网络校验，网络化枚举将需要额外的步骤
+- 如果该枚举包含 Mod 无法使用的构造器（例如它们需要注册表对象，而该枚举可能在 Mod 注册运行之前就已初始化），则应为其标注 `@ReservedConstructor`
 
 :::note
-The `getExtensionInfo` method will be transformed at runtime to provide a dynamically generated `ExtensionInfo` if the enum actually had any entries added to it.
+如果某枚举实际上被添加了任何条目，`getExtensionInfo` 方法会在运行时被转换，以提供一个动态生成的 `ExtensionInfo`。
 :::
 
 ```java
-// This is an example, not an actual enum within Vanilla
+// This is an example, not an actual enum within 原版
 public enum ExampleEnum implements net.neoforged.fml.common.asm.enumextension.IExtensibleEnum {
     // VALUE_1 represents the name parameter here
     VALUE_1(0, "value_1", false),

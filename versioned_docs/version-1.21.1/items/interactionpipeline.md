@@ -1,73 +1,73 @@
 ---
 sidebar_position: 1
 ---
-# The Interaction Pipeline
+# 交互流水线 {#the-interaction-pipeline}
 
-This page aims to make the fairly complex and confusing process of things being right-clicked by the player more understandable, as well as clarifying what result to use where and why.
+本页旨在把玩家右键点击某物这一相当复杂且令人困惑的过程讲清楚，同时说明在什么地方该用什么结果、以及为什么。
 
-## What Happens When I Right-Click?
+## 当我右键点击时会发生什么？ {#what-happens-when-i-right-click}
 
-When you right-click anywhere in the world, a number of things happen, depending on what you are currently looking at and what `ItemStack`s are in your hands. A number of methods returning one of two result types (see below) are called. Most of these methods cancel the pipeline if an explicit success or an explicit failure is returned. For the sake of readability, this "explicit success or explicit failure" will be called a "definitive result" from now on.
+当你在世界中的任意位置右键点击时，会发生一系列事情，具体取决于你当前正看着什么，以及你手中拿着哪些 `ItemStack`。届时会调用一系列方法，它们都返回两种结果类型之一（见下文）。这些方法中的大多数，只要返回明确的成功或明确的失败，就会取消流水线。为了便于阅读，下文将这种“明确的成功或明确的失败”称为“确定性结果”。
 
-- `InputEvent.InteractionKeyMappingTriggered` is fired with the right mouse button and the main hand. If the event is canceled, the pipeline ends.
-- Several circumstances are checked, for example that you are not in spectator mode or that all required feature flags for the `ItemStack` in your main hand are enabled. If at least one of these checks fails, the pipeline ends.
-- Depending on what you are looking at, different things happen:
-    - If you are looking at an entity that is within your reach and not outside the world border:
-        - `PlayerInteractEvent.EntityInteractSpecific` is fired. If the event is canceled, the pipeline ends.
-        - `Entity#interactAt` will be called **on the entity you are looking at**. If it returns a definitive result, the pipeline ends.
-            - If you want to add behavior for your own entity, override this method. If you want to add behavior for a vanilla entity, use the event.
-        - If the entity opens an interface (for example a villager trading GUI or a chest minecart GUI), the pipeline ends.
-        - `PlayerInteractEvent.EntityInteract` is fired. If the event is canceled, the pipeline ends.
-        - `Entity#interact` is called **on the entity you are looking at**. If it returns a definitive result, the pipeline ends.
-            - If you want to add behavior for your own entity, override this method. If you want to add behavior for a vanilla entity, use the event.
-            - For `Mob`s, the override of `Entity#interact` handles things like leashing and spawning babies when the `ItemStack` in your main hand is a spawn egg, and then defers mob-specific handling to `Mob#mobInteract`. The rules for results for `Entity#interact` apply here as well.
-        - If the entity you are looking at is a `LivingEntity`, `Item#interactLivingEntity` is called on the `ItemStack` in your main hand. If it returns a definitive result, the pipeline ends.
-    - If you are looking at a block that is within your reach and not outside the world border:
-        - `PlayerInteractEvent.RightClickBlock` is fired. If the event is canceled, the pipeline ends. You may also specifically deny only block or item usage in this event.
-        - `IItemExtension#onItemUseFirst` is called. If it returns a definitive result, the pipeline ends.
-        - If the player is not sneaking and the event does not deny block usage, `UseItemOnBlockEvent` is fired. If the event is canceled, the cancellation result is used. Otherwise, `Block#useItemOn` is called. If it returns a definitive result, the pipeline ends.
-        - If the `ItemInteractionResult` is `PASS_TO_DEFAULT_BLOCK_INTERACTION` and the executing hand is the main hand, then `Block#useWithoutItem` is called. If it returns a definitive result, the pipeline ends.
-        - If the event does not deny item usage, `Item#useOn` is called. If it returns a definitive result, the pipeline ends.
-- `Item#use` is called. If it returns a definitive result, the pipeline ends.
-- The above process runs a second time, this time with the off hand instead of the main hand.
+- 以鼠标右键和主手触发 `InputEvent.InteractionKeyMappingTriggered`。如果该事件被取消，流水线结束。
+- 检查若干前提条件，例如你没有处于旁观者模式、你主手中 `ItemStack` 所需的所有特性标志均已启用。如果其中至少有一项检查失败，流水线结束。
+- 根据你正看着什么，会发生不同的情况：
+    - 如果你正看着一个在你触及范围内且未越过世界边界的实体：
+        - 触发 `PlayerInteractEvent.EntityInteractSpecific`。如果该事件被取消，流水线结束。
+        - 在**你正看着的那个实体上**调用 `Entity#interactAt`。如果它返回确定性结果，流水线结束。
+            - 如果你想为自己的实体添加行为，重写此方法。如果你想为原版实体添加行为，使用该事件。
+        - 如果该实体打开了某个界面（例如村民交易 GUI 或运输矿车 GUI），流水线结束。
+        - 触发 `PlayerInteractEvent.EntityInteract`。如果该事件被取消，流水线结束。
+        - 在**你正看着的那个实体上**调用 `Entity#interact`。如果它返回确定性结果，流水线结束。
+            - 如果你想为自己的实体添加行为，重写此方法。如果你想为原版实体添加行为，使用该事件。
+            - 对于 `Mob`，`Entity#interact` 的重写会处理诸如拴绳、以及在你主手中的 `ItemStack` 是刷怪蛋时生成幼崽等操作，随后将生物专属的处理交给 `Mob#mobInteract`。 `Entity#interact` 的结果规则在这里同样适用。
+        - 如果你正看着的实体是 `LivingEntity`，则在你主手中的 `ItemStack` 上调用 `Item#interactLivingEntity`。如果它返回确定性结果，流水线结束。
+    - 如果你正看着一个在你触及范围内且未越过世界边界的方块：
+        - 触发 `PlayerInteractEvent.RightClickBlock`。如果该事件被取消，流水线结束。你也可以在该事件中专门只拒绝方块使用或只拒绝物品使用。
+        - 调用 `IItemExtension#onItemUseFirst`。如果它返回确定性结果，流水线结束。
+        - 如果玩家没有潜行，且该事件没有拒绝方块使用，则触发 `UseItemOnBlockEvent`。如果该事件被取消，则使用取消时的结果。否则，调用 `Block#useItemOn`。如果它返回确定性结果，流水线结束。
+        - 如果 `ItemInteractionResult` 为 `PASS_TO_DEFAULT_BLOCK_INTERACTION` 且执行操作的手是主手，则调用 `Block#useWithoutItem`。如果它返回确定性结果，流水线结束。
+        - 如果该事件没有拒绝物品使用，则调用 `Item#useOn`。如果它返回确定性结果，流水线结束。
+- 调用 `Item#use`。如果它返回确定性结果，流水线结束。
+- 上述过程会再运行一次，这一次用副手代替主手。
 
-## Result Types
+## 结果类型 {#result-types}
 
-There are three different types of results: `InteractionResult`s, `ItemInteractionResult`s, and `InteractionResultHolder<T>`s. `InteractionResult` is used most of the time, only `Item#use` uses `InteractionResultHolder<ItemStack>`, and only `BlockBehaviour#useItemOn` and `CauldronInteraction#interact` use `ItemInteractionResult`.
+结果共有三种不同类型：`InteractionResult`、 `ItemInteractionResult` 和 `InteractionResultHolder<T>`。大多数情况下使用 `InteractionResult`，只有 `Item#use` 使用 `InteractionResultHolder<ItemStack>`，而只有 `BlockBehaviour#useItemOn` 和 `CauldronInteraction#interact` 使用 `ItemInteractionResult`。
 
-`InteractionResult` is an enum consisting of five values: `SUCCESS`, `CONSUME`, `CONSUME_PARTIAL`, `PASS` and `FAIL`. Additionally, the method `InteractionResult#sidedSuccess` is available, which returns `SUCCESS` on the server and `CONSUME` on the client.
+`InteractionResult` 是一个由五个值组成的枚举：`SUCCESS`、 `CONSUME`、 `CONSUME_PARTIAL`、 `PASS` 和 `FAIL`。此外还提供了 `InteractionResult#sidedSuccess` 方法，它在服务端返回 `SUCCESS`，在客户端返回 `CONSUME`。
 
-`InteractionResultHolder<T>` is a wrapper around `InteractionResult` that adds additional context for `T`. `T` can be anything, but in 99.99 percent of cases, it is an `ItemStack`. `InteractionResultHolder<T>` provides wrapper methods for the enum values (`#success`, `#consume`, `#pass` and `#fail`), as well as `#sidedSuccess`, which calls `#success` on the server and `#consume` on the client.
+`InteractionResultHolder<T>` 是对 `InteractionResult` 的封装，为 `T` 添加了额外的上下文。 `T` 可以是任何类型，但在 99.99% 的情况下它都是 `ItemStack`。 `InteractionResultHolder<T>` 为各枚举值提供了封装方法（`#success`、 `#consume`、 `#pass` 和 `#fail`），以及 `#sidedSuccess`，后者在服务端调用 `#success`，在客户端调用 `#consume`。
 
-`ItemInteractionResult` is a parallel to `InteractionResult` specifically for when an item is used on a block. It is an enum of six values: `SUCCESS`, `CONSUME`, `CONSUME_PARTIAL`, `PASS_TO_DEFAULT_BLOCK_INTERACTION`, `SKIP_DEFAULT_BLOCK_INTERACTION`,  and `FAIL`. Each `ItemInteractionResult` can be mapped to a `InteractionResult` via `#result`; `PASS_TO_DEFAULT_BLOCK_INTERACTION`, `SKIP_DEFAULT_BLOCK_INTERACTION` both represent `InteractionResult#PASS`. Similarly, `#sidedSucess` also exists for `ItemInteractionResult`.
+`ItemInteractionResult` 是与 `InteractionResult` 平行的一套结果，专用于物品被用于方块的场景。它是一个由六个值组成的枚举：`SUCCESS`、 `CONSUME`、 `CONSUME_PARTIAL`、 `PASS_TO_DEFAULT_BLOCK_INTERACTION`、 `SKIP_DEFAULT_BLOCK_INTERACTION` 和 `FAIL`。每个 `ItemInteractionResult` 都可以通过 `#result` 映射到一个 `InteractionResult`；`PASS_TO_DEFAULT_BLOCK_INTERACTION` 和 `SKIP_DEFAULT_BLOCK_INTERACTION` 都表示 `InteractionResult#PASS`。类似地，`ItemInteractionResult` 也有 `#sidedSucess`。
 
-Generally, the different values mean the following:
+一般来说，各个值的含义如下：
 
-- `InteractionResult#sidedSuccess` (or `InteractionResultHolder#sidedSuccess` / `ItemInteractionResult#sidedSucess` where needed) should be used if the operation should be considered successful, and you want the arm to swing. The pipeline will end.
-- `InteractionResult#SUCCESS` (or `InteractionResultHolder#success` / `ItemInteractionResult#SUCCESS` where needed) should be used if the operation should be considered successful, and you want the arm to swing, but only on one side. Only use this if you want to return a different value on the other logical side for whatever reason. The pipeline will end.
-- `InteractionResult#CONSUME` (or `InteractionResultHolder#consume` / `ItemInteractionResult#CONSUME` where needed) should be used if the operation should be considered successful, but you do not want the arm to swing. The pipeline will end.
-- `InteractionResult#CONSUME_PARTIAL` is mostly identical to `InteractionResult#CONSUME`, the only difference is in its usage in [`Item#useOn`][itemuseon].
-    - `ItemInteractionResult#CONSUME_PARTIAL` is similar within its usage in `BlockBehaviour#useItemOn`.
-- `InteractionResult.FAIL` (or `InteractionResultHolder#fail` / `ItemInteractionResult#FAIL` where needed) should be used if the item functionality should be considered failed and no further interaction should be performed. The pipeline will end. This can be used everywhere, but it should be used with care outside of `Item#useOn` and `Item#use`. In many cases, using `InteractionResult.PASS` makes more sense.
-- `InteractionResult.PASS` (or `InteractionResultHolder#pass` where needed) should be used if the operation should be considered neither successful nor failed. The pipeline will continue. This is the default behavior (unless otherwise specified).
-    - `ItemInteractionResult#PASS_TO_DEFAULT_BLOCK_INTERACTION` allows `BlockBehaviour#useWithoutItem` to be called for the mainhand while `#SKIP_DEFAULT_BLOCK_INTERACTION` prevents the method from executing altogether. `#PASS_TO_DEFAULT_BLOCK_INTERACTION` is the default behavior (unless otherwise specified).
+- 如果操作应被视为成功，且你希望手臂挥动，就应当使用 `InteractionResult#sidedSuccess`（或在需要时使用 `InteractionResultHolder#sidedSuccess` / `ItemInteractionResult#sidedSucess`）。流水线将结束。
+- 如果操作应被视为成功，且你希望手臂挥动，但只在一端挥动，就应当使用 `InteractionResult#SUCCESS`（或在需要时使用 `InteractionResultHolder#success` / `ItemInteractionResult#SUCCESS`）。只有当你出于某种原因想在另一逻辑端返回不同的值时，才使用它。流水线将结束。
+- 如果操作应被视为成功，但你不希望手臂挥动，就应当使用 `InteractionResult#CONSUME`（或在需要时使用 `InteractionResultHolder#consume` / `ItemInteractionResult#CONSUME`）。流水线将结束。
+- `InteractionResult#CONSUME_PARTIAL` 与 `InteractionResult#CONSUME` 基本相同，唯一的区别在于它在 [`Item#useOn`][itemuseon] 中的用法。
+    - `ItemInteractionResult#CONSUME_PARTIAL` 在 `BlockBehaviour#useItemOn` 中的用法与之类似。
+- 如果物品功能应被视为失败、且不应再执行进一步的交互，就应当使用 `InteractionResult.FAIL`（或在需要时使用 `InteractionResultHolder#fail` / `ItemInteractionResult#FAIL`）。流水线将结束。它可以在任何地方使用，但在 `Item#useOn` 和 `Item#use` 之外应谨慎使用。在许多情况下，使用 `InteractionResult.PASS` 更合理。
+- 如果操作既不应被视为成功也不应被视为失败，就应当使用 `InteractionResult.PASS`（或在需要时使用 `InteractionResultHolder#pass`）。流水线将继续。这是默认行为（除非另有说明）。
+    - `ItemInteractionResult#PASS_TO_DEFAULT_BLOCK_INTERACTION` 允许对主手调用 `BlockBehaviour#useWithoutItem`，而 `#SKIP_DEFAULT_BLOCK_INTERACTION` 则完全阻止该方法执行。 `#PASS_TO_DEFAULT_BLOCK_INTERACTION` 是默认行为（除非另有说明）。
 
-Some methods have special behavior or requirements, which are explained in the below chapters.
+有些方法有特殊的行为或要求，将在下面各章节中说明。
 
-## `IItemExtension#onItemUseFirst`
+## `IItemExtension#onItemUseFirst` {#iitemextensiononitemusefirst}
 
-`InteractionResult#sidedSuccess` and `InteractionResult.CONSUME` don't have an effect here. Only `InteractionResult.SUCCESS`, `InteractionResult.FAIL` or `InteractionResult.PASS` should be used here.
+`InteractionResult#sidedSuccess` 和 `InteractionResult.CONSUME` 在这里不起作用。这里只应使用 `InteractionResult.SUCCESS`、 `InteractionResult.FAIL` 或 `InteractionResult.PASS`。
 
-## `Item#useOn`
+## `Item#useOn` {#itemuseon}
 
-If you want the operation to be considered successful, but you do not want the arm to swing or an `ITEM_USED` stat point to be awarded, use `InteractionResult.CONSUME_PARTIAL`.
+如果你希望操作被视为成功，但不希望手臂挥动、也不希望授予 `ITEM_USED` 统计点数，使用 `InteractionResult.CONSUME_PARTIAL`。
 
-## `Item#use`
+## `Item#use` {#itemuse}
 
-This is the only instance where the return type is `InteractionResultHolder<ItemStack>`. The resulting `ItemStack` in the `InteractionResultHolder<ItemStack>` replaces the `ItemStack` the usage was initiated with, if it has changed.
+这是唯一一处返回类型为 `InteractionResultHolder<ItemStack>` 的情况。如果 `InteractionResultHolder<ItemStack>` 中得到的 `ItemStack` 发生了变化，它将替换掉发起本次使用时所用的那个 `ItemStack`。
 
-The default implementation of `Item#use` returns `InteractionResultHolder#consume` when the item is edible and the player can eat the item (because they are hungry, or because the item is always edible), `InteractionResultHolder#fail` when the item is edible but the player cannot eat the item, and `InteractionResultHolder#pass` if the item is not edible.
+`Item#use` 的默认实现在以下情况分别返回不同结果：当物品可食用且玩家能够食用该物品时（因为玩家处于饥饿状态，或因为该物品始终可食用），返回 `InteractionResultHolder#consume`；当物品可食用但玩家无法食用该物品时，返回 `InteractionResultHolder#fail`；当物品不可食用时，返回 `InteractionResultHolder#pass`。
 
-Returning `InteractionResultHolder#fail` here while considering the main hand will prevent offhand behavior from running. If you want offhand behavior to run (which you usually want), return `InteractionResultHolder#pass` instead.
+在处理主手时于此返回 `InteractionResultHolder#fail`，会阻止副手行为运行。如果你希望副手行为运行（通常你会希望如此），那就改为返回 `InteractionResultHolder#pass`。
 
 [itemuseon]: #itemuseon

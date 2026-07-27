@@ -1,18 +1,18 @@
-# Configuration
+# 配置 {#configuration}
 
-Configurations define settings and consumer preferences that can be applied to a mod instance. NeoForge uses a configuration system using [TOML][toml] files and read with [NightConfig][nightconfig].
+配置定义了可应用于某个 Mod 实例的设置和使用者偏好。 NeoForge 采用一套基于 [TOML][toml] 文件的配置系统，并借助 [NightConfig][nightconfig] 进行读取。
 
-## Creating a Configuration
+## 创建配置 {#creating-a-configuration}
 
-A configuration can be created using a subtype of `IConfigSpec`. NeoForge implements the type via `ModConfigSpec` and enables its construction through `ModConfigSpec.Builder`. The builder can separate the config values into sections via `Builder#push` to create a section and `Builder#pop` to leave a section. Afterwards, the configuration can be built using one of two methods:
+配置可以通过 `IConfigSpec` 的某个子类型来创建。 NeoForge 通过 `ModConfigSpec` 实现了该类型，并借助 `ModConfigSpec.Builder` 提供其构造方式。构建器可以通过 `Builder#push` 创建一个分节、 `Builder#pop` 离开一个分节，从而把配置值划分到不同分节中。之后，可以用以下两种方法之一构建配置：
 
- Method     | Description
+ 方法       | 说明
  :---       | :---
-`build`     | Creates the `ModConfigSpec`.
-`configure` | Creates a pair of the class holding the config values and the `ModConfigSpec`.
+`build`     | 创建 `ModConfigSpec`。
+`configure` | 创建一个由持有配置值的类和 `ModConfigSpec` 组成的对（pair）。
 
 :::note
-`ModConfigSpec.Builder#configure` is typically used with a `static` block and a class that takes in `ModConfigSpec.Builder` as part of its constructor to attach and hold the values:
+`ModConfigSpec.Builder#configure` 通常与一个 `static` 块，以及一个把 `ModConfigSpec.Builder` 作为构造函数参数的类配合使用，用来附加并持有这些值：
 
 ```java
 //Define a field to keep the config and spec for later
@@ -31,27 +31,27 @@ static {
 ```
 :::
 
-Each config value can be supplied with additional context to provide additional behavior. Contexts must be defined before the config value is fully built:
+每个配置值都可以附带额外的上下文，以提供额外行为。上下文必须在配置值完全构建之前定义：
 
-| Method         | Description                                                                                                 |
-|:---------------|:------------------------------------------------------------------------------------------------------------|
-| `comment`      | Provides a description of what the config value does. Can provide multiple strings for a multiline comment. |
-| `translation`  | Provides a translation key for the name of the config value.                                                |
-| `worldRestart` | The world must be restarted before the config value can be changed.                                         |
+| 方法           | 说明                                                                     |
+|:---------------|:-------------------------------------------------------------------------|
+| `comment`      | 提供对该配置值作用的说明。可以提供多个字符串以形成多行注释。             |
+| `translation`  | 为配置值的名称提供一个翻译键。                                            |
+| `worldRestart` | 更改此配置值之前，必须重启世界。                                          |
 
-### ConfigValue
+### 配置值 {#configvalue}
 
-Config values can be built with the provided contexts (if defined) using any of the `#define` methods.
+配置值可以使用任意 `#define` 方法，结合已提供的上下文（若有定义）来构建。
 
-All config value methods take in at least two components:
+所有配置值方法至少接收两个组成部分：
 
-- A path representing the name of the variable: a `.` separated string representing the sections the config value is in
-- The default value when no valid configuration is present
+- 一个代表变量名的路径：以 `.` 分隔的字符串，表示该配置值所处的各个分节
+- 当不存在有效配置时使用的默认值
 
-The `ConfigValue` specific methods take in two additional components:
+`ConfigValue` 特有的方法还额外接收两个组成部分：
 
-- A validator to make sure the deserialized object is valid
-- A class representing the data type of the config value
+- 一个校验器，用于确保反序列化得到的对象有效
+- 一个代表该配置值数据类型的类
 
 ```java
 //Store the config properties as public finals
@@ -64,54 +64,54 @@ private ExampleConfig(ModConfigSpec.Builder builder) {
 }
 ```
 
-The values themselves can be obtained using `ConfigValue#get`. The values are additionally cached to prevent multiple readings from files.
+值本身可以通过 `ConfigValue#get` 获取。这些值还会被缓存，以避免多次从文件中读取。
 
-#### Additional Config Value Types
+#### 其他配置值类型 {#additional-config-value-types}
 
-- **Range Values**
-    - Description: Value must be between the defined bounds
-    - Class Type: `Comparable<T>`
-    - Method Name: `#defineInRange`
-    - Additional Components:
-        - The minimum and maximum the config value may be
-        - A class representing the data type of the config value
+- **范围值（Range Values）**
+    - 说明：值必须处于所定义的上下界之间
+    - 类类型：`Comparable<T>`
+    - 方法名：`#defineInRange`
+    - 额外组成部分：
+        - 配置值可取的最小值和最大值
+        - 一个代表该配置值数据类型的类
 
 :::note
-`DoubleValue`s, `IntValue`s, and `LongValue`s are range values which specify the class as `Double`, `Integer`, and `Long` respectively.
+`DoubleValue`、 `IntValue` 和 `LongValue` 都是范围值，其类分别指定为 `Double`、 `Integer` 和 `Long`。
 :::
 
-- **Whitelisted Values**
-    - Description: Value must be in supplied collection
-    - Class Type: `T`
-    - Method Name: `#defineInList`
-    - Additional Components:
-        - A collection of the allowed values the configuration can be
+- **白名单值（Whitelisted Values）**
+    - 说明：值必须在所提供的集合中
+    - 类类型：`T`
+    - 方法名：`#defineInList`
+    - 额外组成部分：
+        - 一个由所有允许取值组成的集合
 
-- **List Values**
-    - Description: Value is a list of entries
-    - Class Type: `List<T>`
-    - Method Name: `#defineList`, `#defineListAllowEmpty` if list can be empty
-    - Additional Components:
-        - A supplier that returns a default value to use when a new entry is added in configuration screens.
-        - A validator to make sure a deserialized element from the list is valid
-        - (optional) A vaidator to make sure the list does not get too little or too many entries
+- **列表值（List Values）**
+    - 说明：值是一个由若干项组成的列表
+    - 类类型：`List<T>`
+    - 方法名：`#defineList`；如果列表可以为空，则用 `#defineListAllowEmpty`
+    - 额外组成部分：
+        - 一个 Supplier，在配置界面中新增条目时返回要使用的默认值。
+        - 一个校验器，用于确保从列表中反序列化得到的元素有效
+        - （可选）一个校验器，用于确保列表的条目数量不会过少或过多
 
-- **Enum Values**
-    - Description: An enum value in the supplied collection
-    - Class Type: `Enum<T>`
-    - Method Name: `#defineEnum`
-    - Additional Components:
-        - A getter to convert a string or integer into an enum
-        - A collection of the allowed values the configuration can be
+- **枚举值（Enum Values）**
+    - 说明：所提供集合中的某个枚举值
+    - 类类型：`Enum<T>`
+    - 方法名：`#defineEnum`
+    - 额外组成部分：
+        - 一个取值器，用于把字符串或整数转换为枚举
+        - 一个由所有允许取值组成的集合
 
-- **Boolean Values**
-    - Description: A `boolean` value
-    - Class Type: `Boolean`
-    - Method Name: `#define`
+- **布尔值（Boolean Values）**
+    - 说明：一个 `boolean` 值
+    - 类类型：`Boolean`
+    - 方法名：`#define`
 
-## Registering a Configuration
+## 注册配置 {#registering-a-configuration}
 
-Once a `ModConfigSpec` has been built, it must be registered to allow NeoForge to load, track, and sync the configuration settings as required. Configurations should be registered in the mod constructor via `ModContainer#registerConfig`. A configuration can be registered with a [given type][configtype] representing the side the config belongs to, the `ModConfigSpec`, and optionally a specific file name for the configuration.
+`ModConfigSpec` 构建完成后，必须将其注册，以便 NeoForge 按需加载、跟踪并同步这些配置设置。配置应当在 Mod 构造函数中通过 `ModContainer#registerConfig` 注册。注册配置时，可以传入一个代表该配置所属端的[给定类型][configtype]、 `ModConfigSpec`，以及可选的一个特定配置文件名。
 
 ```java
 // In the main mod file with a ModConfigSpec CONFIG_SPEC
@@ -123,58 +123,58 @@ public ExampleMod(ModContainer container) {
 }
 ```
 
-### Configuration Types
+### 配置类型 {#configuration-types}
 
-Configuration types determine where the configuration file is located, what time it is loaded, and whether the file is synced across the network. All configurations are, by default, either loaded from `.minecraft/config` on the physical client or `<server_folder>/config` on the physical server. Some nuances between each configuration type can be found in the following subsections.
+配置类型决定了配置文件所处的位置、加载的时机，以及该文件是否会在网络上同步。默认情况下，所有配置要么在物理客户端从 `.minecraft/config` 加载，要么在物理服务端从 `<server_folder>/config` 加载。各配置类型之间的一些细微差别可以在以下小节中找到。
 
 :::tip
-NeoForge documents the [config types][type] within their codebase.
+NeoForge 在其代码库中记录了这些[配置类型][type]。
 :::
 
 - `STARTUP`
-    - Loaded on both the physical client and physical server from the config folder
-    - Read immediately on registration
-    - **NOT** synced across the network
-    - Suffixed with `-startup` by default
+    - 在物理客户端和物理服务端上都从 config 文件夹加载
+    - 注册时立即读取
+    - **不会**在网络上同步
+    - 默认以 `-startup` 作为后缀
 
 :::warning
-Configurations registered under the `STARTUP` type can cause desyncs between the client and server, such as if the configuration is used to disable the registration of content. Therefore, it is highly recommended that any configurations within `STARTUP` are not used to enable or disable features that may change the content of the mod.
+以 `STARTUP` 类型注册的配置可能导致客户端与服务端之间发生错位（desync），例如当该配置被用于禁用某些内容的注册时。因此，强烈建议不要用 `STARTUP` 中的任何配置来启用或禁用可能改变 Mod 内容的功能。
 :::
 
 - `CLIENT`
-    - Loaded **ONLY** on the physical client from the config folder
-        - There is no server location for this configuration type
-    - Read immedately before `FMLCommonSetupEvent` is fired
-    - **NOT** synced across the network
-    - Suffixed with `-client` by default
+    - **仅**在物理客户端上从 config 文件夹加载
+        - 此配置类型没有服务端位置
+    - 在 `FMLCommonSetupEvent` 触发前立即读取
+    - **不会**在网络上同步
+    - 默认以 `-client` 作为后缀
 - `COMMON`
-    - Loaded on both the physical client and physical server from the config folder
-    - Read immedately before `FMLCommonSetupEvent` is fired
-    - **NOT** synced across the network
-    - Suffixed with `-common` by default
+    - 在物理客户端和物理服务端上都从 config 文件夹加载
+    - 在 `FMLCommonSetupEvent` 触发前立即读取
+    - **不会**在网络上同步
+    - 默认以 `-common` 作为后缀
 - `SERVER`
-    - Loaded on both the physical client and physical server from the config folder
-        - Can be overridden for each world by adding a config to:
-            - Client: `.minecraft/saves/<world_name>/serverconfig`
-            - Server: `<server_folder>/world/serverconfig`
-    - Read immedately before `ServerAboutToStartEvent` is fired
-    - Synced across the network to the client
-    - Suffixed with `-server` by default
+    - 在物理客户端和物理服务端上都从 config 文件夹加载
+        - 可以为每个世界单独覆盖，方法是把配置添加到：
+            - 客户端：`.minecraft/saves/<world_name>/serverconfig`
+            - 服务端：`<server_folder>/world/serverconfig`
+    - 在 `ServerAboutToStartEvent` 触发前立即读取
+    - 会在网络上同步到客户端
+    - 默认以 `-server` 作为后缀
 
-## Configuration Events
+## 配置事件 {#configuration-events}
 
-Operations that occur whenever a config is loaded or reloaded can be done using the `ModConfigEvent.Loading` and `ModConfigEvent.Reloading` events. The events must be [registered][events] to the mod event bus.
+每当配置被加载或重新加载时需要执行的操作，可以借助 `ModConfigEvent.Loading` 和 `ModConfigEvent.Reloading` 事件完成。这些事件必须[注册][events]到 Mod 事件总线。
 
 :::caution
-These events are called for all configurations for the mod; the `ModConfig` object provided should be used to denote which configuration is being loaded or reloaded.
+这些事件会为该 Mod 的所有配置调用；应当使用所提供的 `ModConfig` 对象来判断正在加载或重新加载的是哪个配置。
 :::
-## Configuration Screen
+## 配置界面 {#configuration-screen}
 
-A configuration screen allows users to edit the config values for a mod while in-game without needing to open any files. The screen will automatically parse your registered config files and populate the screen. 
+配置界面让用户能在游戏内编辑某个 Mod 的配置值，而无需打开任何文件。该界面会自动解析你已注册的配置文件并填充内容。
 
-A mod can use the built-in configuration screen that NeoForge provides. Mods can extend `ConfigurationScreen` to change the behavior of the default screen or make their own configuration screen. Mods can also create their own screen from scratch and provide that custom screen to NeoForge through the below extension point.
+Mod 可以使用 NeoForge 提供的内置配置界面。 Mod 可以继承 `ConfigurationScreen` 来改变默认界面的行为，或制作自己的配置界面。 Mod 也可以从零开始创建自己的界面，并通过下面的扩展点把这个自定义界面提供给 NeoForge。
 
-A configuration screen can be registered for a mod by registering a `IConfigScreenFactory` extension point during mod construction on the [client]:
+可以在 Mod 构造期间、在[客户端][client]注册一个 `IConfigScreenFactory` 扩展点，从而为该 Mod 注册配置界面：
 ```java
 // In the main client mod file
 public ExampleModClient(ModContainer container) {
@@ -185,19 +185,19 @@ public ExampleModClient(ModContainer container) {
 }
 ```
 
-The configuration screen can be accessed in game by going to the 'Mods' page, selecting the mod from the sidebar, and clicking the 'Config' button. Startup, Common, and Client config options will always be editable at any point. Server configs are only editable in the screen when playing on a world locally. If connected to a server or to another person's LAN world, Server config option will be disabled in the screen. The first page of the config screen for the mod will show every registered config file for players to pick which one to edit.
+在游戏中，可以通过进入“Mods”页面、从侧边栏选择该 Mod、并点击“Config”按钮来访问配置界面。 Startup、 Common 和 Client 配置项在任何时刻都可编辑。 Server 配置只有在本地游玩某个世界时才能在界面中编辑。如果连接到某个服务端、或连接到他人的局域网世界，Server 配置项在界面中将被禁用。该 Mod 配置界面的第一页会列出所有已注册的配置文件，供玩家选择要编辑哪一个。
 
 :::warning
-Translation keys should be added and have the text defined within the lang JSON for all config entries if you are making a screen.
+如果你要制作界面，应当为所有配置条目添加翻译键，并在语言 JSON 中定义相应文本。
 
-You can specify a translation key for a config by using the `ModConfigSpec$Builder#translation` method, so we can extend the previous code to:
+你可以通过 `ModConfigSpec$Builder#translation` 方法为配置指定翻译键，于是我们可以把前面的代码扩展为：
 ```java
 ConfigValue<T> value = builder.comment("This value is called 'config_value_name', and is set to defaultValue if no existing config is present")
     .translation("modid.config.config_value_name")
     .define("config_value_name", defaultValue);
 ```
 
-To make translating easier, open the configuration screen and visit all of the configs and their subsections. Then back out to the mod list screen. All untranslated config entries that were encountered will be printed to the console at this point. This makes it easier to know what to translate and what the translation keys are. 
+为了让翻译更轻松，可以打开配置界面并浏览所有配置及其子分节，然后退回到 Mod 列表界面。此时，所有遇到过的未翻译配置条目都会被打印到控制台。这样你就更容易知道要翻译什么，以及它们的翻译键是什么。
 :::
 
 [toml]: https://toml.io/

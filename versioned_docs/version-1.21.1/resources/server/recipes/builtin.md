@@ -1,14 +1,14 @@
-# Built-In Recipe Types
+# 内置配方类型 {#built-in-recipe-types}
 
-Minecraft provides a variety of recipe types and serializers out of the box for you to use. This article will explain each recipe type, as well as how to generate them.
+Minecraft 开箱即用地提供了多种配方类型和序列化器供你使用。本文将逐一讲解每种配方类型，以及如何生成它们。
 
-## Crafting
+## 合成 {#crafting}
 
-Crafting recipes are typically made in crafting tables, crafters, or in modded crafting tables or machines. Their recipe type is `minecraft:crafting`.
+合成配方通常在工作台、合成器，或 Mod 添加的工作台或机器中制作。它们的配方类型是 `minecraft:crafting`。
 
-### Shaped Crafting
+### 有序合成 {#shaped-crafting}
 
-Some of the most important recipes - such as the crafting table, sticks, or most tools - are created through shaped recipes. These recipes are defined by a crafting pattern or shape (hence "shaped") in which the items must be inserted. Let's have a look at what an example looks like:
+一些最重要的配方——例如工作台、木棍或大多数工具——都是通过有序配方制作的。这些配方由一个物品必须按其摆放的合成图案或形状（因此称为“有序”）来定义。我们来看一个例子长什么样：
 
 ```json5
 {
@@ -34,17 +34,17 @@ Some of the most important recipes - such as the crafting table, sticks, or most
 }
 ```
 
-Let's digest this line for line:
+我们来逐行解读：
 
-- `type`: This is the id of the shaped recipe serializer, `minecraft:crafting_shaped`.
-- `category`: This optional field defines the category in the crafting book.
-- `key` and `pattern`: Together, these define how the items must be put into the crafting grid.
-    - The pattern defines up to three lines of up to three-wide strings that define the shape. All lines must be the same length, i.e. the pattern must form a rectangular shape. Spaces can be used to denote slots that should stay empty.
-    - The key associates the characters used in the pattern with [ingredients][ingredient]. In the above example, all `X`s in the pattern must be iron ingots, and all `#`s must be sticks.
-- `result`: The result of the recipe. This is [an item stack's JSON representation][itemjson].
-- Not shown in the example is the `group` key. This optional string property creates a group in the recipe book. Recipes in the same group will be displayed as one in the recipe book.
+- `type`：这是有序配方序列化器的 id，即 `minecraft:crafting_shaped`。
+- `category`：这个可选字段定义了在合成书中的分类。
+- `key` 和 `pattern`：二者共同定义了物品必须如何摆放到合成网格中。
+    - pattern 定义了最多三行、每行最多三个字符宽的字符串来描述形状。所有行的长度必须相同，即整个图案必须构成一个矩形。空格可用于表示应保持为空的槽位。
+    - key 将图案中使用的字符与[配方材料][ingredient]关联起来。在上面的例子中，图案里所有 `X` 都必须是铁锭，所有 `#` 都必须是木棍。
+- `result`：配方的结果。这是[物品堆叠的 JSON 表示][itemjson]。
+- 例子中未展示的是 `group` 键。这个可选的字符串属性会在合成书中创建一个分组。同一分组内的配方会在合成书中合并显示为一个。
 
-And then, let's have a look at how you'd generate this recipe:
+接下来，我们看看你会如何生成这个配方：
 
 ```java
 // We use a builder pattern, therefore no variable is created. Create a new builder by calling
@@ -70,11 +70,11 @@ ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, Items.IRON_PICKAXE)
         .save(output);
 ```
 
-Additionally, you can call `#group` to set the recipe book group.
+此外，你还可以调用 `#group` 来设置合成书分组。
 
-### Shapeless Crafting
+### 无序合成 {#shapeless-crafting}
 
-Unlike shaped crafting recipes, shapeless crafting recipes do not care about the order the ingredients are passed in. As such, there is no pattern and key, instead there is just a list of ingredients:
+与有序合成配方不同，无序合成配方并不关心配方材料的传入顺序。因此，它没有图案和键，取而代之的只是一个配方材料列表：
 
 ```json5
 {
@@ -98,15 +98,15 @@ Unlike shaped crafting recipes, shapeless crafting recipes do not care about the
 }
 ```
 
-Like before, let's digest this line for line:
+和之前一样，我们逐行解读：
 
-- `type`: This is the id of the shapeless recipe serializer, `minecraft:crafting_shapeless`.
-- `category`: This optional field defines the category in the crafting book.
-- `ingredients`: A list of [ingredients][ingredient]. The list order is preserved in code for recipe viewing purposes, but the recipe itself accepts the ingredients in any order.
-- `result`: The result of the recipe. This is [an item stack's JSON representation][itemjson].
-- Not shown in the example is the `group` key. This optional string property creates a group in the recipe book. Recipes in the same group will be displayed as one in the recipe book.
+- `type`：这是无序配方序列化器的 id，即 `minecraft:crafting_shapeless`。
+- `category`：这个可选字段定义了在合成书中的分类。
+- `ingredients`：一个[配方材料][ingredient]列表。列表顺序在代码中会被保留，用于配方查看，但配方本身接受任意顺序的配方材料。
+- `result`：配方的结果。这是[物品堆叠的 JSON 表示][itemjson]。
+- 例子中未展示的是 `group` 键。这个可选的字符串属性会在合成书中创建一个分组。同一分组内的配方会在合成书中合并显示为一个。
 
-And then, let's have a look at how you'd generate this recipe:
+接下来，我们看看你会如何生成这个配方：
 
 ```java
 // We use a builder pattern, therefore no variable is created. Create a new builder by calling
@@ -131,15 +131,15 @@ ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.MUSHROOM_STEW)
         .save(output);
 ```
 
-Additionally, you can call `#group` to set the recipe book group.
+此外，你还可以调用 `#group` 来设置合成书分组。
 
 :::info
-One-item recipes (e.g. storage blocks unpacking) should be shapeless recipes to follow vanilla standards.
+单物品配方（例如存储方块的拆解）应当使用无序配方，以遵循原版的惯例。
 :::
 
-### Special Crafting
+### 特殊合成 {#special-crafting}
 
-In some cases, outputs must be created dynamically from inputs. Most of the time, this is to set data components on the output by copying or calculating their values from the input stacks. These recipes usually only specify the type and hardcode everything else. For example:
+在某些情况下，输出必须根据输入动态生成。大多数时候，这是为了通过复制或计算输入堆叠中的值来为输出设置数据组件。这类配方通常只指定类型，其余一切都硬编码在代码中。例如：
 
 ```java
 {
@@ -147,38 +147,38 @@ In some cases, outputs must be created dynamically from inputs. Most of the time
 }
 ```
 
-This recipe, which is for leather armor dyeing, just specifies the type and hardcodes everything else - most notably the color calculation, which would be hard to express in JSON. Minecraft prefixes all special crafting recipes with `crafting_special_`, however this practice is not necessary to follow.
+这个配方用于皮革盔甲染色，它只指定了类型，其余一切都硬编码在代码中——最典型的就是颜色计算，这在 JSON 中会很难表达。 Minecraft 为所有特殊合成配方加上了 `crafting_special_` 前缀，不过并不必须遵循这一做法。
 
-Generating this recipe looks as follows:
+生成这个配方的方式如下：
 
 ```java
 // The parameter of #special is a Function<CraftingBookCategory, Recipe<?>>.
-// All vanilla special recipes use a constructor with one CraftingBookCategory parameter for this.
+// All 原版 special recipes use a constructor with one CraftingBookCategory parameter for this.
 SpecialRecipeBuilder.special(ArmorDyeRecipe::new)
         // This overload of #save allows us to specify a name. It can also be used on shaped or shapeless builders.
         .save(output, "armor_dye");
 ```
 
-Vanilla provides the following special crafting serializers (mods may add more):
+原版提供了以下特殊合成序列化器（Mod 可以添加更多）：
 
-- `minecraft:crafting_special_armordye`: For dyeing leather armor and other dyeable items.
-- `minecraft:crafting_special_bannerduplicate`: For duplicating banners.
-- `minecraft:crafting_special_bookcloning`: For copying written books. This increases the resulting book's generation property by one.
-- `minecraft:crafting_special_firework_rocket`: For crafting firework rockets.
-- `minecraft:crafting_special_firework_star`: For crafting firework stars.
-- `minecraft:crafting_special_firework_star_fade`: For applying a fade to a firework star.
-- `minecraft:crafting_special_mapcloning`: For copying filled maps. Also works for treasure maps.
-- `minecraft:crafting_special_mapextending`: For extending filled maps.
-- `minecraft:crafting_special_repairitem`: For repairing two broken items into one.
-- `minecraft:crafting_special_shielddecoration`: For applying a banner to a shield.
-- `minecraft:crafting_special_shulkerboxcoloring`: For coloring a shulker box while preserving its contents.
-- `minecraft:crafting_special_suspiciousstew`: For crafting suspicious stews depending on the input flower.
-- `minecraft:crafting_special_tippedarrow`: For crafting tipped arrows depending on the input potion.
-- `minecraft:crafting_decorated_pot`: For crafting decorated pots from sherds.
+- `minecraft:crafting_special_armordye`：用于给皮革盔甲以及其他可染色物品染色。
+- `minecraft:crafting_special_bannerduplicate`：用于复制旗帜。
+- `minecraft:crafting_special_bookcloning`：用于复制成书。这会使复制出的书的“代数”属性加一。
+- `minecraft:crafting_special_firework_rocket`：用于合成烟花火箭。
+- `minecraft:crafting_special_firework_star`：用于合成烟花之星。
+- `minecraft:crafting_special_firework_star_fade`：用于为烟花之星添加渐变效果。
+- `minecraft:crafting_special_mapcloning`：用于复制已填充的地图，对藏宝图同样有效。
+- `minecraft:crafting_special_mapextending`：用于扩展已填充的地图。
+- `minecraft:crafting_special_repairitem`：用于将两件损坏的物品修复合并为一件。
+- `minecraft:crafting_special_shielddecoration`：用于将旗帜图案应用到盾牌上。
+- `minecraft:crafting_special_shulkerboxcoloring`：用于在保留内容物的情况下给潜影盒染色。
+- `minecraft:crafting_special_suspiciousstew`：用于根据输入的花朵合成迷之炖菜。
+- `minecraft:crafting_special_tippedarrow`：用于根据输入的药水合成药箭。
+- `minecraft:crafting_decorated_pot`：用于用陶片合成饰纹陶罐。
 
-## Furnace-like Recipes
+## 熔炉类配方 {#furnace-like-recipes}
 
-The second most important group of recipes are the ones made through smelting or a similar process. All recipes made in furnaces (type `minecraft:smelting`), smokers (`minecraft:smoking`), blast furnaces (`minecraft:blasting`) and campfires (`minecraft:campfire_cooking`) use the same format:
+第二重要的一组配方是通过熔炼或类似过程制作的配方。所有在熔炉（类型 `minecraft:smelting`）、烟熏炉（`minecraft:smoking`）、高炉（`minecraft:blasting`）和营火（`minecraft:campfire_cooking`）中制作的配方都使用相同的格式：
 
 ```json5
 {
@@ -195,16 +195,16 @@ The second most important group of recipes are the ones made through smelting or
 }
 ```
 
-Let's digest this line by line:
+我们逐行解读：
 
-- `type`: This is the id of the recipe serializer, `minecraft:smelting`. This may be different depending on what kind of furnace-like recipe you're making.
-- `category`: This optional field defines the category in the crafting book.
-- `cookingtime`: This field determines how long the recipes needs to be processed, in ticks. All vanilla furnace recipes use 200, smokers and blast furnaces use 100, and campfires use 600. However, this can be any value you want.
-- `experience`: Determines the amount of experience rewarded when making this recipe. This field is optional, and no experience will be awarded if it is omitted.
-- `ingredient`: The input [ingredient] of the recipe.
-- `result`: The result of the recipe. This is [an item stack's JSON representation][itemjson].
+- `type`：这是配方序列化器的 id，即 `minecraft:smelting`。它会根据你制作的熔炉类配方种类而有所不同。
+- `category`：这个可选字段定义了在合成书中的分类。
+- `cookingtime`：这个字段决定了配方需要处理多久，单位为刻（tick）。所有原版熔炉配方使用 200，烟熏炉和高炉使用 100，营火使用 600。不过，这可以是你想要的任意值。
+- `experience`：决定制作这个配方时奖励的经验值。这个字段是可选的，如果省略则不奖励任何经验。
+- `ingredient`：配方的输入[配方材料][ingredient]。
+- `result`：配方的结果。这是[物品堆叠的 JSON 表示][itemjson]。
 
-Datagen for these recipes looks like this:
+这些配方的数据生成如下所示：
 
 ```java
 // Use #smoking for smoking recipes, #blasting for blasting recipes, and #campfireCooking for campfire recipes.
@@ -228,12 +228,12 @@ SimpleCookingRecipeBuilder.smelting(
 ```
 
 :::info
-The recipe type for these recipes is the same as their recipe serializer, i.e. furnaces use `minecraft:smelting`, smokers use `minecraft:smoking`, and so on.
+这些配方的配方类型与它们的配方序列化器相同，即熔炉使用 `minecraft:smelting`，烟熏炉使用 `minecraft:smoking`，以此类推。
 :::
 
-## Stonecutting
+## 切石 {#stonecutting}
 
-Stonecutter recipes use the `minecraft:stonecutting` recipe type. They are about as simple as it gets, with only a type, an input and an output:
+切石机配方使用 `minecraft:stonecutting` 配方类型。它们简单到不能再简单，只有一个类型、一个输入和一个输出：
 
 ```json5
 {
@@ -248,9 +248,9 @@ Stonecutter recipes use the `minecraft:stonecutting` recipe type. They are about
 }
 ```
 
-The `type` defines the recipe serializer (`minecraft:stonecutting`). The ingredient is an [ingredient], and the result is a basic [item stack JSON][itemjson]. Like crafting recipes, they can also optionally specify a `group` for grouping in the recipe book.
+`type` 定义了配方序列化器（`minecraft:stonecutting`）。 ingredient 是一个[配方材料][ingredient]，result 是一个基本的[物品堆叠 JSON][itemjson]。与合成配方一样，它们也可以选择性地指定 `group`，用于在合成书中分组。
 
-Datagen is also simple:
+数据生成同样简单：
 
 ```java
 SingleItemRecipeBuilder.stonecutting(Ingredient.of(Items.ANDESITE), RecipeCategory.BUILDING_BLOCKS, Items.ANDESITE_SLAB, 2)
@@ -258,15 +258,15 @@ SingleItemRecipeBuilder.stonecutting(Ingredient.of(Items.ANDESITE), RecipeCatego
         .save(output, "andesite_slab_from_andesite_stonecutting");
 ```
 
-Note that the single item recipe builder does not support actual ItemStack results, and as such, no results with data components. The recipe codec, however, does support them, so a custom builder would need to be implemented if this functionality was desired.
+注意，单物品配方构建器不支持真正的 ItemStack 结果，因此也不支持带数据组件的结果。不过配方的 codec 确实支持它们，所以如果需要这一功能，就需要实现一个自定义构建器。
 
-## Smithing
+## 锻造 {#smithing}
 
-The smithing table supports two different recipe serializers. One is for transforming inputs into outputs, copying over the components of the input (such as enchantments), and the other is for applying components to the input. Both use the `minecraft:smithing` recipe type, and require three inputs, named the base, the template, and the addition item.
+锻造台支持两种不同的配方序列化器。一种用于将输入转化为输出，并复制输入的组件（例如附魔）；另一种用于将组件应用到输入上。二者都使用 `minecraft:smithing` 配方类型，并且都需要三个输入，分别称为基础物品（base）、模板（template）和附加物品（addition）。
 
-### Transform Smithing
+### 转化锻造 {#transform-smithing}
 
-This recipe serializer is for transforming two input items into one, preserving the data components of the first input. Vanilla uses this mainly for netherite equipment, however any items can be used here:
+这个配方序列化器用于将两个输入物品转化为一个，并保留第一个输入的数据组件。原版主要将其用于下界合金装备，不过这里可以使用任意物品：
 
 ```json5
 {
@@ -287,15 +287,15 @@ This recipe serializer is for transforming two input items into one, preserving 
 }
 ```
 
-Let's break this down line by line:
+我们逐行拆解：
 
-- `type`: This is the id of the recipe serializer, `minecraft:smithing_transform`.
-- `base`: The base [ingredient] of the recipe. Usually, this is some piece of equipment.
-- `template`: The template [ingredient] of the recipe. Usually, this is a smithing template.
-- `addition`: The addition [ingredient] of the recipe. Usually, this is some sort of material, for example a netherite ingot.
-- `result`: The result of the recipe. This is [an item stack's JSON representation][itemjson].
+- `type`：这是配方序列化器的 id，即 `minecraft:smithing_transform`。
+- `base`：配方的基础[配方材料][ingredient]。通常这是某件装备。
+- `template`：配方的模板[配方材料][ingredient]。通常这是一个锻造模板。
+- `addition`：配方的附加[配方材料][ingredient]。通常这是某种材料，例如下界合金锭。
+- `result`：配方的结果。这是[物品堆叠的 JSON 表示][itemjson]。
 
-During datagen, call on `SmithingTransformRecipeBuilder#smithing` to add your recipe:
+在数据生成时，调用 `SmithingTransformRecipeBuilder#smithing` 来添加你的配方：
 
 ```java
 SmithingTransformRecipeBuilder.smithing(
@@ -317,9 +317,9 @@ SmithingTransformRecipeBuilder.smithing(
         .save(output, "netherite_axe_smithing");
 ```
 
-### Trim Smithing
+### 纹饰锻造 {#trim-smithing}
 
-Trim smithing is the process of applying armor trims to armor:
+纹饰锻造是将盔甲纹饰应用到盔甲上的过程：
 
 ```json5
 {
@@ -336,16 +336,16 @@ Trim smithing is the process of applying armor trims to armor:
 }
 ```
 
-Again, let's break this down into its bits:
+同样，我们把它拆解成各个部分：
 
-- `type`: This is the id of the recipe serializer, `minecraft:smithing_trim`.
-- `base`: The base [ingredient] of the recipe. All vanilla use cases use the `minecraft:trimmable_armor` tag here.
-- `template`: The template [ingredient] of the recipe. All vanilla use cases use a smithing trim template here.
-- `addition`: The addition [ingredient] of the recipe. All vanilla use cases use the `minecraft:trim_materials` tag here.
+- `type`：这是配方序列化器的 id，即 `minecraft:smithing_trim`。
+- `base`：配方的基础[配方材料][ingredient]。所有原版用例在此都使用 `minecraft:trimmable_armor` 标签。
+- `template`：配方的模板[配方材料][ingredient]。所有原版用例在此都使用一个锻造纹饰模板。
+- `addition`：配方的附加[配方材料][ingredient]。所有原版用例在此都使用 `minecraft:trim_materials` 标签。
 
-This recipe serializer is notably missing a result field. This is because it uses the base input and "applies" the template and addition items on it, i.e., it sets the base's components based on the other inputs and uses the result of that operation as the recipe's result.
+值得注意的是，这个配方序列化器缺少一个 result 字段。这是因为它使用基础输入，并在其上“应用”模板和附加物品，也就是根据其他输入设置基础物品的组件，并将该操作的结果用作配方的结果。
 
-During datagen, call on `SmithingTrimRecipeBuilder#smithingTrim` to add your recipe:
+在数据生成时，调用 `SmithingTrimRecipeBuilder#smithingTrim` 来添加你的配方：
 
 ```java
 SmithingTrimRecipeBuilder.smithingTrim(
@@ -360,7 +360,7 @@ SmithingTrimRecipeBuilder.smithingTrim(
 )
         // The recipe advancement, like with the other recipes above.
         .unlocks("has_smithing_trim_template", has(Items.BOLT_ARMOR_TRIM_SMITHING_TEMPLATE))
-        // This overload of #save allows us to specify a name. Yes, this name is copied from vanilla.
+        // This overload of #save allows us to specify a name. Yes, this name is copied from 原版.
         .save(output, "bolt_armor_trim_smithing_template_smithing_trim");
 ```
 

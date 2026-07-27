@@ -1,8 +1,8 @@
-# BlockEntityRenderer
+# 块实体渲染器 {#blockentityrenderer}
 
-A `BlockEntityRenderer`, often abbreviated as BER, is used to render [blocks][block] in a way that cannot be represented with a [static baked model][model] (JSON, OBJ, others). For example, this could be used to dynamically render container contents of a chest-like block. A block entity renderer requires the block to have a [`BlockEntity`][blockentity], even if the block does not store any data otherwise.
+`BlockEntityRenderer`（常缩写为 BER）用于以静态[烘焙模型][model]（JSON、 OBJ 等）无法表现的方式来渲染[方块][block]。例如，它可以用来动态渲染箱子类方块中容器的内容物。方块实体渲染器要求方块拥有一个[`BlockEntity`][blockentity]，即便该方块本身并不存储任何数据。
 
-To create a BER, create a class that inherits from `BlockEntityRenderer`. It takes a generic argument specifying the block's `BlockEntity` class, which is used as a parameter type in the BER's `render` method.
+要创建 BER，先创建一个继承自 `BlockEntityRenderer` 的类。它带有一个泛型参数，用于指定方块的 `BlockEntity` 类，该类型会用作 BER 的 `render` 方法的参数类型。
 
 ```java
 // Assumes the existence of MyBlockEntity as a subclass of BlockEntity.
@@ -26,9 +26,9 @@ public class MyBlockEntityRenderer implements BlockEntityRenderer<MyBlockEntity>
 }
 ```
 
-Only one BER may exist for a given `BlockEntityType<?>`. Therefore, values that are specific to a single block entity instance should be stored in that block entity instance, rather than the BER itself.
+对于给定的 `BlockEntityType<?>`，只能存在一个 BER。因此，特定于单个方块实体实例的值应存储在那个方块实体实例中，而不是 BER 本身。
 
-When you have created your BER, you must also register it to `EntityRenderersEvent.RegisterRenderers`, an [event] fired on the [mod event bus][eventbus]:
+创建好 BER 之后，还必须将其注册到 `EntityRenderersEvent.RegisterRenderers`，这是一个在 [Mod 事件总线][eventbus]上触发的[事件][event]：
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client
@@ -42,7 +42,7 @@ public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderer
 }
 ```
 
-In the event that you do not need the BER provider context in your BER, you can also remove the constructor:
+如果你在 BER 中不需要 BER 提供器上下文，也可以移除构造器：
 
 ```java
 public class MyBlockEntityRenderer implements BlockEntityRenderer<MyBlockEntity> {
@@ -60,11 +60,11 @@ public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderer
 }
 ```
 
-## `BlockEntityWithoutLevelRenderer`
+## `BlockEntityWithoutLevelRenderer` {#blockentitywithoutlevelrenderer}
 
-`BlockEntityWithoutLevelRenderer`, colloquially known as BEWLR, is an adaptation of the regular `BlockEntityRenderer` for special [item] rendering (hence "without level", as items do not have level context). Its overall purpose is the same: do special rendering for cases where static models aren't enough.
+`BlockEntityWithoutLevelRenderer`，俗称 BEWLR，是常规 `BlockEntityRenderer` 针对特殊[物品][item]渲染的改良版（之所以叫“without level”，是因为物品没有 level 上下文）。它的总体用途相同：在静态模型不够用的情况下进行特殊渲染。
 
-To add a BEWLR, create a class that extends `BlockEntityWithoutLevelRenderer` and overrides `#renderByItem`. It also requires some additional constructor setup:
+要添加 BEWLR，创建一个继承 `BlockEntityWithoutLevelRenderer` 并重写 `#renderByItem` 的类。它还需要一些额外的构造器设置：
 
 ```java
 public class MyBlockEntityWithoutLevelRenderer extends BlockEntityWithoutLevelRenderer {
@@ -80,9 +80,9 @@ public class MyBlockEntityWithoutLevelRenderer extends BlockEntityWithoutLevelRe
 }
 ```
 
-Keep in mind that, like with BERs, there is only one instance of your BEWLR. Stack-specific properties should therefore be stored in the stack, not the BEWLR.
+请记住，与 BER 一样，你的 BEWLR 只有一个实例。因此，特定于物品堆叠的属性应存储在堆叠中，而不是 BEWLR 里。
 
-Unlike BERs, we do not register BEWLRs directly. Instead, we register an instance of `IClientItemExtensions` to the `RegisterClientExtensionsEvent`. `IClientItemExtensions` is an interface that allows us to specify a number of rendering-related behaviors on items, such as (but not limited to) a BEWLR. As such, our implementation of that interface could look like so:
+与 BER 不同，我们不直接注册 BEWLR，而是向 `RegisterClientExtensionsEvent` 注册一个 `IClientItemExtensions` 实例。 `IClientItemExtensions` 是一个接口，允许我们为物品指定若干与渲染相关的行为，其中之一（但不限于此）就是 BEWLR。因此，我们对该接口的实现可以像这样：
 
 ```java
 public class MyClientItemExtensions implements IClientItemExtensions {
@@ -97,7 +97,7 @@ public class MyClientItemExtensions implements IClientItemExtensions {
 }
 ```
 
-And then, we can register our `IClientItemExtensions` to the event:
+然后，我们就可以把 `IClientItemExtensions` 注册到该事件：
 
 ```java
 @SubscribeEvent // on the mod event bus only on the physical client
@@ -112,7 +112,7 @@ public static void registerClientExtensions(RegisterClientExtensionsEvent event)
 ```
 
 :::info
-`IClientItemExtensions` are generally expected to be treated as singletons. Do not construct them outside `RegisterClientExtensionsEvent`!
+`IClientItemExtensions` 通常应被视为单例。不要在 `RegisterClientExtensionsEvent` 之外构造它们！
 :::
 
 [block]: ../blocks/index.md

@@ -1,32 +1,32 @@
-# Ingredients
+# 配方材料 {#ingredients}
 
-`Ingredient`s are used in [recipes] to check whether a given [`ItemStack`][itemstack] is a valid input for the recipe. For this purpose, `Ingredient` implements `Predicate<ItemStack>`, and `#test` can be called to confirm if a given `ItemStack` matches the ingredient.
+`Ingredient` 用于在[配方][recipes]中检查给定的 [`ItemStack`][itemstack] 是否是该配方的有效输入。为此，`Ingredient` 实现了 `Predicate<ItemStack>`，可以调用 `#test` 来确认给定的 `ItemStack` 是否与该配方材料匹配。
 
-Unfortunately, many internals of `Ingredient` are a mess. NeoForge works around this by ignoring the `Ingredient` class where possible, instead introducing the `ICustomIngredient` interface for custom ingredients. This is not a direct replacement for regular `Ingredient`s, but we can convert to and from `Ingredient`s using `ICustomIngredient#toVanilla` and `Ingredient#getCustomIngredient`, respectively.
+遗憾的是，`Ingredient` 的许多内部实现相当混乱。 NeoForge 的应对方式是尽可能绕开 `Ingredient` 类，转而为自定义配方材料引入了 `ICustomIngredient` 接口。它并不是常规 `Ingredient` 的直接替代品，但我们可以分别通过 `ICustomIngredient#to 原版` 和 `Ingredient#getCustomIngredient` 在两者之间来回转换。
 
-## Built-In Ingredient Types
+## 内置配方材料类型 {#built-in-ingredient-types}
 
-The simplest way to get an ingredient is using the `Ingredient#of` helpers. Several variants exist:
+获取配方材料最简单的方式是使用 `Ingredient#of` 系列辅助方法。它有多个变体：
 
-- `Ingredient.of()` returns an empty ingredient.
-- `Ingredient.of(Blocks.IRON_BLOCK, Items.GOLD_BLOCK)` returns an ingredient that accepts either an iron or a gold block. The parameter is a vararg of [`ItemLike`s][itemlike], which means that any amount of both blocks and items may be used.
-- `Ingredient.of(new ItemStack(Items.DIAMOND_SWORD))` returns an ingredient that accepts an item stack. Be aware that counts and data components are ignored.
-- `Ingredient.of(Stream.of(new ItemStack(Items.DIAMOND_SWORD)))` returns an ingredient that accepts an item stack. Like the previous method, but with a `Stream<ItemStack>` for if you happen to get your hands on one of those.
-- `Ingredient.of(ItemTags.WOODEN_SLABS)` returns an ingredient that accepts any item from the specified [tag], for example any wooden slab.
+- `Ingredient.of()` 返回一个空配方材料。
+- `Ingredient.of(Blocks.IRON_BLOCK, Items.GOLD_BLOCK)` 返回一个接受铁块或金块的配方材料。该参数是 [`ItemLike`][itemlike] 的可变参数，也就是说方块和物品都可以传入任意数量。
+- `Ingredient.of(new ItemStack(Items.DIAMOND_SWORD))` 返回一个接受某个物品堆叠的配方材料。注意，其中的数量和数据组件会被忽略。
+- `Ingredient.of(Stream.of(new ItemStack(Items.DIAMOND_SWORD)))` 返回一个接受某个物品堆叠的配方材料。与上一个方法类似，但接受的是 `Stream<ItemStack>`，方便你在手头恰好有这样一个流时使用。
+- `Ingredient.of(ItemTags.WOODEN_SLABS)` 返回一个接受指定[标签（Tag）][tag]中任意物品的配方材料，例如任意一种木台阶。
 
-Additionally, NeoForge adds a few additional ingredients:
+此外，NeoForge 还额外添加了几种配方材料：
 
-- `new BlockTagIngredient(BlockTags.CONVERTABLE_TO_MUD)` returns an ingredient similar to the tag variant of `Ingredient.of()`, but with a block tag instead. This should be used for cases where you'd use an item tag, but there is only a block tag available (for example `minecraft:convertable_to_mud`).
-- `CompoundIngredient.of(Ingredient.of(Items.DIRT))` returns an ingredient with child ingredients, passed in the constructor (vararg parameter). The ingredient matches if any of its children matches.
-- `DataComponentIngredient.of(true, new ItemStack(Items.DIAMOND_SWORD))` returns an ingredient that, in addition to the item, also matches the data component. The boolean parameter denotes strict matching (true) or partial matching (false). Strict matching means the data components must match exactly, while partial matching means the data components must match, but other data components may also be present. Additional overloads of `#of` exist that allow specifying multiple `Item`s, or provide other options.
-- `DifferenceIngredient.of(Ingredient.of(ItemTags.PLANKS), Ingredient.of(ItemTags.NON_FLAMMABLE_WOOD))` returns an ingredient that matches everything in the first ingredient that doesn't also match the second ingredient. The given example only matches planks that can burn (i.e. all planks except crimson planks, warped planks and modded nether wood planks).
-- `IntersectionIngredient.of(Ingredient.of(ItemTags.PLANKS), Ingredient.of(ItemTags.NON_FLAMMABLE_WOOD))` returns an ingredient that matches everything that matches both sub-ingredients. The given example only matches planks that cannot burn (i.e. crimson planks, warped planks and modded nether wood planks).
+- `new BlockTagIngredient(BlockTags.CONVERTABLE_TO_MUD)` 返回一个与 `Ingredient.of()` 的标签变体类似的配方材料，但使用的是方块标签而非物品标签。当你本想使用物品标签，但只有方块标签可用时（例如 `minecraft:convertable_to_mud`），应使用这种方式。
+- `CompoundIngredient.of(Ingredient.of(Items.DIRT))` 返回一个带有子配方材料的配方材料，子材料在构造函数中传入（可变参数）。只要其任意一个子材料匹配，该配方材料即匹配。
+- `DataComponentIngredient.of(true, new ItemStack(Items.DIAMOND_SWORD))` 返回一个除物品外还会匹配数据组件的配方材料。布尔参数表示严格匹配（true）还是部分匹配（false）。严格匹配意味着数据组件必须完全一致，而部分匹配意味着数据组件必须匹配，但也允许存在其他数据组件。 `#of` 还有其他重载，允许指定多个 `Item`，或提供其他选项。
+- `DifferenceIngredient.of(Ingredient.of(ItemTags.PLANKS), Ingredient.of(ItemTags.NON_FLAMMABLE_WOOD))` 返回一个配方材料，匹配第一个配方材料中所有不同时匹配第二个配方材料的内容。上面的例子只匹配可以燃烧的木板（即除绯红木板、诡异木板以及 Mod 添加的下界木木板之外的所有木板）。
+- `IntersectionIngredient.of(Ingredient.of(ItemTags.PLANKS), Ingredient.of(ItemTags.NON_FLAMMABLE_WOOD))` 返回一个配方材料，匹配同时满足两个子配方材料的所有内容。上面的例子只匹配无法燃烧的木板（即绯红木板、诡异木板以及 Mod 添加的下界木木板）。
 
-Keep in mind that the NeoForge-provided ingredient types are `ICustomIngredient`s and must call `#toVanilla` before using them in vanilla contexts, as outlined in the beginning of this article.
+请记住，NeoForge 提供的这些配方材料类型都是 `ICustomIngredient`，在用于原版上下文之前必须调用 `#to 原版`，正如本文开头所述。
 
-## Custom Ingredient Types
+## 自定义配方材料类型 {#custom-ingredient-types}
 
-It is possible for modders to add their custom ingredient types through the `ICustomIngredient` system. For the sake of example, let's make an enchanted item ingredient that accepts an item tag and a map of enchantments to min levels:
+Mod 开发者可以通过 `ICustomIngredient` 系统添加自己的配方材料类型。举例来说，我们来做一个附魔物品配方材料，它接受一个物品标签以及一个从附魔到最低等级的映射：
 
 ```java
 public class MinEnchantedIngredient implements ICustomIngredient {
@@ -104,7 +104,7 @@ public class MinEnchantedIngredient implements ICustomIngredient {
 }
 ```
 
-Custom ingredients are a [registry], so we must register our ingredient. We do so using the `IngredientType` class provided by NeoForge, which is basically a wrapper around a [`MapCodec`][codec] and optionally a [`StreamCodec`][streamcodec].
+自定义配方材料是一种[注册表][registry]，因此我们必须注册自己的配方材料。为此，我们使用 NeoForge 提供的 `IngredientType` 类，它本质上是对一个 [`MapCodec`][codec] 以及一个可选的 [`StreamCodec`][streamcodec] 的封装。
 
 ```java
 public static final DeferredRegister<IngredientType<?>> INGREDIENT_TYPES =
@@ -117,7 +117,7 @@ public static final Supplier<IngredientType<MinEnchantedIngredient>> MIN_ENCHANT
                 () -> new IngredientType<>(MinEnchantedIngredient.CODEC, MinEnchantedIngredient.STREAM_CODEC));
 ```
 
-When we have done that, we also need to override `#getType` in our ingredient class:
+完成之后，我们还需要在配方材料类中重写 `#getType`：
 
 ```java
 public class MinEnchantedIngredient implements ICustomIngredient {
@@ -130,13 +130,13 @@ public class MinEnchantedIngredient implements ICustomIngredient {
 }
 ```
 
-And there we go! Our ingredient type is ready to use.
+大功告成！我们的配方材料类型可以使用了。
 
-## JSON Representation
+## JSON 表示 {#json-representation}
 
-Due to vanilla ingredients being pretty limited and NeoForge introducing a whole new registry for them, it's also worth looking at what the built-in and our own ingredients look like in JSON.
+由于原版配方材料相当受限，而 NeoForge 又为其引入了一整套全新的注册表，因此也值得看一看内置配方材料以及我们自己的配方材料在 JSON 中长什么样。
 
-Ingredients that specify a `type` are generally assumed to be non-vanilla. For example:
+指定了 `type` 的配方材料通常会被视为非原版配方材料。例如：
 
 ```json5
 {
@@ -145,7 +145,7 @@ Ingredients that specify a `type` are generally assumed to be non-vanilla. For e
 }
 ```
 
-Or another example using our own ingredient:
+再来一个使用我们自己配方材料的例子：
 
 ```json5
 {
@@ -157,9 +157,9 @@ Or another example using our own ingredient:
 }
 ```
 
-If the `type` is unspecified, then we have a vanilla ingredient. Vanilla ingredients can specify one of two properties: `item` or `tag`.
+如果未指定 `type`，那么这就是一个原版配方材料。原版配方材料可以指定 `item` 或 `tag` 两个属性中的一个。
 
-An example for a vanilla item ingredient:
+一个原版物品配方材料的例子：
 
 ```json5
 {
@@ -167,7 +167,7 @@ An example for a vanilla item ingredient:
 }
 ```
 
-An example for a vanilla tag ingredient:
+一个原版标签配方材料的例子：
 
 ```json5
 {

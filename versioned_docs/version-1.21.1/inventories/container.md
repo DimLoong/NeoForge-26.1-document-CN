@@ -1,25 +1,25 @@
 ---
 sidebar_position: 1
 ---
-# Containers
+# 容器（Containers） {#containers}
 
-Many systems in Minecraft, such as [block entities][blockentity] or entities, store items of some kind. To store items on something, Minecraft uses `Container` implementations.
+Minecraft 中的许多系统，例如[方块实体][blockentity]或实体，都会以某种形式存储物品。为了在某个对象上存储物品，Minecraft 使用 `Container` 的各种实现。
 
-The `Container` interface defines methods such as `#getItem`, `#setItem` and `#removeItem` that can be used to query and update the container. Since it is an interface, it does not actually contain a backing list or other data structure, that is up to the implementing system.
+`Container` 接口定义了诸如 `#getItem`、 `#setItem` 和 `#removeItem` 等方法，可用于查询和更新容器。由于它是一个接口，因此并不实际持有底层的列表或其他数据结构，这一点由实现该接口的系统决定。
 
-Due to this, `Container`s can not only be implemented on block entities, but any other class as well. Notable examples include entity inventories, as well as common modded [items][item] such as backpacks.
+正因如此，`Container` 不仅可以实现在方块实体上，还可以实现在任何其他类上。典型例子包括实体的物品栏，以及诸如背包之类常见的 Mod[物品][item]。
 
 :::warning
-NeoForge provides the `ItemStackHandler` class as a replacement for `Container`s in many places. It should be used wherever possible in favor of `Container`, as it allows for cleaner interaction with other `Container`s/`ItemStackHandler`s.
+NeoForge 在许多场景中提供 `ItemStackHandler` 类作为 `Container` 的替代品。在可行的情况下，都应优先使用它而非 `Container`，因为它能与其他 `Container`/`ItemStackHandler` 更清晰地交互。
 
-The main reason this article exists is for reference in vanilla code, or if you are developing mods on multiple loaders. Always use `ItemStackHandler` in your own code if possible! Docs on that are a work in progress.
+本文之所以存在，主要是为了在阅读原版代码时作参考，或供你在多个加载器上开发 Mod 时参考。在你自己的代码中，只要可能，请始终使用 `ItemStackHandler`！相关文档仍在完善中。
 :::
 
-## Basic Container Implementation
+## 容器的基本实现 {#basic-container-implementation}
 
-Containers can be implemented in any way you like, so long as you satisfy the dictated methods (as with any other interface in Java). However, it is common to use a `NonNullList<ItemStack>` with a fixed length as a backing structure. Single-slot containers may also simply use an `ItemStack` field instead.
+只要你满足所规定的方法（就像 Java 中任何其他接口一样），容器可以按你喜欢的任何方式实现。不过，常见做法是使用一个固定长度的 `NonNullList<ItemStack>` 作为底层结构。单槽位容器也可以直接使用一个 `ItemStack` 字段。
 
-For example, a basic implementation of `Container` with a size of 27 slots (one chest) could look like this:
+例如，一个大小为 27 个槽位（一个箱子）的 `Container` 基本实现可能如下所示：
 
 ```java
 public class MyContainer implements Container {
@@ -98,20 +98,20 @@ public class MyContainer implements Container {
 }
 ```
 
-### `SimpleContainer`
+### `SimpleContainer` {#simplecontainer}
 
-The `SimpleContainer` class is a basic implementation of a container with some sprinkles on top, such as the ability to add `ContainerListener`s. It can be used if you need a container implementation that doesn't have any special requirements.
+`SimpleContainer` 类是容器的一个基本实现，并附带了一些额外功能，例如可以添加 `ContainerListener`。如果你需要一个没有任何特殊要求的容器实现，可以直接使用它。
 
-### `BaseContainerBlockEntity`
+### `BaseContainerBlockEntity` {#basecontainerblockentity}
 
-The `BaseContainerBlockEntity` class is the base class of many important block entities in Minecraft, such as chests and chest-like blocks, the various furnace types, hoppers, dispensers, droppers, brewing stands and a few others.
+`BaseContainerBlockEntity` 类是 Minecraft 中许多重要方块实体的基类，例如箱子及类箱子方块、各类熔炉、漏斗、发射器、投掷器、酿造台以及其他一些方块。
 
-Aside from `Container`, it also implements the `MenuProvider` and `Nameable` interfaces:
+除 `Container` 外，它还实现了 `MenuProvider` 和 `Nameable` 接口：
 
-- `Nameable` defines a few methods related to setting (custom) names and, aside from many block entities, is implemented by classes such as `Entity`. This uses the [`Component` system][component].
-- `MenuProvider`, on the other hand, defines the `#createMenu` method, which allows an [`AbstractContainerMenu`][menu] to be constructed from the container. This means that using this class is not desirable if you want a container without an associated GUI, for example in jukeboxes.
+- `Nameable` 定义了一些与设置（自定义）名称相关的方法，除许多方块实体外，它还被 `Entity` 等类实现。它使用 [`Component` 系统][component]。
+- `MenuProvider` 则定义了 `#createMenu` 方法，该方法允许从容器构造出一个 [`AbstractContainerMenu`][menu]。这意味着，如果你想要一个不带关联 GUI 的容器（例如唱片机），那么使用这个类就不合适。
 
-`BaseContainerBlockEntity` bundles all calls we would normally make to our `NonNullList<ItemStack>` through two methods `#getItems` and `#setItems`, drastically reducing the amount of boilerplate we need to write. An example implementation of a `BaseContainerBlockEntity` could look like this:
+`BaseContainerBlockEntity` 通过 `#getItems` 和 `#setItems` 两个方法，把我们通常对 `NonNullList<ItemStack>` 所做的全部调用都打包起来，从而大幅减少需要编写的样板代码。一个 `BaseContainerBlockEntity` 的示例实现可能如下所示：
 
 ```java
 public class MyBlockEntity extends BaseContainerBlockEntity {
@@ -157,11 +157,11 @@ public class MyBlockEntity extends BaseContainerBlockEntity {
 }
 ```
 
-Keep in mind that this class is a `BlockEntity` and a `Container` at the same time. This means that you can use the class as a supertype for your block entity to get a functioning block entity with a pre-implemented container.
+请记住，这个类同时是 `BlockEntity` 和 `Container`。这意味着你可以把该类用作你自己方块实体的父类，从而得到一个自带预实现容器的、可正常工作的方块实体。
 
-### `WorldlyContainer`
+### `WorldlyContainer` {#worldlycontainer}
 
-`WorldlyContainer` is a sub-interface of `Container` that allows accessing slots of the given `Container` by `Direction`. It is mainly intended for block entities that only expose parts of their container to a particular side. For example, this could be used by a machine that outputs to one side and takes inputs from all other sides, or vice-versa. A simple implementation of the interface could look like this:
+`WorldlyContainer` 是 `Container` 的一个子接口，它允许按 `Direction`（方向）访问给定 `Container` 的槽位。它主要用于那些只向特定方向暴露部分容器内容的方块实体。例如，某台机器向一个方向输出、从其他所有方向接收输入（或反之）就可以使用它。该接口的一个简单实现可能如下所示：
 
 ```java
 // See BaseContainerBlockEntity methods above. You can of course extend BlockEntity directly
@@ -196,11 +196,11 @@ public class MyBlockEntity extends BaseContainerBlockEntity implements WorldlyCo
 }
 ```
 
-## Using Containers
+## 使用容器 {#using-containers}
 
-Now that we have created containers, let's use them!
+既然我们已经创建了容器，那就来用一用吧！
 
-Since there is a considerable overlap between `Container`s and `BlockEntity`s, containers are best retrieved by casting the block entity to `Container` if possible:
+由于 `Container` 与 `BlockEntity` 之间存在相当大的重叠，因此在可能的情况下，最好通过将方块实体强制转换为 `Container` 来获取容器：
 
 ```java
 if (blockEntity instanceof Container container) {
@@ -208,7 +208,7 @@ if (blockEntity instanceof Container container) {
 }
 ```
 
-The container can then use the methods we mentioned before, for example:
+随后容器就可以使用我们之前提到的方法，例如：
 
 ```java
 // Get the first item in the container.
@@ -222,12 +222,12 @@ container.removeItem(2, 16);
 ```
 
 :::warning
-A container may throw an exception if trying to access a slot that is beyond its container size. Alternatively, they may return `ItemStack.EMPTY`, as is the case with (for example) `SimpleContainer`.
+如果尝试访问超出容器大小的槽位，容器可能会抛出异常。或者，它们也可能返回 `ItemStack.EMPTY`，例如 `SimpleContainer` 就是这样。
 :::
 
-## `Container`s on `ItemStack`s
+## `ItemStack` 上的 `Container` {#containers-on-itemstacks}
 
-Until now, we mainly discussed `Container`s on `BlockEntity`s. However, they can also be applied to [`ItemStack`s][itemstack] using the `minecraft:container` [data component][datacomponent]:
+到目前为止，我们主要讨论的是 `BlockEntity` 上的 `Container`。然而，它们也可以通过 `minecraft:container` [数据组件][datacomponent]应用到 [`ItemStack`][itemstack] 上：
 
 ```java
 // We use SimpleContainer as the superclass here so we don't have to reimplement the item handling logic ourselves.
@@ -259,25 +259,25 @@ public class MyBackpackContainer extends SimpleContainer {
 }
 ```
 
-And voilà, you have created an item-backed container! Call `new MyBackpackContainer(stack)` to create a container for a menu or other use case.
+如此一来，你就创建了一个由物品支撑的容器！调用 `new MyBackpackContainer(stack)` 即可为菜单或其他用途创建一个容器。
 
 :::warning
-Be aware that `Menu`s that directly interface with `Container`s must `#copy()` their `ItemStack`s when modifying them, as otherwise the immutability contract on data components is broken. To do this, NeoForge provides the `StackCopySlot` class for you.
+请注意，直接与 `Container` 交互的 `Menu` 在修改其 `ItemStack` 时必须调用 `#copy()`，否则数据组件的不可变性约定就会被破坏。为此，NeoForge 为你提供了 `StackCopySlot` 类。
 :::
 
-## `Container`s on `Entity`s
+## `Entity` 上的 `Container` {#containers-on-entitys}
 
-`Container`s on `Entity`s are finicky: whether an entity has a container or not cannot be universally determined. It all depends on what entity you are handling, and as such can require a lot of special-casing.
+`Entity` 上的 `Container` 比较棘手：一个实体是否拥有容器无法一概而论，完全取决于你处理的是哪种实体，因此往往需要大量的特例处理。
 
-If you are creating an entity yourself, there is nothing stopping you from implementing `Container` on it directly, though be aware that you will not be able to use superclasses such as `SimpleContainer` (since `Entity` is the superclass).
+如果你在自行创建实体，没有什么能阻止你直接在其上实现 `Container`，但请注意你将无法使用诸如 `SimpleContainer` 之类的父类（因为父类已经是 `Entity`）。
 
-### `Container`s on `Mob`s
+### `Mob` 上的 `Container` {#containers-on-mobs}
 
-`Mob`s do not implement `Container`, but they implement the `EquipmentUser` interface (among others). This interface defines the methods `#setItemSlot(EquipmentSlot, ItemStack)`, `#getItemBySlot(EquipmentSlot)` and `#setDropChance(EquipmentSlot, float)`. While not related to `Container` code-wise, the functionality is quite similar: we associate slots, in this case equipment slots, with `ItemStack`s.
+`Mob` 并不实现 `Container`，但它们实现了 `EquipmentUser` 接口（及其他一些接口）。该接口定义了 `#setItemSlot(EquipmentSlot, ItemStack)`、 `#getItemBySlot(EquipmentSlot)` 和 `#setDropChance(EquipmentSlot, float)` 方法。虽然它在代码层面与 `Container` 无关，但功能相当类似：我们将槽位（此处是装备槽位）与 `ItemStack` 关联起来。
 
-The most notable difference to `Container` is that there is no list-like order (though `Mob` uses `NonNullList<ItemStack>`s in the background). Access does not work through slot indices, but rather through the seven `EquipmentSlot` enum values: `MAINHAND`, `OFFHAND`, `FEET`, `LEGS`, `CHEST`, `HEAD`, and `BODY` (where `BODY` is used for horse and dog armor).
+与 `Container` 最显著的区别在于，它没有类似列表那样的顺序（尽管 `Mob` 在背后使用的是 `NonNullList<ItemStack>`）。访问不通过槽位索引进行，而是通过七个 `EquipmentSlot` 枚举值：`MAINHAND`、 `OFFHAND`、 `FEET`、 `LEGS`、 `CHEST`、 `HEAD` 和 `BODY`（其中 `BODY` 用于马铠和狗的护甲）。
 
-An example of interaction with the mob's "slots" would look something like this:
+与生物的“槽位”交互的示例大致如下：
 
 ```java
 // Get the item stack in the HEAD (helmet) slot.
@@ -290,21 +290,21 @@ mob.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.BEDROCK));
 mob.setDropChance(EquipmentSlot.FEET, 1f);
 ```
 
-### `InventoryCarrier`
+### `InventoryCarrier` {#inventorycarrier}
 
-`InventoryCarrier` is an interface implemented by some living entities, such as villagers. It declares a method `#getInventory`, which returns a `SimpleContainer`. This interface is used by non-player entities that need an actual inventory instead of just the equipment slots provided by `EquipmentUser`.
+`InventoryCarrier` 是由某些生物实体（例如村民）实现的接口。它声明了一个 `#getInventory` 方法，返回一个 `SimpleContainer`。该接口供那些需要真正物品栏、而不只是 `EquipmentUser` 所提供装备槽位的非玩家实体使用。
 
-### `Container`s on `Player`s (Player Inventory)
+### `Player` 上的 `Container`（玩家物品栏） {#containers-on-players-player-inventory}
 
-The player's inventory is implemented through the `Inventory` class, a class implementing `Container` as well as the `Nameable` interface mentioned earlier. An instance of that `Inventory` is then stored as a field named `inventory` on the `Player`, accessible via `Player#getInventory`. The inventory can be interacted with like any other container.
+玩家的物品栏通过 `Inventory` 类实现，该类实现了 `Container` 以及前面提到的 `Nameable` 接口。该 `Inventory` 的一个实例随后作为一个名为 `inventory` 的字段存储在 `Player` 上，可通过 `Player#getInventory` 访问。该物品栏可以像其他任何容器一样进行交互。
 
-The inventory contents are stored in three `public final NonNullList<ItemStack>`s:
+物品栏内容存储在三个 `public final NonNullList<ItemStack>` 中：
 
-- The `items` list covers the 36 main inventory slots, including the nine hotbar slots (indices 0-8).
-- The `armor` list is a list of length 4, containing armor for the `FEET`, `LEGS`, `CHEST`, and `HEAD`, in that order. This list uses `EquipmentSlot` accessors, similar to `Mob`s (see above).
-- The `offhand` list contains only the offhand slot, i.e. has a length of 1.
+- `items` 列表涵盖 36 个主物品栏槽位，包括九个快捷栏槽位（索引 0-8）。
+- `armor` 列表长度为 4，依次存放 `FEET`、 `LEGS`、 `CHEST` 和 `HEAD` 的护甲。该列表使用 `EquipmentSlot` 访问器，类似于 `Mob`（见上文）。
+- `offhand` 列表仅包含副手槽位，即长度为 1。
 
-When iterating over the inventory contents, it is recommended to iterate over `items`, then over `armor` and then over `offhand`, to be consistent with vanilla behavior.
+在遍历物品栏内容时，建议先遍历 `items`，再遍历 `armor`，最后遍历 `offhand`，以与原版行为保持一致。
 
 [blockentity]: ../blockentities/index.md
 [component]: ../resources/client/i18n.md#components

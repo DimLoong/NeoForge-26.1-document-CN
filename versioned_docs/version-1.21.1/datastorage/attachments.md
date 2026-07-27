@@ -1,31 +1,31 @@
 ---
 sidebar_position: 3
 ---
-# Data Attachments
+# 数据附加（Data Attachments） {#data-attachments}
 
-The data attachment system allows mods to attach and store additional data on block entities, chunks, and entities.
+数据附加系统允许 Mod 在方块实体、区块和实体上附加并存储额外数据。
 
-_To store additional level data, you can use [SavedData][saveddata]._
+_如果要存储额外的世界数据，可以使用 [SavedData][saveddata]。_
 
 :::note
-Data attachments for item stacks have been superceeded by vanilla's [data components][datacomponents].
+针对物品堆叠的数据附加已被原版的[数据组件][datacomponents]取代。
 :::
 
-## Creating an attachment type
+## 创建附加类型 {#creating-an-attachment-type}
 
-To use the system, you need to register an `AttachmentType`. The attachment type contains the following configuration:
+要使用该系统，你需要注册一个 `AttachmentType`。附加类型包含以下配置：
 
-- A default value supplier to create the instance when the data is first accessed.
-- An optional serializer if the attachment should be persisted.
-- (If a serializer was configured) The `copyOnDeath` flag to automatically copy entity data on death (see below).
+- 一个默认值 Supplier，用于在首次访问数据时创建实例。
+- 一个可选的序列化器，用于在需要持久化附加数据时使用。
+- （如果配置了序列化器）`copyOnDeath` 标志，用于在实体死亡时自动复制其数据（见下文）。
 
 :::tip
-If you don't want your attachment to persist, do not provide a serializer.
+如果不希望附加数据被持久化，就不要提供序列化器。
 :::
 
-There are a few ways to provide an attachment serializer: directly implementing `IAttachmentSerializer`, implementing `INBTSerializable` and using the static `AttachmentType#serializable` method to create the builder, or providing a codec to the builder.
+提供附加序列化器有几种方式：直接实现 `IAttachmentSerializer`；实现 `INBTSerializable` 并使用静态方法 `AttachmentType#serializable` 来创建构建器；或者向构建器提供一个 codec。
 
-In any case, the attachment **must be registered** to the `NeoForgeRegistries.ATTACHMENT_TYPES` registry. Here is an example:
+无论采用哪种方式，附加数据都**必须注册**到 `NeoForgeRegistries.ATTACHMENT_TYPES` 注册表。示例如下：
 
 ```java
 // Create the DeferredRegister for attachment types
@@ -48,9 +48,9 @@ private static final Supplier<AttachmentType<SomeCache>> SOME_CACHE = ATTACHMENT
 ATTACHMENT_TYPES.register(modBus);
 ```
 
-## Using the attachment type
+## 使用附加类型 {#using-the-attachment-type}
 
-Once the attachment type is registered, it can be used on any holder object. Calling `getData` if no data is present will attach a new default instance.
+附加类型注册完成后，即可在任意 holder 对象上使用。如果调用 `getData` 时不存在数据，则会附加一个新的默认实例。
 
 ```java
 // Get the ItemStackHandler if it already exists, else attach a new one:
@@ -60,7 +60,7 @@ int playerMana = player.getData(MANA);
 // And so on...
 ```
 
-If attaching a default instance is not desired, a `hasData` check can be added:
+如果不希望附加默认实例，可以先用 `hasData` 检查：
 
 ```java
 // Check if the chunk has the HANDLER attachment before doing anything.
@@ -70,7 +70,7 @@ if (chunk.hasData(HANDLER)) {
 }
 ```
 
-The data can also be updated with `setData`:
+数据也可以通过 `setData` 更新：
 
 ```java
 // Increment mana by 10.
@@ -78,13 +78,13 @@ player.setData(MANA, player.getData(MANA) + 10);
 ```
 
 :::important
-Usually, block entities and chunks need to be marked as dirty when they are modified (with `setChanged` and `setUnsaved(true)`). This is done automatically for calls to `setData`:
+通常，方块实体和区块在被修改时需要被标记为脏（dirty），分别通过 `setChanged` 和 `setUnsaved(true)`。对于 `setData` 调用，这一步会自动完成：
 
 ```java
 chunk.setData(MANA, chunk.getData(MANA) + 10); // will call setUnsaved automatically
 ```
 
-but if you modify some data that you obtained from `getData` (including a newly created default instance) then you must mark block entities and chunks as dirty explicitly:
+但如果你修改的是从 `getData` 获取到的数据（包括新创建的默认实例），那么你必须显式地把方块实体和区块标记为脏：
 
 ```java
 var mana = chunk.getData(MUTABLE_MANA);
@@ -93,17 +93,17 @@ chunk.setUnsaved(true); // must be done manually because we did not use setData
 ```
 :::
 
-## Sharing data with the client
+## 与客户端共享数据 {#sharing-data-with-the-client}
 
-To sync block entity, chunk, or entity attachments to a client, you need to [send a packet to the client][network] yourself. For chunks, you can use `ChunkWatchEvent.Sent` to know when to send chunk data to a player.
+要把方块实体、区块或实体的附加数据同步到客户端，你需要自行[向客户端发送网络包][network]。对于区块，可以使用 `ChunkWatchEvent.Sent` 来得知何时应向玩家发送区块数据。
 
-## Copying data on player death
+## 在玩家死亡时复制数据 {#copying-data-on-player-death}
 
-By default, entity data attachments are not copied on player death. To automatically copy an attachment on player death, set `copyOnDeath` in the attachment builder.
+默认情况下，实体的数据附加不会在玩家死亡时被复制。要在玩家死亡时自动复制某个附加数据，请在附加类型构建器中设置 `copyOnDeath`。
 
-More complex handling can be implemented via `PlayerEvent.Clone` by reading the data from the original entity and assigning it to the new entity. In this event, the `#isWasDeath` method can be used to distinguish between respawning after death and returning from the End. This is important because the data will already exist when returning from the End, so care has to be taken to not duplicate values in this case.
+更复杂的处理可以通过 `PlayerEvent.Clone` 实现：从原实体读取数据并赋给新实体。在该事件中，可以使用 `#isWasDeath` 方法来区分是死亡后重生还是从末地返回。这一点很重要，因为从末地返回时数据已经存在，因此在这种情况下必须注意不要重复复制数值。
 
-For example:
+例如：
 
 ```java
 NeoForge.EVENT_BUS.register(PlayerEvent.Clone.class, event -> {
