@@ -22,6 +22,64 @@
     - 首次执行时，Gradle 会下载 NeoForge 的所有依赖（包括 Minecraft 本身）并对其反编译。这可能会花费相当长的时间（视你的硬件和网络状况而定，最长可达一小时）。
     - 每当你修改了 Gradle 文件后，都需要重新加载这些 Gradle 变更，可以通过 IDE 中的 “Reload Gradle” 按钮，或再次使用 `gradlew` 终端命令来完成。
 
+:::tip
+译者著：Gradle部署和反编译过程可能很漫长，请考虑参考下述内容为Gradle配置和启用代理
+
+<details>
+
+### 为Gradle配置和启用代理，选其一
+
+- 已经拥有代理，并且启用了全局代理时，在项目根目录下的`gradle.properties`加入：
+
+```properties
+systemProp.http.proxyHost=127.0.0.1
+// 以实际使用时代理软件显示的端口为准
+systemProp.http.proxyPort=7890
+
+systemProp.https.proxyHost=127.0.0.1
+// 以实际使用时代理软件显示的端口为准
+systemProp.https.proxyPort=7890
+
+systemProp.http.nonProxyHosts=localhost|127.*|[::1]
+```
+
+- 无代理，配置国内 Maven 镜像，将项目根目录中的 `settings.gradle` 相关内容调整为：
+
+```groovy
+pluginManagement {
+    repositories {
+        // Gradle Plugin Portal 的阿里云代理
+        maven { url = 'https://maven.aliyun.com/repository/gradle-plugin' }
+
+        // Maven Central 的阿里云代理
+        maven { url = 'https://maven.aliyun.com/repository/central' }
+
+        // NeoGradle/NeoForge 必须保留官方仓库
+        maven { url = 'https://maven.neoforged.net/releases' }
+
+        // 镜像缺少插件时回退到官方 Plugin Portal
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+dependencyResolutionManagement {
+    repositories {
+        // 普通 Java 依赖优先使用国内镜像
+        maven { url = 'https://maven.aliyun.com/repository/central' }
+
+        // 镜像尚未同步新版本时回退到 Maven Central
+        mavenCentral()
+    }
+}
+```
+
+</details>
+:::
+
 ## 自定义你的 Mod 信息 {#customizing-your-mod-information}
 
 Mod 的许多基本属性都可以在 `gradle.properties` 文件中修改，包括 Mod 名称、Mod 版本等基础信息。更多信息请参见 `gradle.properties` 文件中的注释，或参见 [`gradle.properties` 文件的文档][properties]。
