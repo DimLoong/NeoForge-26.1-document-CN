@@ -2,8 +2,7 @@
 
 `BlockEntityRenderer`，常缩写为 BER，用于以静态[烘焙模型][model]（JSON、OBJ 等）无法表现的方式来“渲染”[方块][block]。例如，它可用于动态渲染类箱子方块的容器内容物。方块实体渲染器要求方块拥有一个 [`BlockEntity`][blockentity]，即便该方块本身并不存储任何数据。
 
-
-BER 直接实现 `BlockEntityRenderer`，后者提交其[地物][features]以供渲染：
+创建 BER 时，需要直接实现 `BlockEntityRenderer`，并在其中提交方块实体的[渲染元素][features]：
 
 ```java
 // The generic type in the superinterface should be set to what block entity
@@ -61,7 +60,7 @@ public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderer
 
 ```java
 public class MyBlockEntityRenderer implements BlockEntityRenderer<MyBlockEntity, MyBlockEntityRenderState> {
-    
+
     // ...
 }
 
@@ -79,7 +78,7 @@ public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderer
 
 ## 方块实体渲染状态 {#block-entity-render-states}
 
-正如上面的示例中所提到的，方块实体渲染状态用于从实际方块实体的值中提取出渲染所需的值。它们在功能上是可变的数据存储对象，扩展自 `BlockEntityRenderState`：
+如上例所示，方块实体渲染状态用于从实际的方块实体中提取渲染所需的值。它本质上是一个继承自 `BlockEntityRenderState` 的可变数据存储对象：
 
 ```java
 public class MyBlockEntityRenderState extends BlockEntityRenderState {
@@ -91,7 +90,7 @@ public class MyBlockEntityRenderState extends BlockEntityRenderState {
 
 ## 物品方块渲染 {#item-block-rendering}
 
-由于并非所有带渲染器的方块实体都能用静态物品模型来表现，可以创建一个特殊的渲染器来更动态地控制这一过程。这是通过 [`SpecialModelRenderer`][special] 完成的。在这些情况下，既需要创建一个特殊模型渲染器来提交所需的[地物][features]，也需要一个对应的、已注册的特殊方块模型渲染器，以应对方块本身（而非某个物品变体）被提交渲染的场景（例如末影人搬运方块）。
+并非所有带有渲染器的方块实体都能用静态物品模型表示。此时可以使用 [`SpecialModelRenderer`][special]，以更灵活地控制渲染过程。你既要创建特殊模型渲染器来提交所需的[渲染元素][features]，也要注册对应的特殊方块模型渲染器，供直接提交方块本身而非其物品形态时使用（例如末影人搬运方块）。
 
 更多信息请参阅[客户端物品文档][special]。
 

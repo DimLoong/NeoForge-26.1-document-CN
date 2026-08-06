@@ -8,7 +8,7 @@
 
 `Particle` 定义了在世界中生成并展示给玩家的对象的客户端表示。大多数属性和基础物理由 `gravity`、`lifetime`、`hasPhysics`、`friction` 等字段控制。通常只有两个方法会被重写，即 `tick` 和 `move`，二者的作用正如其名。因此，大多数自定义粒子往往很短，仅包含一个用于设置所需字段的构造函数，偶尔在这两个方法中加以重写。
 
-构造粒子最常见的两种方式：一是继承 `SingleQuadParticle` 的某个实现（例如 `SimpleAnimatedParticle`），它会将一张始终朝向摄像机的纹理绘制（blit）到屏幕上；二是直接继承 `Particle`，从而完整掌控提交渲染的各项[功能][features]。
+构造粒子最常见的方式有两种：一是继承 `SingleQuadParticle` 的某个实现（例如 `SimpleAnimatedParticle`），将始终朝向摄像机的纹理绘制（blit）到屏幕上；二是直接继承 `Particle`，从而完全控制要提交的各项[渲染元素][features]。
 
 ## 单个四边形 {#a-single-quad}
 
@@ -20,7 +20,7 @@
 如果在粒子构造函数中更新了 `age` 或 `lifetime` 字段，应当调用 `setSpriteFromAge` 以显示相应的纹理。
 :::
 
-随后，在[功能提交过程][features]中，`SingleQuadParticle.Layer` 决定使用哪张图集，以及用于将四边形绘制到屏幕的管线。原版默认提供六种层：
+随后，在[渲染元素提交过程][features]中，`SingleQuadParticle.Layer` 决定使用哪张图集，以及使用哪条管线将四边形绘制到屏幕上。原版默认提供六种层：
 
 | 层                    | 纹理图集      | 用途                                                   |
 |:--------------------:|:-------------:|:-------------------------------------------------------|
@@ -127,7 +127,7 @@ public class ComplexParticleGroup extends ParticleGroup<ComplexParticle> {
 }
 ```
 
-一旦 `Particle` 被添加到 `ParticleGroup`，它会在[功能提交][features]期间通过 `ParticleGroup#extractRenderState` 被提取为一个 `ParticleGroupRenderState`。`ParticleGroupRenderState` 兼具两种角色：既是一个包含所提取粒子的渲染状态，又是一个用于提交粒子元素以供渲染的处理器（通过 `#submit`）。
+`Particle` 添加到 `ParticleGroup` 后，系统会在[渲染元素提交][features]期间调用 `ParticleGroup#extractRenderState`，将其数据提取到 `ParticleGroupRenderState` 中。`ParticleGroupRenderState` 既保存所提取粒子的渲染状态，也通过 `#submit` 负责提交待绘制的粒子元素。
 
 ```java
 // The particle group render state

@@ -1134,7 +1134,7 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 
 ## 特殊模型 {#special-models}
 
-并非所有模型都能用基础的模型 JSON 表示。有些模型可能包含动态组件，或使用为 [`BlockEntityRenderer`][ber] 创建的现有 `Model`。在这些情况下，有一种特殊模型类型，允许用户指定要提交渲染的 [feature][features]。它们被称为 `SpecialModelRenderer`，定义在 `SpecialModelRenderers` 中。
+并非所有模型都能用基础的模型 JSON 表示。有些模型可能包含动态组件，或使用为 [`BlockEntityRenderer`][ber] 创建的现有 `Model`。在这些情况下，可以使用一种特殊模型类型，自行指定要提交的[渲染元素][features]。这种渲染器称为 `SpecialModelRenderer`，其原版实现定义在 `SpecialModelRenderers` 中。
 
 <Tabs>
 <TabItem value="json" label="JSON" default>
@@ -1201,7 +1201,7 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 </TabItem>
 </Tabs>
 
-创建自己的 `SpecialModelRenderer` 分为三部分：用于提交渲染物品所需 [feature][features] 的 `SpecialModelRenderer` 实例、用于读写 JSON 的 `SpecialModelRenderer.Unbaked` 实例，以及将该渲染器注册为物品使用（必要时也注册为方块使用）。
+创建自己的 `SpecialModelRenderer` 包含三部分：用于提交物品[渲染元素][features]的 `SpecialModelRenderer` 实例、用于读写 JSON 的 `SpecialModelRenderer.Unbaked` 实例，以及供物品使用该渲染器的注册代码（必要时也为方块注册）。
 
 首先是 `SpecialModelRenderer`。它的工作方式与其他任何渲染器类（例如方块实体渲染器、实体渲染器）类似。它应接收提交过程中使用的静态数据（例如 `Model` 子类、纹理的 `SpriteId` 等）。有两个方法需要注意。第一个是 `extractArgument`。它用于只从 `ItemStack` 中提供必要的数据，从而限制 `submit` 方法可用的数据量。
 
@@ -1209,7 +1209,7 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 如果你不确定可能需要哪些数据，可以让它直接返回相应的 `ItemStack`。如果你不需要来自物品堆叠的任何数据，则可以改用 `NoDataSpecialModelRenderer`，它已为你实现了该方法。
 :::
 
-接下来是 `submit` 方法。它接收 `extractArgument` 返回的值、pose stack、用于提交所需 feature 的收集器、打包光照、覆盖层纹理、物品堆叠是否带有附魔光效（例如已附魔），以及轮廓颜色。所有 feature 的提交都应在该方法中进行。
+接下来是 `submit` 方法。它接收 `extractArgument` 的返回值、姿态栈、用于提交所需渲染元素的收集器、打包光照值、覆盖层纹理、物品堆叠是否带有附魔光效，以及轮廓颜色。所有渲染元素都应在该方法中提交。
 
 ```java
 public record ExampleSpecialRenderer(SpriteGetter spriteGetter, Model.Simple model, SpriteId sprite) implements SpecialModelRenderer<Boolean> {
@@ -1462,7 +1462,7 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 
 ## 手动提交物品进行渲染 {#manually-submitting-an-item-for-rendering}
 
-如果你需要提交一个物品 [feature][features]，例如在某个 `BlockEntityRenderer` 或 `EntityRenderer` 中，可以通过三个步骤实现。首先，相应的渲染器创建一个 `ItemStackRenderState` 来保存物品堆叠的状态。然后，`ItemModelResolver` 使用其某个方法更新 `ItemStackRenderState`，把状态更新为当前正在提交的物品。最后，通过 `ItemStackRenderState#submit` 提交该物品。
+如果需要在 `BlockEntityRenderer` 或 `EntityRenderer` 等位置手动提交物品的[渲染元素][features]，可以分三步完成。首先，由相应的渲染器创建 `ItemStackRenderState`，用于保存物品堆叠的状态。然后，调用 `ItemModelResolver` 的相应方法，根据当前要提交的物品更新该状态。最后，通过 `ItemStackRenderState#submit` 提交物品。
 
 `ItemStackRenderState` 负责追踪绘制所用的数据。每个“模型”都拥有自己的 `ItemStackRenderState.LayerRenderState`，其中包含要渲染的 `BakedQuad`，以及它的渲染类型、附魔光效状态、染色信息、动画标志、范围（extents）以及所用的任何特殊渲染器。图层通过 `newLayer` 方法创建，并通过 `clear` 方法清空以便渲染。如果使用了预定数量的图层，则用 `ensureCapacity` 确保有足够数量的 `LayerRenderStates` 以正确渲染。
 
@@ -1644,7 +1644,7 @@ protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerat
 [capability]: ../../../inventories/capabilities.md#registering-capabilities
 [composite]: modelloaders.md#composite-model
 [features]: ../../../rendering/feature.md
-[itemmodel]: #manually-rendering-an-item
+[itemmodel]: #manually-submitting-an-item-for-rendering
 [modbus]: ../../../concepts/events.md#event-buses
 [models]: modelsystem.md
 [rl]: ../../../misc/identifier.md

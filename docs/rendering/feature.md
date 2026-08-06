@@ -1,13 +1,13 @@
 ---
 sidebar_position: 1
 ---
-# 功能 {#features}
+# 渲染元素 {#features}
 
-渲染功能定义了一组未烘焙进世界几何体的对象，例如实体、文本和粒子。这些对象通常具有动态位置，因此像下落中的方块、手持的方块和物品也归入此类。功能渲染器的目的，正是为了更好地批处理并排序绘制到屏幕上的这些对象。功能渲染器分为两个阶段：提交阶段，收集所有功能；以及渲染阶段，渲染收集到的功能。
+渲染元素是指未烘焙到世界几何体中的一类对象，例如实体、文本和粒子。这些对象的位置通常会动态变化，因此下落中的方块以及被拿在手中的方块和物品也属于渲染元素。渲染元素系统负责对这些待绘制对象进行批处理，并安排其绘制顺序。整个过程分为两个阶段：提交阶段收集所有渲染元素，渲染阶段再将收集到的元素绘制到屏幕上。
 
-## 提交功能 {#submitting-features}
+## 提交渲染元素 {#submitting-features}
 
-功能提交通常由负责这些对象的底层子系统处理：[实体交由 `EntityRenderer`][entities]、[方块实体交由 `BlockEntityRenderer`][blockentities]、[粒子交由 `ParticleGroupRenderState`][particles] 等。每个子系统都提供各自的 `submit` 方法，通常接收该对象的某种通用渲染状态。所需的元素随后通过 `SubmitNodeCollector` 提交，并存入 `SubmitNodeCollection` 树状映射中以供渲染。
+渲染元素通常由相应的底层子系统提交，例如：[实体由 `EntityRenderer` 负责][entities]，[方块实体由 `BlockEntityRenderer` 负责][blockentities]，[粒子由 `ParticleGroupRenderState` 负责][particles]。这些子系统各自提供 `submit` 方法，通常接收对应对象的通用渲染状态。该方法通过 `SubmitNodeCollector` 提交所需元素，并将其存入 `SubmitNodeCollection` 的树形映射中，供渲染阶段使用。
 
 下列方法通过该收集器提供，按其最终渲染的顺序排列：
 
@@ -23,8 +23,8 @@ sidebar_position: 1
 | `submitMovingBlock`        | 一组带动态光照的 `BlockStateModelPart`。                                                      |
 | `submitBlockModel`         | 一个带烘焙光照的 `BlockStateModel`。                                                          |
 | `submitBreakingBlockModel` | 叠加在 `BlockStateModel` 之上的方块破碎覆盖层。                                               |
-| `submitItem`               | 一个已解构的 `ItemStackRenderState`。                                                         |
-| `submitCustomGeometry`     | 一个任意方法，用于定义上传到给定 `RenderType` 缓冲区的顶点。                                  |
+| `submitItem`               | 一个拆解后的 `ItemStackRenderState`。                                                         |
+| `submitCustomGeometry`     | 一个自定义方法，用于定义上传到指定 `RenderType` 缓冲区的顶点。                                |
 | `submitParticleGroup`      | 一个用于缓存并写入一批粒子四边形的渲染器。                                                    |
 
 NeoForge 还添加了 `submitMultiLayerBlockModel`，用于提交一组 `BlockStateModelPart`，并完整支持逐四边形的渲染类型，而不是将所有四边形塞进单一的类型层。
@@ -33,7 +33,7 @@ NeoForge 还添加了 `submitMultiLayerBlockModel`，用于提交一组 `BlockSt
 提交给收集器的每个元素在方法被调用后都应视为不可变。像 `PoseStack` 这样的元素会在此时被拍下快照，以防止后续任何改动。
 :::
 
-从技术上讲，上面列出的所有方法都属于父接口 `OrderedSubmitNodeCollector`。这是因为收集器可以将功能分组到若干“order”中，每个 order 代表渲染器的一次绘制通道。默认情况下，所有功能都在 order 0 上渲染，也就是说它们会按照下文定义的渲染顺序绘制。编号较小的 order 会先渲染，编号较大的 order 则在之后渲染。`SubmitNodeCollector#order` 可用于指定元素绘制的 order：
+从技术上讲，上述方法都定义在父接口 `OrderedSubmitNodeCollector` 中。收集器可以将渲染元素划分到不同的顺序层（order），每一层代表渲染器的一次绘制通道。所有元素默认位于顺序层 0，并按照下文给出的渲染顺序绘制。编号较小的顺序层先绘制，编号较大的后绘制。可通过 `SubmitNodeCollector#order` 指定元素所在的顺序层：
 
 ```java
 // Assume we have some SubmitNodeCollector collector
@@ -48,11 +48,11 @@ collector.order(-1).submitBlockModel(...);
 collector.order(1).submitParticleGroup(...);
 ```
 
-## 渲染功能 {#rendering-features}
+## 绘制渲染元素 {#rendering-features}
 
-功能渲染由 `FeatureRenderDispatcher` 通过 `renderAllFeatures` 处理，它会渲染 `SubmitNodeStorage` 中所持有的 `SubmitNodeCollection` 树状映射内已提交的对象。该分发器包含一个渲染器类的列表，每个渲染器负责渲染某一类已提交的对象。这一顺序分为两个阶段：渲染实心功能，以及渲染透明几何体。
+渲染阶段由 `FeatureRenderDispatcher#renderAllFeatures` 处理。它会读取 `SubmitNodeStorage` 所持有的 `SubmitNodeCollection` 树形映射，并绘制其中已提交的对象。该分发器维护一组渲染器类，每个类负责一种已提交对象。绘制分为两个阶段：先绘制不透明渲染元素，再绘制透明几何体。
 
-对于实心功能，在给定的“order”内，功能按以下顺序渲染：
+在同一个顺序层中，不透明渲染元素按以下顺序绘制：
 
 - 模型
 - 模型部件
@@ -65,7 +65,7 @@ collector.order(1).submitParticleGroup(...);
 - 自定义几何体
 - 粒子
 
-对于透明功能，在给定的“order”内，功能按以下顺序渲染：
+在同一个顺序层中，透明渲染元素按以下顺序绘制：
 
 - 阴影
 - 模型
@@ -78,11 +78,11 @@ collector.order(1).submitParticleGroup(...);
 - NeoForge 的多层方块模型
 - 自定义几何体
 
-透明粒子会在所有透明功能渲染完毕后，作为独立的一趟通道渲染。
+所有透明渲染元素绘制完毕后，透明粒子会在单独的通道中绘制。
 
-功能渲染完成后，`SubmitNodeStorage` 会被清空以备下次使用。功能渲染器每帧可能被多次调用，因为它不仅用于世界，还用于手持物品和[画中画 GUI 渲染器][gui]。请注意，在那些情况下，`renderAllFeatures` 之后会跟一个 `MultiBufferSource.BufferSource#endBatch` 调用，用于构建网格并将其绘制到缓冲区。
+渲染元素绘制完成后，`SubmitNodeStorage` 会被清空以备下次使用。该渲染系统不仅用于世界，还用于手持物品和[画中画 GUI 渲染器][gui]，因此每帧可能调用多次。在后两种情况下，调用 `renderAllFeatures` 后还会调用 `MultiBufferSource.BufferSource#endBatch`，以构建网格并将其绘制到缓冲区。
 
-[blockentities]: ../blockentities/ber.md#blockentityrenderer
-[entities]: ../entities/renderer.md#entity-renderers
+[blockentities]: ../blockentities/ber.md
+[entities]: ../entities/renderer.md
 [gui]: screens.md#picture-in-picture
-[particles]: #TODO
+[particles]: particles.md#particle-groups-and-render-states

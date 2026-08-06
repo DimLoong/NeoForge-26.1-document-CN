@@ -100,7 +100,9 @@
 | damage type | 伤害类型 | |
 | biome modifier | 生物群系修改器（BiomeModifier） | |
 | world generation / worldgen | 世界生成 | |
-| feature | 地物（Feature） | 世界生成语境；渲染语境另议 |
+| feature | 地物（Feature） | 仅限世界生成语境；渲染管线中译为“渲染元素” |
+| rendering feature | 渲染元素 | 指提交到渲染收集器、稍后统一绘制的模型、文本、粒子等对象 |
+| feature submission | 渲染元素提交 | 渲染管线语境 |
 | model | 模型 | |
 | texture | 纹理 | |
 | sound | 声音 | |
@@ -162,7 +164,7 @@
 | 英文 | 正确译法 | 常见错误 |
 | --- | --- | --- |
 | side（logical/physical） | 端（逻辑端/物理端） | 误译为“边/侧” |
-| feature | 世界生成语境为“地物”；渲染语境为“功能/特性” | 一律译“特征” |
+| feature | 世界生成语境为“地物”；渲染管线语境为“渲染元素” | 不分语境一律译为“地物”“功能”或“特征” |
 | dedicated server | 专用服务端 | “专注服务器” |
 | vanilla | 原版 | “香草” |
 | render / rendering | 渲染 | “翻译”（同形词 render） |
@@ -181,5 +183,3 @@
 - 中文正文使用中文标点（，。：；“”（）），代码/标识符内保持英文标点。
 - 中英文之间、中文与行内代码之间可留空格以提升可读性（全文统一）。
 - 标题简洁、便于导航，术语与正文一致。
-</content>
-</invoke>

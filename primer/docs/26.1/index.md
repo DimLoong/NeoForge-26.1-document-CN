@@ -2145,7 +2145,7 @@ builder.put(
 );
 ```
 
-在功能提交过程中，块模型通过 `BlockModelResolver` 和 `BlockModelRenderState` 进行处理。这与其他渲染状态的工作方式类似。首先，`BlockModelResolver#update` 设置 `BlockModelRenderState`。设置是通过基本路径 -`BlockModelRenderState#setupModel` 处理的，将模型部件添加到返回的列表中，然后是 `setupTints`，或者通过 `setupSpecialModel` 处理特殊渲染器。然后，渲染状态通过 `BlockModelRenderState#submit` 提交其元素进行渲染。渲染状态还提供使用轮廓渲染类型的 `submitOnlyOutline` 和使用出售的实体前向 Z 偏移渲染类型的 `submitWithZOffset`。
+提交渲染元素时，方块模型由 `BlockModelResolver` 和 `BlockModelRenderState` 处理，其流程与其他渲染状态类似。首先，`BlockModelResolver#update` 初始化 `BlockModelRenderState`。普通模型会依次经过 `BlockModelRenderState#setupModel` 和 `setupTints`：前者把模型部件加入返回的列表，后者设置色调；特殊渲染器则由 `setupSpecialModel` 处理。随后，渲染状态通过 `BlockModelRenderState#submit` 提交待绘制元素。此外，它还提供 `submitOnlyOutline` 和 `submitWithZOffset`，前者使用轮廓渲染类型，后者使用带前向 Z 偏移的实体实心渲染类型。
 
 ```java
 // BlockEntity example
@@ -2283,7 +2283,7 @@ colors.register(
 
 ### 删除旧的块和物品渲染器 {#removing-the-old-block-and-item-renderers}
 
-由于 `ItemModel`s 和 `BlockModel` 现在完全通过自己的功能提交管道进行处理，因此 `BlockRenderDispatcher` 和 `ItemRenderer` 已被完全删除，并由相应的系统取代。
+由于 `ItemModel` 和 `BlockModel` 现在完全由各自的渲染元素提交管线处理，`BlockRenderDispatcher` 和 `ItemRenderer` 已被移除，并由相应的新系统取代。
 
 ### 对象定义转换 {#object-definition-transformations}
 

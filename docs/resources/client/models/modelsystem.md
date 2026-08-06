@@ -137,7 +137,7 @@ public static void modifyBakingResult(ModelEvent.ModifyBakingResult event) {
 [clientitem]: items.md
 [event]: ../../../concepts/events.md
 [extended]: ../../../advanced/extensibleenums.md#creating-an-enum-entry
-[itemmodels]: items.md#manually-rendering-an-item
+[itemmodels]: items.md#manually-submitting-an-item-for-rendering
 [itemmodelsection]: #item-models
 [livingentity]: ../../../entities/livingentity.md
 [modbus]: ../../../concepts/events.md#event-buses
